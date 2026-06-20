@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0,09090b,0d0d12,1a1a2e&height=220&section=header&text=BicepsApp&fontSize=90&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Gym+Management+System+%E2%80%94+Wreck+%26+Build+Fitness&descAlignY=60&descSize=18&descColor=a1a1aa" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=09090b&height=220&section=header&text=BicepsApp&fontSize=90&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Gym+Management+System+%E2%80%94+Wreck+%26+Build+Fitness&descAlignY=60&descSize=18&descColor=a1a1aa" width="100%"/>
 
 <br/>
 
@@ -348,6 +348,6 @@ by [Konete326](https://github.com/Konete326)
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0,1a1a2e,0d0d12,09090b&height=120&section=footer&animation=fadeIn" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=09090b&height=120&section=footer&animation=fadeIn" width="100%"/>
 
 </div>
