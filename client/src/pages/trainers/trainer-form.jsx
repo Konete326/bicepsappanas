@@ -76,7 +76,7 @@ export default function TrainerForm() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-xl font-bold mb-6 font-outfit uppercase">{id ? "Edit Trainer" : "Register Trainer"}</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
         <div>
           <Label htmlFor="fullName">Full Name</Label>
           <Input id="fullName" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} required />
@@ -97,7 +97,7 @@ export default function TrainerForm() {
           <Label htmlFor="commission">Commission Rate Per Session (PKR)</Label>
           <Input id="commission" type="number" min={0} value={formData.commissionRate} onChange={(e) => setFormData({ ...formData, commissionRate: parseInt(e.target.value) || 0 })} required />
         </div>
-        <div className="sm:col-span-4 flex justify-end gap-2 pt-4 border-t border-stone-100">
+        <div className="sm:col-span-2 flex justify-end gap-2 pt-4 border-t border-stone-100">
           <Button type="button" onClick={() => navigate("/trainers")}>Cancel</Button>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? "Saving..." : "Save Trainer"}

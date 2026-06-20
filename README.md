@@ -1,6 +1,5 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=09090b&height=220&section=header&text=BicepsApp&fontSize=90&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Gym+Management+System+%E2%80%94+Wreck+%26+Build+Fitness&descAlignY=60&descSize=18&descColor=a1a1aa" width="100%"/>
 
 <br/>
 

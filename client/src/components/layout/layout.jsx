@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Sidebar } from "./sidebar";
 import { Footer } from "./footer";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Menu } from "lucide-react";
+import { Menu, History } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function Layout({ children, title, description }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -53,6 +55,23 @@ export function Layout({ children, title, description }) {
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2">
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                asChild
+                                                className="relative text-stone-600 hover:text-stone-900 border-none bg-transparent"
+                                            >
+                                                <Link to="/changelog">
+                                                    <History className="h-5 w-5" />
+                                                </Link>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom" className="text-xs">
+                                            Changelog
+                                        </TooltipContent>
+                                    </Tooltip>
                                     <NotificationBell />
                                 </div>
                             </div>

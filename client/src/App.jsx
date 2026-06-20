@@ -28,6 +28,8 @@ import MeasurementHistory from "@/pages/measurements/measurement-history";
 import RoutineForm from "@/pages/routines/routine-form";
 import RoutineView from "@/pages/routines/routine-view";
 import Reports from "@/pages/reports";
+import Changelog from "@/pages/changelog";
+import License from "@/pages/license";
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -68,6 +70,8 @@ function Router() {
 
       <Route path="/notifications" element={<ProtectedRoute><Layout title="System Alerts"><Notifications /></Layout></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><Layout title="Gym Financial Reports"><Reports /></Layout></ProtectedRoute>} />
+      <Route path="/changelog" element={<ProtectedRoute><Layout title="Changelog"><Changelog /></Layout></ProtectedRoute>} />
+      <Route path="/license" element={<Layout title="License & Legal"><License /></Layout>} />
       <Route path="/about" element={<Layout title="About Wreck & Build Gym"><About /></Layout>} />
       <Route path="/auth/sign-in" element={user ? <Navigate to="/" replace /> : <SignIn />} />
       <Route path="*" element={<NotFound />} />

@@ -43,7 +43,7 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 max-w-4xl mx-auto p-4 border border-stone-200 rounded-xl bg-white shadow-sm">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto p-4 border border-stone-200 rounded-xl bg-white shadow-sm">
       <div>
         <Label htmlFor="planName">Plan Name</Label>
         <Input
@@ -83,7 +83,7 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
       </div>
-      <div className="sm:col-span-4 flex justify-end gap-2 pt-2">
+      <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
         {onCancel && (
           <Button type="button" onClick={onCancel}>
             Cancel

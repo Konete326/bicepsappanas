@@ -90,8 +90,8 @@ export default function MeasurementForm() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-xl font-bold mb-6 font-outfit uppercase">Log Body Measurements</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
-        <div className="sm:col-span-4">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
+        <div className="sm:col-span-2">
           <Label htmlFor="memberSelect">Select Member</Label>
           <Select value={memberId} onValueChange={setMemberId}>
             <SelectTrigger id="memberSelect"><SelectValue placeholder="Choose member" /></SelectTrigger>
@@ -110,13 +110,13 @@ export default function MeasurementForm() {
         <div><Label htmlFor="legs">Thighs / Legs (inches)</Label><Input id="legs" type="number" step="0.1" value={legs} onChange={(e) => setLegs(e.target.value)} required /></div>
 
         {weight && height && (
-          <div className="sm:col-span-4 p-3 bg-stone-50 border border-stone-200 rounded-lg text-xs space-y-1">
+          <div className="sm:col-span-2 p-3 bg-stone-50 border border-stone-200 rounded-lg text-xs space-y-1">
             <p><strong>Calculated BMI Category:</strong> {bmiDetails.category}</p>
             <p className="text-stone-600 font-semibold">{bmiDetails.tips}</p>
           </div>
         )}
 
-        <div className="sm:col-span-4 flex justify-end gap-2 pt-4 border-t border-stone-100">
+        <div className="sm:col-span-2 flex justify-end gap-2 pt-4 border-t border-stone-100">
           <Button type="button" onClick={() => navigate("/measurements")}>Cancel</Button>
           <Button type="submit" disabled={mutation.isPending}>Save Stats</Button>
         </div>
