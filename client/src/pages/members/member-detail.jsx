@@ -31,7 +31,7 @@ export default function MemberDetail() {
       <div className="p-6 text-center space-y-4">
         <p className="text-stone-500">Member not found.</p>
         <Link to="/members">
-          <Button variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Directory</Button>
+          <Button><ArrowLeft className="mr-2 h-4 w-4" /> Back to Directory</Button>
         </Link>
       </div>
     );
@@ -41,7 +41,7 @@ export default function MemberDetail() {
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/members">
-          <Button variant="outline" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
+          <Button size="icon"><ArrowLeft className="h-4 w-4" /></Button>
         </Link>
         <h2 className="text-xl font-bold text-stone-900 font-outfit uppercase">Member Profile</h2>
       </div>
@@ -95,7 +95,7 @@ export default function MemberDetail() {
                   <Button size="sm"><CreditCard className="mr-2 h-4 w-4" /> Pay Fees</Button>
                 </Link>
                 <Link to={`/measurements/new?memberId=${member._id}`}>
-                  <Button size="sm" variant="outline"><Ruler className="mr-2 h-4 w-4" /> Log Stats</Button>
+                  <Button size="sm"><Ruler className="mr-2 h-4 w-4" /> Log Stats</Button>
                 </Link>
               </div>
             </CardHeader>

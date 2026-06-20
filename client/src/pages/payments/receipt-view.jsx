@@ -33,7 +33,7 @@ export default function ReceiptView() {
       <div className="p-6 text-center space-y-4">
         <p className="text-stone-500">Receipt not found.</p>
         <Link to="/payments">
-          <Button variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Log</Button>
+          <Button><ArrowLeft className="mr-2 h-4 w-4" /> Back to Log</Button>
         </Link>
       </div>
     );
@@ -43,7 +43,7 @@ export default function ReceiptView() {
     <div className="p-6 space-y-6 max-w-2xl mx-auto">
       <div className="flex justify-between items-center print:hidden">
         <Link to="/payments">
-          <Button variant="outline" size="sm"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Log</Button>
+          <Button size="sm"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Log</Button>
         </Link>
         <Button onClick={handlePrint} size="sm"><Printer className="mr-2 h-4 w-4" /> Print Invoice</Button>
       </div>

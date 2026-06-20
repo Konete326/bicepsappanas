@@ -60,7 +60,6 @@ export default function PaymentGrid({ memberId }) {
             </Badge>
             <Button
               size="sm"
-              variant="outline"
               className="text-[10px] h-7 px-2"
               disabled={toggleMutation.isPending}
               onClick={() => toggleMutation.mutate(idx)}

@@ -86,7 +86,7 @@ export default function LedgerEntryForm() {
         </div>
 
         <div className="sm:col-span-4 flex justify-end gap-2 pt-4 border-t border-stone-100">
-          <Button type="button" variant="outline" onClick={() => navigate(`/trainers/${id}/ledger`)}>Cancel</Button>
+          <Button type="button" onClick={() => navigate(`/trainers/${id}/ledger`)}>Cancel</Button>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? "Logging..." : "Confirm Entry"}
           </Button>

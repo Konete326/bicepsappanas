@@ -117,7 +117,7 @@ export default function MeasurementForm() {
         )}
 
         <div className="sm:col-span-4 flex justify-end gap-2 pt-4 border-t border-stone-100">
-          <Button type="button" variant="outline" onClick={() => navigate("/measurements")}>Cancel</Button>
+          <Button type="button" onClick={() => navigate("/measurements")}>Cancel</Button>
           <Button type="submit" disabled={mutation.isPending}>Save Stats</Button>
         </div>
       </form>

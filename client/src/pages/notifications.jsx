@@ -32,7 +32,7 @@ export default function Notifications() {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-stone-900 font-outfit uppercase">System Notifications</h2>
         {notifications?.length > 0 && (
-          <Button size="sm" variant="outline" onClick={() => clearMutation.mutate()} disabled={clearMutation.isPending}>
+          <Button size="sm" onClick={() => clearMutation.mutate()} disabled={clearMutation.isPending}>
             <CheckCircle className="mr-2 h-4 w-4" /> Clear All
           </Button>
         )}

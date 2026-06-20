@@ -69,10 +69,10 @@ export default function RoutineForm() {
   }
 
   return (
-    <div className="p-6 max-w-lg mx-auto">
+    <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-xl font-bold mb-6 font-outfit uppercase">Design Gym Routine</h2>
-      <form onSubmit={handleSubmit} className="space-y-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
-        <div>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
+        <div className="sm:col-span-4">
           <Label htmlFor="exercises">Exercise Schedule / Splits Description</Label>
           <Textarea
             id="exercises"
@@ -96,8 +96,8 @@ export default function RoutineForm() {
           />
         </div>
 
-        <div className="flex justify-end gap-2 pt-4 border-t border-stone-100">
-          <Button type="button" variant="outline" onClick={() => navigate("/routines")}>Cancel</Button>
+        <div className="sm:col-span-4 flex justify-end gap-2 pt-4 border-t border-stone-100">
+          <Button type="button" onClick={() => navigate("/routines")}>Cancel</Button>
           <Button type="submit" disabled={mutation.isPending}>Save Guidelines</Button>
         </div>
       </form>

@@ -61,7 +61,7 @@ export default function TrainerList() {
                     <TableCell>PKR {t.commissionRate} / Session</TableCell>
                     <TableCell className="text-right space-x-2">
                       <Link to={`/trainers/${t._id}/ledger`}>
-                        <Button size="sm" variant="outline" className="h-8">
+                        <Button size="sm" className="h-8">
                           <BookOpen className="mr-2 h-4 w-4" /> Ledger
                         </Button>
                       </Link>

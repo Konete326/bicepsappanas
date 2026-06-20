@@ -23,7 +23,7 @@ export default function DuesReport() {
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/payments">
-          <Button variant="outline" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
+          <Button size="icon"><ArrowLeft className="h-4 w-4" /></Button>
         </Link>
         <h2 className="text-xl font-bold text-stone-900 font-outfit uppercase">Outstanding Dues Report</h2>
       </div>

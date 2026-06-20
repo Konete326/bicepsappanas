@@ -149,7 +149,7 @@ export default function MemberForm() {
           </Select>
         </div>
         <div className="sm:col-span-4 flex justify-end gap-2 pt-4 border-t border-stone-100">
-          <Button type="button" variant="outline" onClick={() => navigate("/members")}>Cancel</Button>
+          <Button type="button" onClick={() => navigate("/members")}>Cancel</Button>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
             Save Member

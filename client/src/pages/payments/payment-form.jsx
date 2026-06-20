@@ -139,7 +139,7 @@ export default function PaymentForm() {
         )}
 
         <div className="sm:col-span-4 flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={() => navigate("/payments")}>Cancel</Button>
+          <Button type="button" onClick={() => navigate("/payments")}>Cancel</Button>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? "Recording..." : "Record Payment"}
           </Button>

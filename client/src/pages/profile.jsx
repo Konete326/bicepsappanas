@@ -33,9 +33,9 @@ export default function Profile() {
 
   const [formData, setFormData] = useState({
     name: user?.name || "",
-    brandName: user?.brandName || "Happy Hanger",
-    brandLogo: user?.brandLogo || "",
-    phoneNumber: user?.phoneNumber || "+92 300 0000000"
+    gymName: user?.gymName || "Wreck & Build Ladies & Gents Fitness Gym",
+    gymAddress: user?.gymAddress || "Nazimabad No 5, Karachi",
+    phone: user?.phone || "+92 300 0000000"
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -53,7 +53,7 @@ export default function Profile() {
       }
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, brandLogo: reader.result });
+        setFormData({ ...formData, gymLogo: reader.result });
       };
       reader.readAsDataURL(file);
     }
@@ -75,7 +75,7 @@ export default function Profile() {
 
       if (response.data.status === "success") {
         updateUser(response.data.data.user);
-        toast({ title: "Profile Updated", description: "Your brand identity has been saved successfully." });
+        toast({ title: "Profile Updated", description: "Your gym profile has been saved successfully." });
         setIsEditing(false);
       }
     } catch (error) {
@@ -131,8 +131,8 @@ export default function Profile() {
                 onClick={handleAvatarClick}
                 className="w-24 h-24 border-4 border-stone-800 shadow-2xl overflow-hidden cursor-pointer"
               >
-                {formData.brandLogo ? (
-                  <AvatarImage src={formData.brandLogo} className="object-cover" />
+                {formData.gymLogo ? (
+                  <AvatarImage src={formData.gymLogo} className="object-cover" />
                 ) : (
                   <AvatarImage src="/logo.png" className="object-cover opacity-50" />
                 )}
@@ -150,7 +150,7 @@ export default function Profile() {
             </div>
 
             <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl font-bold">{formData.brandName}</h1>
+              <h1 className="text-3xl font-bold">{formData.gymName}</h1>
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2 text-stone-400">
                 <span className="flex items-center text-sm">
                   <UserIcon className="w-4 h-4 mr-1.5" />
@@ -166,11 +166,10 @@ export default function Profile() {
             {!isEditing ? (
               <Button
                 onClick={() => setIsEditing(true)}
-                variant="outline"
                 className="bg-transparent border-white/20 text-white hover:bg-white/10"
               >
                 <Edit className="w-4 h-4 mr-2" />
-                Edit Brand Identity
+                Edit Gym Profile
               </Button>
             ) : (
               <div className="flex space-x-2">
@@ -193,27 +192,27 @@ export default function Profile() {
             <CardHeader className="border-b border-stone-100 bg-stone-50/50">
               <CardTitle className="text-lg flex items-center">
                 <Store className="w-5 h-5 mr-2 text-stone-500" />
-                Store Branding
+                Gym Profile
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
               {isEditing ? (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="brandName">Store/Brand Name</Label>
+                    <Label htmlFor="gymName">Gym Name</Label>
                     <Input
-                      id="brandName"
-                      value={formData.brandName}
-                      onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-                      placeholder="e.g. Happy Hanger"
+                      id="gymName"
+                      value={formData.gymName}
+                      onChange={(e) => setFormData({ ...formData, gymName: e.target.value })}
+                      placeholder="e.g. Wreck & Build Fitness Gym"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phoneNumber">Contact Number (Print on Receipt)</Label>
+                    <Label htmlFor="phone">Contact Number</Label>
                     <Input
-                      id="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="+92 3XX XXXXXXX"
                     />
                   </div>
@@ -230,12 +229,12 @@ export default function Profile() {
               ) : (
                 <>
                   <div className="space-y-1">
-                    <Label className="text-stone-500 text-xs uppercase tracking-wider">Display Brand Name</Label>
-                    <p className="font-semibold text-lg text-stone-900">{user?.brandName || "Happy Hanger"}</p>
+                    <Label className="text-stone-500 text-xs uppercase tracking-wider">Gym Name</Label>
+                    <p className="font-semibold text-lg text-stone-900">{user?.gymName || "Wreck & Build Ladies & Gents Fitness Gym"}</p>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-stone-500 text-xs uppercase tracking-wider">Contact Number (Print on Receipt)</Label>
-                    <p className="font-medium text-stone-900">{user?.phoneNumber || "+92 3XX XXXXXXX"}</p>
+                    <Label className="text-stone-500 text-xs uppercase tracking-wider">Contact Number</Label>
+                    <p className="font-medium text-stone-900">{user?.phone || "+92 3XX XXXXXXX"}</p>
                   </div>
                   <div className="space-y-1">
                     <Label className="text-stone-500 text-xs uppercase tracking-wider">Admin/Owner Name</Label>
@@ -283,7 +282,6 @@ export default function Profile() {
               </div>
               <Button
                 onClick={() => setIsPasswordModalOpen(true)}
-                variant="outline"
                 className="border-stone-300 hover:bg-stone-900 hover:text-white transition-all"
               >
                 Update Password
@@ -299,14 +297,14 @@ export default function Profile() {
         <DialogContent className="max-w-md p-0 overflow-hidden border-0 bg-transparent shadow-none">
           <DialogHeader className="sr-only">
             <DialogTitle>Logo Preview</DialogTitle>
-            <DialogDescription>Full size preview of your brand logo.</DialogDescription>
+            <DialogDescription>Full size preview of your gym logo.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="relative w-full aspect-square bg-white rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center p-8 border border-stone-100">
-              {formData.brandLogo ? (
-                <img src={formData.brandLogo} alt="Brand Logo" className="max-w-full max-h-full object-contain" />
+              {formData.gymLogo ? (
+                <img src={formData.gymLogo} alt="Gym Logo" className="max-w-full max-h-full object-contain" />
               ) : (
-                <div className="text-stone-300 text-8xl font-black">{formData.brandName?.[0]}</div>
+                <div className="text-stone-300 text-8xl font-black">{formData.gymName?.[0]}</div>
               )}
             </div>
             <Button onClick={() => setIsPreviewOpen(false)} variant="secondary" className="bg-white/10 text-white hover:bg-white/20 border-white/20 backdrop-blur-md">

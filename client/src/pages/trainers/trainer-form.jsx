@@ -98,7 +98,7 @@ export default function TrainerForm() {
           <Input id="commission" type="number" min={0} value={formData.commissionRate} onChange={(e) => setFormData({ ...formData, commissionRate: parseInt(e.target.value) || 0 })} required />
         </div>
         <div className="sm:col-span-4 flex justify-end gap-2 pt-4 border-t border-stone-100">
-          <Button type="button" variant="outline" onClick={() => navigate("/trainers")}>Cancel</Button>
+          <Button type="button" onClick={() => navigate("/trainers")}>Cancel</Button>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? "Saving..." : "Save Trainer"}
           </Button>

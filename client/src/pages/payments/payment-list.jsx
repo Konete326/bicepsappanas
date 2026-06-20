@@ -20,8 +20,8 @@ export default function PaymentList() {
         <h2 className="text-xl font-bold text-stone-900 font-outfit uppercase">Payments & Receipts Log</h2>
         <div className="flex gap-2 w-full sm:w-auto">
           <Link to="/payments/dues" className="flex-1 sm:flex-initial">
-            <Button variant="outline" className="w-full">
-              <AlertCircle className="mr-2 h-4 w-4 text-red-500" /> Dues Report
+            <Button className="w-full">
+              <AlertCircle className="mr-2 h-4 w-4" /> Dues Report
             </Button>
           </Link>
           <Link to="/payments/new" className="flex-1 sm:flex-initial">

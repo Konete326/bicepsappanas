@@ -48,7 +48,7 @@ export default function PlanList() {
               <p className="text-sm text-stone-600">{plan.description || "No description provided."}</p>
             </CardContent>
             <CardFooter className="flex justify-end pt-4 border-t border-stone-100">
-              <Button size="sm" variant="outline" onClick={() => { setEditingPlan(plan); setIsFormOpen(true); }}>
+              <Button size="sm" onClick={() => { setEditingPlan(plan); setIsFormOpen(true); }}>
                 <Edit className="mr-2 h-4.5 w-4.5" /> Edit
               </Button>
             </CardFooter>

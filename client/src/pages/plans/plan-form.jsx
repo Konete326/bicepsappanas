@@ -85,7 +85,7 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
       </div>
       <div className="sm:col-span-4 flex justify-end gap-2 pt-2">
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" onClick={onCancel}>
             Cancel
           </Button>
         )}
