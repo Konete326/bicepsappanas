@@ -107,7 +107,7 @@ export default function TrainerForm() {
         </div>
         <div>
           <Label htmlFor="phone">Phone Number</Label>
-          <Input id="phone" className={getErrClass(errors, "phone")} value={formData.phone} onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); validate("phone", e.target.value); }} onBlur={(e) => validate("phone", e.target.value)} required />
+          <Input id="phone" type="tel" className={getErrClass(errors, "phone")} value={formData.phone} onChange={(e) => { const v = e.target.value.replace(/[^0-9+]/g, ""); setFormData({ ...formData, phone: v }); validate("phone", v); }} onBlur={(e) => validate("phone", formData.phone)} required />
           {errors.phone && <p className="text-[11px] text-red-500 mt-1">{errors.phone}</p>}
         </div>
         <div>

@@ -150,7 +150,7 @@ export default function MemberForm() {
         </div>
         <div>
           <Label htmlFor="cellNo">Cell Number</Label>
-          <Input id="cellNo" className={getErrClass(errors, "cellNo")} value={formData.cellNo} onChange={(e) => { setFormData({ ...formData, cellNo: e.target.value }); validate("cellNo", e.target.value); }} onBlur={(e) => validate("cellNo", e.target.value)} placeholder="+923000000000" required />
+          <Input id="cellNo" type="tel" className={getErrClass(errors, "cellNo")} value={formData.cellNo} onChange={(e) => { const v = e.target.value.replace(/[^0-9+]/g, ""); setFormData({ ...formData, cellNo: v }); validate("cellNo", v); }} onBlur={(e) => validate("cellNo", formData.cellNo)} placeholder="+923000000000" required />
           {errors.cellNo && <p className="text-[11px] text-red-500 mt-1">{errors.cellNo}</p>}
         </div>
         <div>
