@@ -63,8 +63,8 @@ export default function MemberForm() {
   });
 
   useEffect(() => {
-    if (nextRollNo && !id) {
-      setFormData((prev) => ({ ...prev, rollNo: nextRollNo }));
+    if (!id) {
+      setFormData((prev) => ({ ...prev, rollNo: nextRollNo || "0001" }));
     }
   }, [nextRollNo, id]);
 
