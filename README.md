@@ -1,306 +1,353 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=💪%20BicepsApp&fontSize=80&fontColor=fff&animation=twinkling&fontAlignY=35&desc=Gym%20Management%20System%20for%20Wreck%20%26%20Build%20Fitness&descAlignY=60&descSize=20" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0,09090b,0d0d12,1a1a2e&height=220&section=header&text=BicepsApp&fontSize=90&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Gym+Management+System+%E2%80%94+Wreck+%26+Build+Fitness&descAlignY=60&descSize=18&descColor=a1a1aa" width="100%"/>
 
 <br/>
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=24&duration=3000&pause=1000&color=FF6B35&center=true&vCenter=true&multiline=true&repeat=true&width=700&height=100&lines=🏋️+Digitizing+Gym+Management;📊+Smart+Dashboard+for+Admin;💬+WhatsApp+Auto+Alerts;🔥+Built+with+MERN+Stack)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=22&duration=3500&pause=1000&color=FFFFFF&background=09090B00&center=true&vCenter=true&multiline=true&repeat=true&width=750&height=90&lines=A+unified+admin+dashboard+for+gym+operations.;Member+management%2C+payments+%26+digital+receipts.;Trainer+payroll+%26+body+measurement+tracking.;Automated+WhatsApp+billing+alerts+via+Twilio.)](https://git.io/typing-svg)
 
 <br/>
 
-![GitHub last commit](https://img.shields.io/github/last-commit/Konete326/bicepsappanas?style=for-the-badge&color=FF6B35&labelColor=1a1a2e)
-![GitHub repo size](https://img.shields.io/github/repo-size/Konete326/bicepsappanas?style=for-the-badge&color=E94560&labelColor=1a1a2e)
-![GitHub stars](https://img.shields.io/github/stars/Konete326/bicepsappanas?style=for-the-badge&color=f5a623&labelColor=1a1a2e)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white&labelColor=1a1a2e)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white&labelColor=1a1a2e)
-![Node.js](https://img.shields.io/badge/Node.js-LTS-339933?style=for-the-badge&logo=node.js&logoColor=white&labelColor=1a1a2e)
+![GitHub last commit](https://img.shields.io/github/last-commit/Konete326/bicepsappanas?style=for-the-badge&color=ffffff&labelColor=09090b&logo=github&logoColor=white)
+![GitHub repo size](https://img.shields.io/github/repo-size/Konete326/bicepsappanas?style=for-the-badge&color=ffffff&labelColor=09090b&logo=files&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-ffffff?style=for-the-badge&logo=mongodb&logoColor=09090b&labelColor=09090b)
+![React](https://img.shields.io/badge/React-19-ffffff?style=for-the-badge&logo=react&logoColor=09090b&labelColor=09090b)
+![Node.js](https://img.shields.io/badge/Node.js-LTS-ffffff?style=for-the-badge&logo=nodedotjs&logoColor=09090b&labelColor=09090b)
+![Express](https://img.shields.io/badge/Express-v5-ffffff?style=for-the-badge&logo=express&logoColor=09090b&labelColor=09090b)
 
 </div>
 
 ---
 
-## 🏢 About the Gym
+## Overview
 
-> **Wreck & Build Ladies & Gents Fitness Gym**
-> 📍 Nazimabad No 5, Karachi
+**BicepsApp** is a cloud-based Gym Management System built exclusively for **Wreck & Build Ladies & Gents Fitness Gym**, located in Nazimabad No. 5, Karachi. The application replaces the gym's legacy paper-based operations — manual receipt booklets, membership notebooks, cardboard fitness charts, and handwritten salary ledgers — with a centralized, secure, and fully digital admin dashboard.
 
-Yeh gym pehle **100% paper-based system** par chalti thi — manual receipt booklets, membership notebooks, cardboard fitness charts aur register-based salary ledgers. **BicepsApp** ne is poore system ko ek powerful, cloud-based digital platform par shift kar diya.
-
----
-
-## 🚀 What is BicepsApp?
-
-**BicepsApp** ek full-stack **Gym Management System** hai jo specifically **Wreck & Build Fitness Gym** ke liye banaya gaya hai. Yeh ek **unified admin dashboard** provide karta hai jahan se:
-
-- ✅ Members ko manage karo (registration, renewal, status)
-- ✅ Digital receipts generate karo
-- ✅ Trainer salary & advance ledger track karo
-- ✅ Body measurements aur BMI track karo
-- ✅ Custom workout routines & meal plans assign karo
-- ✅ WhatsApp pe automatic dues alerts bhejo
+The system is architected on the **MERN stack** (MongoDB, Express.js, React, Node.js) and integrates Twilio WhatsApp for automated billing notifications and Cloudinary for media asset management.
 
 ---
 
-## 🎯 Core Modules
+## The Problem It Solves
 
-### 🏷️ Module 1 — Member Management & Digital Receipts
+Before BicepsApp, the gym relied entirely on physical documents:
 
-```
-Physical Membership Card  ──►  Members Collection (MongoDB)
-Manual Receipt Booklet    ──►  Payments Collection (MongoDB)
-12-Month Payment Grid     ──►  Digital 12-Column Status Matrix
-```
+| Physical Asset | Problem |
+|---|---|
+| Membership card notebooks | Data loss, no search, no expiry tracking |
+| Manual receipt booklets | Accounting errors, no digital backup |
+| Cardboard fitness charts | No history, no BMI computation |
+| Handwritten advance ledgers | Calculation errors in trainer payroll |
 
-- Member Roll No se fast lookup
-- Sequential Serial No generation (physical booklet se continuity)
-- Cash / Cheque / UPI payment support
-- Dynamic PDF invoice generation
-- Outstanding Dues = Plan Base Fee − Amount Paid
+BicepsApp digitizes all four into a single, coherent system accessible from any device.
 
 ---
 
-### 💰 Module 2 — Trainer Salary & Advance Ledger
+## Core Modules
+
+### 1 — Member Management & Digital Receipt Engine
+
+Manages the complete membership lifecycle — from registration to renewal — and replaces the physical 12-month payment grid on the back of membership cards with a digital status matrix.
+
+**How it works:**
+1. Admin enters the member's Roll Number
+2. System verifies membership status from the `Members` collection
+3. A sequential Serial Number is generated (initialized from the last physical receipt to maintain continuity)
+4. Payment is recorded (Cash / Cheque / UPI) and the 12-month grid is updated
+5. A digital PDF receipt is generated on-demand
 
 ```
-Manual Advance Register  ──►  SalaryLedger Collection (MongoDB)
+Outstanding Dues  =  Plan Base Fee  −  Amount Paid
 ```
-
-**Salary Formula:**
-```
-Net Salary = Base Salary + (Sessions Completed × Session Rate) − Advance Balance
-```
-
-- Advance disburse hone par balance auto-update
-- Monthly payout par advance auto-deduct
-- Negative balance alerts built-in
 
 ---
 
-### 📏 Module 3 — Body Measurements & Progress Tracking
+### 2 — Trainer Salary & Advance Ledger
 
+Replaces the manual advance register with a structured digital ledger that tracks base pay, session commissions, and advance disbursements per trainer.
+
+**Net Salary Formula:**
 ```
-Manual Fitness Chart  ──►  PhysicalMeasurements Collection (MongoDB)
+Net Salary  =  Base Salary  +  (Sessions Completed × Session Rate)  −  Advance Balance
 ```
+
+- Every advance disbursement creates a debit entry; the advance balance updates automatically
+- On monthly payout, the advance balance auto-clears to zero
+- Negative balances trigger system-level alerts
+
+---
+
+### 3 — Body Measurements & Progress Tracking
+
+Digitizes the gym's manual fitness charts into a historical measurement log with BMI computation and progress visualization charts.
 
 **BMI Calculation:**
 ```
-BMI = Weight(kg) / Height(m)²
+BMI  =  Weight (kg)  ÷  Height (m)²
 ```
 
-| BMI Category | Range | System Action |
+| Category | BMI Range | System Response |
 |---|---|---|
-| 🔵 Underweight | < 18.5 | High-protein diet alert bheja jata hai |
-| 🟢 Normal | 18.5 – 24.9 | Continue current plan |
-| 🟡 Overweight | ≥ 25.0 | Max cardio & sets recommendation |
-| 🔴 Obesity | ≥ 30.0 | Urgent intervention alert |
+| Underweight | < 18.5 | Triggers high-protein, high-calorie diet alert |
+| Normal | 18.5 – 24.9 | No action — continue current plan |
+| Overweight | ≥ 25.0 | Triggers increased cardio and max-sets recommendation |
+| Obesity | ≥ 30.0 | Urgent intervention notification dispatched |
 
-**Tracked Measurements:** Weight • Bicep • Shoulder • Chest • Waist • Calf • Leg
-> 📅 Data logging standard: **Har mahine ki 3 tarikh** ko measurements log hoti hain
+**Tracked metrics:** Weight · Bicep · Shoulder · Chest · Waist · Calf · Leg
+
+> Measurements are to be logged on the **3rd of every month** as the system's standard data integrity protocol.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-<div align="center">
+### Frontend
 
-| Layer | Technology |
+| Technology | Purpose |
 |---|---|
-| ⚛️ **Frontend** | React 19 + Vite + Tailwind CSS v4 + shadcn/ui |
-| 🔧 **Backend** | Node.js LTS + Express.js v5 |
-| 🗄️ **Database** | MongoDB Atlas + Mongoose ODM |
-| 🔐 **Auth** | JWT + bcryptjs |
-| 📊 **Charts** | Recharts |
-| 🎞️ **Animations** | Framer Motion |
-| 📋 **Forms** | React Hook Form + Zod |
-| 🔁 **State** | TanStack React Query v5 |
-| 📡 **HTTP** | Axios |
-| 🖼️ **Media** | Cloudinary |
-| 💬 **WhatsApp** | Twilio API |
-| 🚀 **Deployment** | Vercel (Frontend) + Render (Backend) |
+| React 19 + Vite | Component-driven UI, ultra-fast dev server |
+| Tailwind CSS v4 | Utility-first styling |
+| shadcn/ui | 40+ accessible atomic components (Radix-based) |
+| Framer Motion | Page transitions and micro-animations |
+| Recharts | Progress and dashboard data visualization |
+| TanStack React Query v5 | Server-state management and caching |
+| React Router DOM v7 | Client-side routing |
+| React Hook Form + Zod | Form handling and schema validation |
+| Axios | HTTP client for API communication |
+| Lucide React | Icon library |
 
-</div>
+### Backend
+
+| Technology | Purpose |
+|---|---|
+| Node.js (LTS) | JavaScript runtime environment |
+| Express.js v5 | RESTful API framework |
+| Mongoose (ODM) | MongoDB schema modeling and validation |
+| JSON Web Token (JWT) | Stateless admin authentication |
+| bcryptjs | Password hashing |
+| Multer | File upload handling |
+| date-fns | Date computation utilities |
+| Nodemon | Development auto-reload |
+
+### Infrastructure
+
+| Service | Purpose |
+|---|---|
+| MongoDB Atlas | Cloud-hosted NoSQL database |
+| Cloudinary | Media and image asset hosting |
+| Twilio WhatsApp API | Automated billing and expiry alerts |
+| Vercel | Frontend deployment |
 
 ---
 
-## 🎨 UI Theme — Happy Hanger (material-shadcn-1.0.0)
+## UI Theme — Happy Hanger
 
-- **Color System:** Monochromatic & Minimalist Modern
-  - 🌑 Dark Mode: Deep dark (`hsl(240, 10%, 3.9%)`) + Pure White elements
-  - 🌕 Light Mode: Soft off-white (`hsl(0, 0%, 97%)`) + Solid Black buttons
-- **Typography:** Inter / system-ui — 14px base (perfect for data-rich dashboards)
-- **Grain Texture:** Global noise overlay at 0.08 opacity — tactile material feel
-- **Radius:** `0.75rem` — soft, modern card & button design
-- **Scrollbars:** Custom 6px slim webkit scrollbars
-
----
-
-## 🏗️ Architecture
+The application's interface is built on the `material-shadcn-1.0.0` design system, branded as **Happy Hanger** by Konete326. It follows a strict monochromatic, minimalist-modern aesthetic.
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                   React.js Frontend                    │
-│          (Admin Dashboard — React 19 + shadcn/ui)      │
-└───────────────────────────┬────────────────────────────┘
-                            │  Axios API Requests
-┌───────────────────────────▼────────────────────────────┐
-│                  Express.js Backend                    │
-│       (JWT Middleware, Controllers, Twilio Webhooks)   │
-└───────────────────────────┬────────────────────────────┘
-                            │  Mongoose ODM
-┌───────────────────────────▼────────────────────────────┐
-│               MongoDB Atlas NoSQL DB                   │
-│     (Normalized schemas using referenced ObjectIDs)    │
-└────────────────────────────────────────────────────────┘
+Dark Mode
+  Background  →  hsl(240, 10%, 3.9%)   #09090b   Deep washed dark
+  Foreground  →  hsl(0, 0%, 100%)       #ffffff   Pure white
+
+Light Mode
+  Background  →  hsl(0, 0%, 97%)        #f7f7f7   Soft off-white
+  Primary     →  hsl(0, 0%, 0%)         #000000   Solid black
+
+Border Tint  →  hsl(214, 32%, 91%)      #e2e8f0   Subtle blue-gray
+Border Radius  →  0.75rem (12px)
+Font Stack     →  Inter / system-ui
+Base Font Size →  14px
+```
+
+**Signature elements:**
+- **Grain texture overlay** — A fixed noise texture at `0.08` opacity gives the UI a tactile, physical material feel
+- **Custom slim scrollbars** — `6px` webkit scrollbars that blend into the muted background
+- **High visual hierarchy** — Fully monochromatic with contrast-driven structure, no decorative color
+
+---
+
+## System Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    React.js Frontend                     │
+│         Admin Dashboard  ·  React 19  ·  shadcn/ui       │
+└────────────────────────────┬─────────────────────────────┘
+                             │  Axios REST API Requests
+┌────────────────────────────▼─────────────────────────────┐
+│                   Express.js Backend                     │
+│      JWT Middleware  ·  MVC Controllers  ·  Twilio       │
+└────────────────────────────┬─────────────────────────────┘
+                             │  Mongoose ODM
+┌────────────────────────────▼─────────────────────────────┐
+│                  MongoDB Atlas (NoSQL)                   │
+│      Normalized schemas with referenced ObjectIDs        │
+└──────────────────────────────────────────────────────────┘
+                             │
+           ┌─────────────────┼─────────────────┐
+           ▼                 ▼                 ▼
+      Cloudinary          Twilio          Vercel / Render
+    (Media Assets)   (WhatsApp Alerts)  (Production Host)
 ```
 
 ---
 
-## 📡 API Endpoints
+## Database Collections
 
-| Method | Route | Description | Access |
+```
+MongoDB Atlas
+│
+├── Members              rollNo · fullName · fatherName · cellNo · address
+│                        joiningDate · renewalDate · status · planLink
+│
+├── Payments             serialNo · memberId · amountReceived
+│                        paymentMethod · chequeOrTransactionNo
+│
+├── PhysicalMeasurements memberId · age · heightFeetInches · weightHistory
+│                        bicepHistory · BMI · exerciseSchedule · mealPlan
+│
+├── SalaryLedger         trainerId · baseSalary · commissionRate
+│                        advanceBalance · transactionType · debit/credit
+│
+├── MembershipPlans      planName · duration · price
+│
+├── Trainers             fullName · phone · baseSalary · commissionRate
+│
+└── Notifications        auto-generated system alerts · read status · timestamp
+```
+
+---
+
+## API Reference
+
+| Method | Endpoint | Description | Access |
 |---|---|---|---|
-| `POST` | `/api/admin/login` | Admin JWT login | Public |
-| `POST` | `/api/members` | Register new member | Admin |
-| `GET` | `/api/members/payment-grid/:id` | 12-month payment grid | Admin |
-| `POST` | `/api/payments` | Create digital receipt | Admin |
-| `POST` | `/api/trainers` | Register trainer | Admin |
-| `POST` | `/api/trainers/ledger` | Log salary/advance entry | Admin |
-| `GET` | `/api/trainers/ledger/:id` | View trainer ledger | Admin |
-| `POST` | `/api/measurements` | Log body measurements | Admin |
-| `POST` | `/api/routines` | Assign workout & meal plan | Admin |
-| `GET` | `/api/dashboard` | Dashboard stats | Admin |
-| `GET` | `/api/notifications` | View all alerts | Admin |
+| `POST` | `/api/admin/login` | Authenticate admin and receive JWT | Public |
+| `POST` | `/api/members` | Register a new gym member | Admin |
+| `GET` | `/api/members` | List all members | Admin |
+| `GET` | `/api/members/payment-grid/:id` | Retrieve 12-month payment matrix | Admin |
+| `POST` | `/api/payments` | Record payment and generate receipt | Admin |
+| `GET` | `/api/payments` | List all payment records | Admin |
+| `POST` | `/api/trainers` | Register a trainer | Admin |
+| `POST` | `/api/trainers/ledger` | Post salary or advance ledger entry | Admin |
+| `GET` | `/api/trainers/ledger/:id` | View full trainer ledger statement | Admin |
+| `POST` | `/api/measurements` | Log monthly body measurements | Admin |
+| `POST` | `/api/routines` | Assign workout plan and meal schedule | Admin |
+| `GET` | `/api/dashboard` | Retrieve aggregated dashboard stats | Admin |
+| `GET` | `/api/notifications` | View all system notifications | Admin |
 
 ---
 
-## 💬 Twilio WhatsApp Auto-Alerts
+## WhatsApp Billing Alerts
 
-System daily scheduled jobs chalata hai. Jab kisi member ki **renewalDate** match hoti hai:
+A server-side scheduled job runs **daily** to check all active members' `renewalDate` fields. When a match is found, Twilio dispatches a WhatsApp message automatically:
 
-```js
-// Auto WhatsApp alert triggered:
-`Assalam-o-Alaikum [memberName],
-BicepApp (Wreck & Build Gym) ki taraf se reminder:
-Invoice S.No: [invoiceNo] pending hai.
-Outstanding dues: Rs. [pendingDues]
-Renewal date: [deadline]
-Kindly counter par verification karke receipt claim karein.`
+```
+Assalam-o-Alaikum [Member Name],
+
+This is a reminder from BicepsApp — Wreck & Build Gym.
+
+Invoice Serial No: [S.No]
+Outstanding Dues:  Rs. [Amount]
+Renewal Deadline:  [Date]
+
+Kindly visit the counter for verification and receipt collection.
+Thank you.
 ```
 
-✅ Message SID logged for audit trail
+Every dispatched message logs a **Twilio Message SID** for a complete audit trail.
 
 ---
 
-## 🗂️ Database Collections
+## Security
 
-```
-📦 MongoDB Atlas
- ├── 👤 Members           — rollNo, fullName, fatherName, cellNo, address, renewalDate, status
- ├── 💳 Payments          — serialNo, memberId, amountReceived, paymentMethod, chequeNo
- ├── 📏 PhysicalMeasurements — monthly logs, BMI, body metrics, exerciseSchedule, mealPlan
- ├── 💰 SalaryLedger      — baseSalary, commissionRate, advanceBalance, debit/credit
- ├── 📋 MembershipPlans   — plan name, duration, price
- ├── 👨‍🏫 Trainers          — fullName, phone, baseSalary, commissionRate
- └── 🔔 Notifications     — auto-generated system alerts
-```
+- **JWT Authentication** — All admin-only routes are protected by a JWT verification middleware layer
+- **Single Admin Architecture** — Pricing, discounts, and system configurations are accessible only to the verified admin account
+- **Schema Validation** — Every write operation passes through Mongoose schema-level validation before touching the database
+- **Environment Isolation** — All sensitive credentials (MongoDB URI, JWT secret, Cloudinary keys, Twilio tokens) are stored strictly in `.env` files and are never committed to the repository
+- **Audit Trail** — All collections use `timestamps: true` to track `createdAt` and `updatedAt` for every document
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
-Create a `.env` file in `server/`:
+Create a `.env` file inside the `server/` directory:
 
 ```env
 PORT=5000
-MONGODB_URI=your_mongodb_atlas_uri
-JWT_SECRET=your_jwt_secret_key
-CLOUDINARY_NAME=your_cloudinary_name
-CLOUDINARY_KEY=your_cloudinary_key
-CLOUDINARY_SECRET=your_cloudinary_secret
-TWILIO_ACCOUNT_SID=your_twilio_sid
+MONGODB_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_jwt_signing_secret
+
+CLOUDINARY_NAME=your_cloudinary_cloud_name
+CLOUDINARY_KEY=your_cloudinary_api_key
+CLOUDINARY_SECRET=your_cloudinary_api_secret
+
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
 TWILIO_AUTH_TOKEN=your_twilio_auth_token
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### 1. Clone the repo
 ```bash
+# 1. Clone the repository
 git clone https://github.com/Konete326/bicepsappanas.git
 cd bicepsappanas
-```
 
-### 2. Install server dependencies
-```bash
+# 2. Start the backend server
 cd server
 npm install
 npm run dev
-```
 
-### 3. Install client dependencies
-```bash
+# 3. Start the frontend (in a new terminal)
 cd client
 npm install
 npm run dev
 ```
 
-### 4. Open in browser
+| Service | URL |
+|---|---|
+| Frontend (Admin Dashboard) | `http://localhost:5173` |
+| Backend API | `http://localhost:5000` |
+
+---
+
+## Deployment Phases
+
 ```
-Frontend: http://localhost:5173
-Backend:  http://localhost:5000
+Phase 1  ──  Environment & Database Setup
+             MongoDB Atlas cluster · Schema validation policies · Indexing
+
+Phase 2  ──  Controller Programming
+             Trainer advance ledger · Serial receipt sequences · BMI engine
+
+Phase 3  ──  Theme Integration & Go-Live          ← Current Phase
+             shadcn/ui theme mapping · Twilio live testing · Production deploy
 ```
 
 ---
 
-## 🗺️ Rollout Phases
+## Functional Transition Matrix
 
-```
-Phase 1 ──► Environment & Database Setup
-            ✅ MongoDB Atlas cluster deployment
-            ✅ Security policies & schema validations
-            ✅ Index settings for high speed
-
-Phase 2 ──► Controller Programming
-            ✅ Trainer advance ledger logic
-            ✅ Serial receipt sequence configuration
-            ✅ BMI computation & routine maps
-
-Phase 3 ──► Theme Integration & Twilio Live
-            🔄 React MUI/shadcn theme mapping
-            🔄 WhatsApp alert sandbox testing
-            🔄 Production deployment & handover
-```
-
----
-
-## 🔒 Security
-
-- 🔐 JWT-based single admin authentication
-- 🛡️ All sensitive keys in `.env` — never exposed publicly
-- ✅ Mongoose schema-level validation before every DB write
-- 🔄 `timestamps: true` on all collections for full audit trail
-- 📋 Only **one admin account** — pricing, discounts, configs fully secured
-
----
-
-## 📊 Functional Transition Matrix
-
-| 📄 Physical Document | 💾 Digital Collection | Key Fields | Outcome |
+| Physical Document | Digital Collection | Key Fields Mapped | Outcome |
 |---|---|---|---|
-| Membership Card | Members | rollNo, fullName, cellNo, renewalDate | Zero redundancy, fast indexing |
-| Receipt Booklet | Payments | serialNo, amountReceived, paymentMethod | Transparent accounting |
-| Fitness Chart | PhysicalMeasurements | BMI, body metrics, history logs | Progress visualization |
-| Advance Register | SalaryLedger | advanceBalance, debit/credit entries | Accurate payroll |
+| Membership Card | `Members` | rollNo, fullName, fatherName, cellNo, renewalDate | Instant lookup, expiry tracking |
+| Receipt Booklet | `Payments` | serialNo, amountReceived, paymentMethod | Transparent accounting, digital PDFs |
+| Fitness Chart | `PhysicalMeasurements` | BMI, body metrics, monthly history | Progress visualization charts |
+| Advance Register | `SalaryLedger` | advanceBalance, debit/credit entries | Accurate auto-calculated payroll |
 
 ---
 
 <div align="center">
 
-**Built with ❤️ for Wreck & Build Fitness Gym, Nazimabad Karachi**
+<br/>
 
-*by [Konete326](https://github.com/Konete326)*
+Built for **Wreck & Build Ladies & Gents Fitness Gym** · Nazimabad No. 5, Karachi
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=120&section=footer&animation=twinkling" width="100%"/>
+by [Konete326](https://github.com/Konete326)
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0,1a1a2e,0d0d12,09090b&height=120&section=footer&animation=fadeIn" width="100%"/>
 
 </div>
