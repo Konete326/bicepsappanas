@@ -1,0 +1,62 @@
+name: Release Electron App
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Check Version Change
+        id: check_version
+        shell: bash
+        run: |
+          if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+            prev_version=$(git show HEAD~1:client/package.json | jq -r .version)
+          else
+            prev_version="0.0.0"
+          fi
+          curr_version=$(jq -r .version client/package.json)
+          if [ "$prev_version" != "$curr_version" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$curr_version" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install Client Dependencies
+        if: steps.check_version.outputs.changed == 'true'
+        working-directory: client
+        run: npm ci
+
+      - name: Build React Client
+        if: steps.check_version.outputs.changed == 'true'
+        working-directory: client
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: npm run build
+
+      - name: Build and Publish Electron App
+        if: steps.check_version.outputs.changed == 'true'
+        working-directory: client
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx electron-builder --win --publish always

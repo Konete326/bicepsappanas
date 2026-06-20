@@ -3,11 +3,16 @@
   "private": true,
   "version": "1.0.1",
   "type": "module",
+  "main": "electron/main.cjs",
+  "author": "Konete326",
+  "description": "BicepsApp Gym Management Desktop Application",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "electron .",
+    "electron:build": "electron-builder"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -44,6 +49,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "electron-updater": "^6.8.9",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.38.0",
     "install": "^0.13.0",
@@ -70,11 +76,40 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "electron": "^42.4.1",
+    "electron-builder": "^26.15.3",
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
     "tailwindcss": "^4.3.0",
     "vite": "^8.0.10"
+  },
+  "build": {
+    "appId": "com.bicepsapp.app",
+    "productName": "BicepsApp",
+    "copyright": "Copyright © 2026 Konete326",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "Konete326",
+      "repo": "bicepsappanas"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "runAfterFinish": true
+    }
   }
 }
