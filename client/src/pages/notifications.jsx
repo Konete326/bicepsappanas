@@ -4,6 +4,7 @@ import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Loader2, Bell, CheckCircle, Trash2, Circle, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +14,8 @@ export default function Notifications() {
   const [filter, setFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null); // null | "all" | notification id
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ["notifications"],
@@ -48,8 +51,17 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries(["notifications"]);
       toast({ title: "Notification deleted" });
+      setIsDialogOpen(false);
+      setDeleteTarget(null);
     }
   });
+
+  const openDeleteConfirm = (id) => { setDeleteTarget(id); setIsDialogOpen(true); };
+  const openClearAllConfirm = () => { setDeleteTarget("all"); setIsDialogOpen(true); };
+  const handleConfirmDelete = () => {
+    if (deleteTarget === "all") clearMutation.mutate();
+    else if (deleteTarget) deleteMutation.mutate(deleteTarget);
+  };
 
   const readMutation = useMutation({
     mutationFn: async (id) => API.patch(`/notifications/${id}/read`),
@@ -63,7 +75,7 @@ export default function Notifications() {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-stone-900 font-outfit uppercase">System Notifications</h2>
         {notifications?.length > 0 && (
-          <Button size="sm" onClick={() => clearMutation.mutate()} disabled={clearMutation.isPending}>
+          <Button size="sm" onClick={openClearAllConfirm} disabled={clearMutation.isPending}>
             <CheckCircle className="mr-2 h-4 w-4" /> Clear All
           </Button>
         )}
@@ -124,7 +136,7 @@ export default function Notifications() {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-8 w-8 shrink-0 mt-0.5"
+                    className="h-8 w-8 shrink-0 mt-0.5 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"
                     onClick={() => readMutation.mutate(n._id)}
                     title={n.isRead ? "Read" : "Mark as read"}
                   >
@@ -144,8 +156,8 @@ export default function Notifications() {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-8 w-8 shrink-0"
-                    onClick={() => deleteMutation.mutate(n._id)}
+                    className="h-8 w-8 shrink-0 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"
+                    onClick={() => openDeleteConfirm(n._id)}
                     disabled={deleteMutation.isPending}
                     title="Delete"
                   >
@@ -157,6 +169,27 @@ export default function Notifications() {
           )}
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{deleteTarget === "all" ? "Clear All Notifications?" : "Delete Notification?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget === "all"
+                ? "This will permanently remove all notifications. This action cannot be undone."
+                : "Are you sure you want to delete this notification? This action cannot be undone."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-red-600 hover:bg-red-700">
+              {(deleteTarget === "all" ? clearMutation.isPending : deleteMutation.isPending) ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
+              {deleteTarget === "all" ? "Clear All" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

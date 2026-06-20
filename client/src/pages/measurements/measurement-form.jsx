@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { validators, getErrClass } from "@/utils/validation";
 export default function MeasurementForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const defaultMemberId = searchParams.get("memberId") || "";
 
@@ -52,17 +53,30 @@ export default function MeasurementForm() {
   const getBmiCategory = () => {
     const w = parseFloat(weight);
     const hFt = parseFloat(height);
-    if (!w || !hFt) return { category: "N/A", tips: "" };
+    const a = parseInt(age);
+    if (!w || !hFt) return { category: "N/A", bmi: 0, tips: "" };
 
     const hM = hFt * 0.3048;
-    const bmi = w / (hM * hM);
+    const bmi = +(w / (hM * hM)).toFixed(1);
 
-    if (bmi < 18.5) {
-      return { category: "Underweight", tips: "Optimize with high-protein and high-calorie nutrition." };
-    } else if (bmi >= 25.0) {
-      return { category: "Overweight", tips: "Routine recommendation: Maximize cardio and daily sets." };
+    // Age-specific BMI thresholds
+    if (a > 0 && a < 18) {
+      // Teen BMI-for-age simplified cut-points (WHO reference)
+      let uw, ow;
+      if (a < 10) { uw = 15; ow = 18.5; }
+      else if (a < 15) { uw = 15.5; ow = 20; }
+      else { uw = 16.5; ow = 22; }
+
+      if (bmi < uw) return { category: "Underweight", bmi, tips: "Focus on calorie-dense meals and strength training for healthy weight gain." };
+      if (bmi >= ow) return { category: "Overweight", bmi, tips: "Increase cardio activity and balance diet with lean protein and vegetables." };
+      return { category: "Normal", bmi, tips: "Great shape! Maintain active lifestyle and balanced nutrition for growth." };
     }
-    return { category: "Normal", tips: "Maintain active lifestyle and balance calories." };
+
+    // Adult BMI (18+)
+    if (bmi < 18.5) return { category: "Underweight", bmi, tips: "Optimize with high-protein and high-calorie nutrition." };
+    if (bmi >= 25 && bmi < 30) return { category: "Overweight", bmi, tips: "Routine recommendation: Maximize cardio and daily sets." };
+    if (bmi >= 30) return { category: "Obese", bmi, tips: "Prioritize daily cardio, strength training and strict calorie control." };
+    return { category: "Normal", bmi, tips: "Maintain active lifestyle and balance calories." };
   };
 
   const bmiDetails = getBmiCategory();
@@ -73,6 +87,7 @@ export default function MeasurementForm() {
       return res.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["measurements-history"] });
       toast({ title: "Measurements logged successfully" });
       navigate("/measurements");
     },
@@ -121,18 +136,18 @@ export default function MeasurementForm() {
             </SelectContent>
           </Select>
         </div>
-        <div><Label htmlFor="age">Age</Label><Input id="age" type="number" className={getErrClass(errors, "age")} value={age} onChange={(e) => { setAge(e.target.value); validate("age", e.target.value); }} onBlur={(e) => validate("age", e.target.value)} required />{errors.age && <p className="text-[11px] text-red-500 mt-1">{errors.age}</p>}</div>
+        <div><Label htmlFor="age">Age</Label><Input id="age" type="number" placeholder="Enter age" className={getErrClass(errors, "age")} value={age} onChange={(e) => { setAge(e.target.value); validate("age", e.target.value); }} onBlur={(e) => validate("age", e.target.value)} required />{errors.age && <p className="text-[11px] text-red-500 mt-1">{errors.age}</p>}</div>
 
         <div><Label htmlFor="height">Height (Feet.Inches)</Label><Input id="height" placeholder="e.g. 5.7" className={getErrClass(errors, "height")} value={height} onChange={(e) => { setHeight(e.target.value); validate("height", e.target.value); }} onBlur={(e) => validate("height", e.target.value)} required />{errors.height && <p className="text-[11px] text-red-500 mt-1">{errors.height}</p>}</div>
-        <div><Label htmlFor="weight">Weight (kg)</Label><Input id="weight" type="number" step="0.1" className={getErrClass(errors, "weight")} value={weight} onChange={(e) => { setWeight(e.target.value); validate("weight", e.target.value); }} onBlur={(e) => validate("weight", e.target.value)} required />{errors.weight && <p className="text-[11px] text-red-500 mt-1">{errors.weight}</p>}</div>
-        <div><Label htmlFor="bicep">Bicep Size (inches)</Label><Input id="bicep" type="number" step="0.1" className={getErrClass(errors, "bicep")} value={bicep} onChange={(e) => { setBicep(e.target.value); validate("bicep", e.target.value); }} onBlur={(e) => validate("bicep", e.target.value)} required />{errors.bicep && <p className="text-[11px] text-red-500 mt-1">{errors.bicep}</p>}</div>
-        <div><Label htmlFor="chest">Chest Size (inches)</Label><Input id="chest" type="number" step="0.1" className={getErrClass(errors, "chest")} value={chest} onChange={(e) => { setChest(e.target.value); validate("chest", e.target.value); }} onBlur={(e) => validate("chest", e.target.value)} required />{errors.chest && <p className="text-[11px] text-red-500 mt-1">{errors.chest}</p>}</div>
-        <div><Label htmlFor="waist">Waist Size (inches)</Label><Input id="waist" type="number" step="0.1" className={getErrClass(errors, "waist")} value={waist} onChange={(e) => { setWaist(e.target.value); validate("waist", e.target.value); }} onBlur={(e) => validate("waist", e.target.value)} required />{errors.waist && <p className="text-[11px] text-red-500 mt-1">{errors.waist}</p>}</div>
-        <div><Label htmlFor="legs">Thighs / Legs (inches)</Label><Input id="legs" type="number" step="0.1" className={getErrClass(errors, "legs")} value={legs} onChange={(e) => { setLegs(e.target.value); validate("legs", e.target.value); }} onBlur={(e) => validate("legs", e.target.value)} required />{errors.legs && <p className="text-[11px] text-red-500 mt-1">{errors.legs}</p>}</div>
+        <div><Label htmlFor="weight">Weight (kg)</Label><Input id="weight" type="number" step="0.1" placeholder="e.g. 70.5" className={getErrClass(errors, "weight")} value={weight} onChange={(e) => { setWeight(e.target.value); validate("weight", e.target.value); }} onBlur={(e) => validate("weight", e.target.value)} required />{errors.weight && <p className="text-[11px] text-red-500 mt-1">{errors.weight}</p>}</div>
+        <div><Label htmlFor="bicep">Bicep Size (inches)</Label><Input id="bicep" type="number" step="0.1" placeholder="e.g. 14.5" className={getErrClass(errors, "bicep")} value={bicep} onChange={(e) => { setBicep(e.target.value); validate("bicep", e.target.value); }} onBlur={(e) => validate("bicep", e.target.value)} required />{errors.bicep && <p className="text-[11px] text-red-500 mt-1">{errors.bicep}</p>}</div>
+        <div><Label htmlFor="chest">Chest Size (inches)</Label><Input id="chest" type="number" step="0.1" placeholder="e.g. 40" className={getErrClass(errors, "chest")} value={chest} onChange={(e) => { setChest(e.target.value); validate("chest", e.target.value); }} onBlur={(e) => validate("chest", e.target.value)} required />{errors.chest && <p className="text-[11px] text-red-500 mt-1">{errors.chest}</p>}</div>
+        <div><Label htmlFor="waist">Waist Size (inches)</Label><Input id="waist" type="number" step="0.1" placeholder="e.g. 32" className={getErrClass(errors, "waist")} value={waist} onChange={(e) => { setWaist(e.target.value); validate("waist", e.target.value); }} onBlur={(e) => validate("waist", e.target.value)} required />{errors.waist && <p className="text-[11px] text-red-500 mt-1">{errors.waist}</p>}</div>
+        <div><Label htmlFor="legs">Thighs / Legs (inches)</Label><Input id="legs" type="number" step="0.1" placeholder="e.g. 22" className={getErrClass(errors, "legs")} value={legs} onChange={(e) => { setLegs(e.target.value); validate("legs", e.target.value); }} onBlur={(e) => validate("legs", e.target.value)} required />{errors.legs && <p className="text-[11px] text-red-500 mt-1">{errors.legs}</p>}</div>
 
-        {weight && height && (
+        {weight && height && age && (
           <div className="sm:col-span-3 p-3 bg-stone-50 border border-stone-200 rounded-lg text-xs space-y-1">
-            <p><strong>Calculated BMI Category:</strong> {bmiDetails.category}</p>
+            <p><strong>BMI:</strong> {bmiDetails.bmi} &mdash; <strong>Category:</strong> {bmiDetails.category}</p>
             <p className="text-stone-600 font-semibold">{bmiDetails.tips}</p>
           </div>
         )}

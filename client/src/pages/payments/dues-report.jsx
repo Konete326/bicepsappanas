@@ -15,8 +15,8 @@ export default function DuesReport() {
   });
 
   const unpaidMembers = members?.filter((m) => {
-    const planPrice = m.planLink?.price || 0;
-    return planPrice > 0;
+    const fee = m.monthlyFee || 0;
+    return fee > 0;
   }) || [];
 
   return (
@@ -39,8 +39,7 @@ export default function DuesReport() {
               <TableRow>
                 <TableHead>Roll No</TableHead>
                 <TableHead>Member Name</TableHead>
-                <TableHead>Active Plan</TableHead>
-                <TableHead>Plan Price</TableHead>
+                <TableHead>Monthly Fee</TableHead>
                 <TableHead>Renewal Date</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -48,7 +47,7 @@ export default function DuesReport() {
             <TableBody>
               {unpaidMembers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-stone-500 py-6">
+                  <TableCell colSpan={5} className="text-center text-stone-500 py-6">
                     All memberships are fully settled.
                   </TableCell>
                 </TableRow>
@@ -57,8 +56,7 @@ export default function DuesReport() {
                   <TableRow key={m._id}>
                     <TableCell className="font-semibold">{m.rollNo}</TableCell>
                     <TableCell>{m.fullName}</TableCell>
-                    <TableCell>{m.planLink?.planName || "N/A"}</TableCell>
-                    <TableCell className="font-semibold text-stone-700">PKR {m.planLink?.price || 0}</TableCell>
+                    <TableCell className="font-semibold text-stone-700">PKR {m.monthlyFee || 0}</TableCell>
                     <TableCell>{new Date(m.renewalDate).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right">
                       <Link to={`/payments/new?memberId=${m._id}`}>

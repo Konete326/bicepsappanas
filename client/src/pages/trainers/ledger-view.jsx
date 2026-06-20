@@ -25,7 +25,7 @@ export default function LedgerView() {
     queryKey: ["ledger", id],
     queryFn: async () => {
       const res = await API.get(`/trainers/ledger/${id}`);
-      return res.data.data || [];
+      return res.data.data?.entries || [];
     }
   });
 
@@ -63,7 +63,7 @@ export default function LedgerView() {
           <h3 className="text-lg font-bold font-outfit text-stone-900 uppercase">Payout Calculator</h3>
           <div>
             <Label htmlFor="sessions">Sessions Completed this Month</Label>
-            <Input id="sessions" type="number" min={0} value={sessions} onChange={(e) => setSessions(parseInt(e.target.value) || 0)} />
+            <Input id="sessions" type="number" min={0} placeholder="e.g. 20" value={sessions} onChange={(e) => setSessions(parseInt(e.target.value) || 0)} />
           </div>
           <div className="space-y-2 text-sm border-t border-stone-100 pt-4">
             <div className="flex justify-between"><span>Base Salary:</span><strong>PKR {basePay}</strong></div>

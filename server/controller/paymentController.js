@@ -1,6 +1,5 @@
 const Payment = require("../model/payment");
 const Member = require("../model/member");
-const MembershipPlan = require("../model/membershipPlan");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -9,9 +8,9 @@ const getNextSerialNo = async () => {
     return lastPayment ? lastPayment.serialNo + 1 : 99;
 };
 
-exports.createPayment = catchAsync(async (req, res) => {
+exports.createPayment = catchAsync(async (req, res, next) => {
     const { memberId, amountReceived, paymentMethod, chequeOrTransactionNo } = req.body;
-    const member = await Member.findById(memberId).populate("planLink");
+    const member = await Member.findById(memberId);
     if (!member) return next(new AppError("Member not found", 404));
 
     const serialNo = await getNextSerialNo();
@@ -19,17 +18,12 @@ exports.createPayment = catchAsync(async (req, res) => {
         serialNo, memberId, amountReceived, paymentMethod, chequeOrTransactionNo
     });
 
-    const monthKey = new Date().toLocaleString("default", { month: "short" }).toLowerCase();
-    const yearKey = new Date().getFullYear().toString();
-    const gridKey = `${monthKey}-${yearKey}`;
-    member.paymentGrid.set(gridKey, "Paid");
+    const currentMonth = new Date().getMonth();
+    member.paymentGrid.set(String(currentMonth), true);
     member.status = "Active";
-    const plan = await MembershipPlan.findById(member.planLink);
-    if (plan) {
-        const renewal = new Date(member.renewalDate);
-        renewal.setMonth(renewal.getMonth() + plan.duration);
-        member.renewalDate = renewal;
-    }
+    const renewal = new Date(member.renewalDate);
+    renewal.setMonth(renewal.getMonth() + 1);
+    member.renewalDate = renewal;
     await member.save();
 
     res.status(201).json({ status: "success", data: payment });
@@ -70,20 +64,20 @@ exports.getMemberPayments = catchAsync(async (req, res) => {
 });
 
 exports.getOutstandingDues = catchAsync(async (req, res) => {
-    const members = await Member.find({ status: "Active" }).populate("planLink", "planName price duration");
+    const members = await Member.find({ status: "Active" });
     const duesList = [];
     for (const member of members) {
         const totalPaid = await Payment.aggregate([
             { $match: { memberId: member._id } },
             { $group: { _id: null, total: { $sum: "$amountReceived" } } }
         ]);
-        const planPrice = member.planLink?.price || 0;
+        const fee = member.monthlyFee || 0;
         const paid = totalPaid[0]?.total || 0;
-        const outstanding = planPrice - paid;
+        const outstanding = fee - paid;
         if (outstanding > 0) {
             duesList.push({
                 member: { id: member._id, fullName: member.fullName, rollNo: member.rollNo, cellNo: member.cellNo },
-                planPrice, totalPaid: paid, outstanding,
+                monthlyFee: fee, totalPaid: paid, outstanding,
                 renewalDate: member.renewalDate
             });
         }

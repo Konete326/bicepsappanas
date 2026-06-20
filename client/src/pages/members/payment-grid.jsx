@@ -1,13 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "@/api/api";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
 export default function PaymentGrid({ memberId }) {
@@ -18,7 +17,7 @@ export default function PaymentGrid({ memberId }) {
     queryKey: ["payment-grid", memberId],
     queryFn: async () => {
       const res = await API.get(`/members/payment-grid/${memberId}`);
-      return res.data.data || {};
+      return res.data.data.paymentGrid || {};
     }
   });
 
@@ -49,23 +48,22 @@ export default function PaymentGrid({ memberId }) {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 p-4">
+    <div className="grid grid-cols-6 gap-2 p-4">
       {MONTHS.map((month, idx) => {
         const isPaid = grid && grid[idx] === true;
         return (
-          <div key={month} className="border border-stone-200 rounded-lg p-3 flex flex-col items-center justify-between bg-stone-50 hover:bg-stone-100 transition-colors">
-            <span className="text-xs font-semibold text-stone-600 mb-2">{month}</span>
-            <Badge variant={isPaid ? "default" : "destructive"} className="mb-2">
+          <div key={month} className="border border-stone-200 rounded-md p-2 flex flex-col items-center gap-1.5 bg-stone-50 hover:bg-stone-100 transition-colors">
+            <span className="text-[10px] font-semibold text-stone-500 uppercase">{month}</span>
+            <Badge className={`text-[9px] px-1.5 py-0 h-4 ${isPaid ? "bg-green-600 text-white hover:bg-green-600/80 border-transparent" : "bg-destructive text-destructive-foreground hover:bg-destructive/80 border-transparent"}`}>
               {isPaid ? "Paid" : "Unpaid"}
             </Badge>
-            <Button
-              size="sm"
-              className="text-[10px] h-7 px-2"
+            <button
+              className="text-[9px] font-medium px-2 py-0.5 rounded border border-stone-300 bg-white hover:bg-stone-200 text-stone-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={toggleMutation.isPending}
               onClick={() => toggleMutation.mutate(idx)}
             >
-              Toggle
-            </Button>
+              {isPaid ? "Undo" : "Pay"}
+            </button>
           </div>
         );
       })}

@@ -82,12 +82,12 @@ export default function TrainerList() {
                     <TableCell>PKR {t.commissionRate} / Session</TableCell>
                     <TableCell className="text-right space-x-2">
                       <Link to={`/trainers/${t._id}/ledger`}>
-                        <Button size="sm" className="h-8">
+                        <Button size="sm" className="h-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg">
                           <BookOpen className="mr-2 h-4 w-4" /> Ledger
                         </Button>
                       </Link>
                       <Link to={`/trainers/edit/${t._id}`}>
-                        <Button size="icon" className="h-8 w-8">
+                        <Button size="icon" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg">
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>

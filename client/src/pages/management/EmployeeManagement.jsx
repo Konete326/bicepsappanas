@@ -304,7 +304,7 @@ export default function EmployeeManagement() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="text-stone-300 hover:text-stone-900"
+                                                    className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"
                                                     onClick={() => handleEditRequest(emp)}
                                                 >
                                                     <Pencil className="w-4 h-4" />
@@ -312,7 +312,7 @@ export default function EmployeeManagement() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="text-stone-300 hover:text-red-600"
+                                                    className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 hover:text-red-600 rounded-lg"
                                                     onClick={() => handleDeleteRequest(emp)}
                                                 >
                                                     <Trash2 className="w-4 h-4" />

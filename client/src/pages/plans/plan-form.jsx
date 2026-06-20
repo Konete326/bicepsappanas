@@ -13,7 +13,7 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
   const [formData, setFormData] = useState({
     planName: plan?.planName || "",
     duration: plan?.duration || 1,
-    price: plan?.price || 0,
+    price: plan?.price ?? "",
     description: plan?.description || ""
   });
 
@@ -60,23 +60,24 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
     <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto p-4 border border-stone-200 rounded-xl bg-white shadow-sm">
       <div>
         <Label htmlFor="planName">Plan Name</Label>
-        <Input id="planName" className={getErrClass(errors, "planName")} value={formData.planName} onChange={(e) => { setFormData({ ...formData, planName: e.target.value }); validate("planName", e.target.value); }} onBlur={(e) => validate("planName", e.target.value)} required />
+        <Input id="planName" placeholder="e.g. Gold Monthly" className={getErrClass(errors, "planName")} value={formData.planName} onChange={(e) => { setFormData({ ...formData, planName: e.target.value }); validate("planName", e.target.value); }} onBlur={(e) => validate("planName", e.target.value)} required />
         {errors.planName && <p className="text-[11px] text-red-500 mt-1">{errors.planName}</p>}
       </div>
       <div>
         <Label htmlFor="duration">Duration (Months)</Label>
-        <Input id="duration" type="number" min={1} className={getErrClass(errors, "duration")} value={formData.duration} onChange={(e) => { setFormData({ ...formData, duration: parseInt(e.target.value) || 1 }); validate("duration", e.target.value); }} onBlur={(e) => validate("duration", e.target.value)} required />
+        <Input id="duration" type="number" min={1} placeholder="e.g. 12" className={getErrClass(errors, "duration")} value={formData.duration} onChange={(e) => { setFormData({ ...formData, duration: parseInt(e.target.value) || 1 }); validate("duration", e.target.value); }} onBlur={(e) => validate("duration", e.target.value)} required />
         {errors.duration && <p className="text-[11px] text-red-500 mt-1">{errors.duration}</p>}
       </div>
       <div>
         <Label htmlFor="price">Price (PKR)</Label>
-        <Input id="price" type="number" min={0} className={getErrClass(errors, "price")} value={formData.price} onChange={(e) => { setFormData({ ...formData, price: parseInt(e.target.value) || 0 }); validate("price", e.target.value); }} onBlur={(e) => validate("price", e.target.value)} required />
+        <Input id="price" type="number" min={0} placeholder="Enter price" className={getErrClass(errors, "price")} value={formData.price} onChange={(e) => { setFormData({ ...formData, price: e.target.value === "" ? "" : parseInt(e.target.value) }); validate("price", e.target.value); }} onBlur={(e) => validate("price", formData.price)} required />
         {errors.price && <p className="text-[11px] text-red-500 mt-1">{errors.price}</p>}
       </div>
       <div>
         <Label htmlFor="description">Description</Label>
         <Input
           id="description"
+          placeholder="e.g. Includes gym access and personal training"
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />

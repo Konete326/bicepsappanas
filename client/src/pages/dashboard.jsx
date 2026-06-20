@@ -59,7 +59,7 @@ export default function Dashboard() {
             <CardTitle className="text-sm font-semibold">Membership Status Breakdown</CardTitle>
           </CardHeader>
           <CardContent className="pt-4 h-64">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 1, height: 1 }}>
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />

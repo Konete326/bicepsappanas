@@ -190,3 +190,40 @@
     width: 6px;
   }
 }
+
+/* ─── 88mm Thermal Printer Print Styles ─── */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .thermal-receipt,
+  .thermal-receipt * {
+    visibility: visible !important;
+  }
+
+  .thermal-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    padding: 3mm;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+}

@@ -50,11 +50,15 @@ const memberSchema = new mongoose.Schema({
     planLink: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "MembershipPlan",
-        required: [true, "Membership plan is required"],
+    },
+    monthlyFee: {
+        type: Number,
+        required: [true, "Monthly fee is required"],
+        min: [0, "Monthly fee cannot be negative"],
     },
     paymentGrid: {
         type: Map,
-        of: String,
+        of: Boolean,
         default: {},
     },
 }, { timestamps: true });

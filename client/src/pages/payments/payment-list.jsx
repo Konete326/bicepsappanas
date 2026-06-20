@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Eye, AlertCircle, Search } from "lucide-react";
+import { Loader2, Plus, AlertCircle, Search, Printer } from "lucide-react";
 
 export default function PaymentList() {
   const [search, setSearch] = useState("");
@@ -112,8 +112,8 @@ export default function PaymentList() {
                     <TableCell className="font-bold text-stone-850">PKR {p.amountReceived}</TableCell>
                     <TableCell className="text-right">
                       <Link to={`/payments/receipt/${p._id}`}>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <Eye className="h-4 w-4" />
+                        <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg">
+                          <Printer className="h-4 w-4" />
                         </Button>
                       </Link>
                     </TableCell>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ export default function MemberForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
     rollNo: "",
@@ -25,7 +26,7 @@ export default function MemberForm() {
     joiningDate: new Date().toISOString().split("T")[0],
     renewalDate: "",
     status: "Active",
-    planLink: ""
+    monthlyFee: ""
   });
 
   const [errors, setErrors] = useState({});
@@ -45,14 +46,6 @@ export default function MemberForm() {
 
   const hasErrors = Object.values(errors).some((e) => e !== "");
 
-  const { data: plans, isLoading: loadingPlans, isError: plansError } = useQuery({
-    queryKey: ["plans"],
-    queryFn: async () => {
-      const res = await API.get("/plans");
-      return res.data.data || [];
-    }
-  });
-
   const { data: nextRollNo } = useQuery({
     queryKey: ["nextRollNo"],
     queryFn: async () => {
@@ -68,29 +61,31 @@ export default function MemberForm() {
     }
   }, [nextRollNo, id]);
 
-  const { isLoading: loadingMember } = useQuery({
+  const { data: memberData, isLoading: loadingMember } = useQuery({
     queryKey: ["member", id],
     queryFn: async () => {
       const res = await API.get(`/members/${id}`);
-      const data = res.data.data;
-      if (data) {
-        setFormData({
-          rollNo: data.rollNo || "",
-          fullName: data.fullName || "",
-          fatherName: data.fatherName || "",
-          email: data.email || "",
-          cellNo: data.cellNo || "+92",
-          address: data.address || "",
-          joiningDate: new Date(data.joiningDate).toISOString().split("T")[0],
-          renewalDate: new Date(data.renewalDate).toISOString().split("T")[0],
-          status: data.status || "Active",
-          planLink: data.planLink?._id || data.planLink || ""
-        });
-      }
-      return data;
+      return res.data.data;
     },
     enabled: !!id
   });
+
+  useEffect(() => {
+    if (memberData) {
+      setFormData({
+        rollNo: memberData.rollNo || "",
+        fullName: memberData.fullName || "",
+        fatherName: memberData.fatherName || "",
+        email: memberData.email || "",
+        cellNo: memberData.cellNo || "+92",
+        address: memberData.address || "",
+        joiningDate: new Date(memberData.joiningDate).toISOString().split("T")[0],
+        renewalDate: new Date(memberData.renewalDate).toISOString().split("T")[0],
+        status: memberData.status || "Active",
+        monthlyFee: memberData.monthlyFee ?? ""
+      });
+    }
+  }, [memberData]);
 
   const mutation = useMutation({
     mutationFn: async (payload) => {
@@ -100,6 +95,7 @@ export default function MemberForm() {
       return API.post("/members", payload);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["members"] });
       toast({ title: `Member successfully ${id ? "updated" : "registered"}` });
       navigate("/members");
     },
@@ -135,17 +131,17 @@ export default function MemberForm() {
         </div>
         <div>
           <Label htmlFor="fullName">Full Name</Label>
-          <Input id="fullName" className={getErrClass(errors, "fullName")} value={formData.fullName} onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); validate("fullName", e.target.value); }} onBlur={(e) => validate("fullName", e.target.value)} required />
+          <Input id="fullName" placeholder="e.g. Muhammad Ali" className={getErrClass(errors, "fullName")} value={formData.fullName} onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); validate("fullName", e.target.value); }} onBlur={(e) => validate("fullName", e.target.value)} required />
           {errors.fullName && <p className="text-[11px] text-red-500 mt-1">{errors.fullName}</p>}
         </div>
         <div>
           <Label htmlFor="fatherName">Father's Name</Label>
-          <Input id="fatherName" className={getErrClass(errors, "fatherName")} value={formData.fatherName} onChange={(e) => { setFormData({ ...formData, fatherName: e.target.value }); validate("fatherName", e.target.value); }} onBlur={(e) => validate("fatherName", e.target.value)} required />
+          <Input id="fatherName" placeholder="e.g. Muhammad Ahmed" className={getErrClass(errors, "fatherName")} value={formData.fatherName} onChange={(e) => { setFormData({ ...formData, fatherName: e.target.value }); validate("fatherName", e.target.value); }} onBlur={(e) => validate("fatherName", e.target.value)} required />
           {errors.fatherName && <p className="text-[11px] text-red-500 mt-1">{errors.fatherName}</p>}
         </div>
         <div>
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" type="email" className={getErrClass(errors, "email")} value={formData.email} onChange={(e) => { setFormData({ ...formData, email: e.target.value }); validate("email", e.target.value); }} onBlur={(e) => validate("email", e.target.value)} />
+          <Input id="email" type="email" placeholder="e.g. ali@example.com" className={getErrClass(errors, "email")} value={formData.email} onChange={(e) => { setFormData({ ...formData, email: e.target.value }); validate("email", e.target.value); }} onBlur={(e) => validate("email", e.target.value)} />
           {errors.email && <p className="text-[11px] text-red-500 mt-1">{errors.email}</p>}
         </div>
         <div>
@@ -155,7 +151,7 @@ export default function MemberForm() {
         </div>
         <div>
           <Label htmlFor="address">Address</Label>
-          <Input id="address" className={getErrClass(errors, "address")} value={formData.address} onChange={(e) => { setFormData({ ...formData, address: e.target.value }); validate("address", e.target.value); }} onBlur={(e) => validate("address", e.target.value)} required />
+          <Input id="address" placeholder="e.g. 123 Main Street, Lahore" className={getErrClass(errors, "address")} value={formData.address} onChange={(e) => { setFormData({ ...formData, address: e.target.value }); validate("address", e.target.value); }} onBlur={(e) => validate("address", e.target.value)} required />
           {errors.address && <p className="text-[11px] text-red-500 mt-1">{errors.address}</p>}
         </div>
         <div>
@@ -167,17 +163,8 @@ export default function MemberForm() {
           <Input id="renewalDate" type="date" value={formData.renewalDate} onChange={(e) => setFormData({ ...formData, renewalDate: e.target.value })} required />
         </div>
         <div className="sm:col-span-2">
-          <Label htmlFor="planLink">Select Plan</Label>
-          <Select value={formData.planLink} onValueChange={(val) => setFormData({ ...formData, planLink: val })}>
-            <SelectTrigger><SelectValue placeholder={loadingPlans ? "Loading plans..." : plansError ? "Failed to load plans" : "Choose a plan"} /></SelectTrigger>
-            <SelectContent>
-              {plans?.length > 0 ? (
-                plans.map((p) => <SelectItem key={p._id} value={p._id}>{p.planName} — PKR {p.price.toLocaleString()}</SelectItem>)
-              ) : (
-                <SelectItem value="__none__" disabled>{plansError ? "Check server connection" : "No plans available"}</SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="monthlyFee">Monthly Fee (PKR)</Label>
+          <Input id="monthlyFee" type="number" min={0} placeholder="e.g. 3000" value={formData.monthlyFee} onChange={(e) => setFormData({ ...formData, monthlyFee: e.target.value === "" ? "" : parseInt(e.target.value) })} required />
         </div>
         <div className="sm:col-span-2">
           <Label htmlFor="status">Status</Label>

@@ -17,7 +17,7 @@ export default function LedgerEntryForm() {
 
   const [formData, setFormData] = useState({
     transactionType: "Debit",
-    amount: 0,
+    amount: "",
     referenceNote: ""
   });
 
@@ -81,16 +81,17 @@ export default function LedgerEntryForm() {
             id="amount"
             type="number"
             min={1}
+            placeholder="Enter amount"
             className={getErrClass(errors, "amount")}
             value={formData.amount}
-            onChange={(e) => { setFormData({ ...formData, amount: parseInt(e.target.value) || 0 }); validate("amount", e.target.value); }}
-            onBlur={(e) => validate("amount", e.target.value)}
+            onChange={(e) => { setFormData({ ...formData, amount: e.target.value === "" ? "" : parseInt(e.target.value) }); validate("amount", e.target.value); }}
+            onBlur={(e) => validate("amount", formData.amount)}
             required
           />
           {errors.amount && <p className="text-[11px] text-red-500 mt-1">{errors.amount}</p>}
         </div>
 
-        <div>
+        <div className="sm:col-span-2">
           <Label htmlFor="reference">Reference Note</Label>
           <Input
             id="reference"

@@ -101,10 +101,10 @@ export default function MemberList() {
                     <TableCell>{new Date(member.renewalDate).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right space-x-2">
                       <Link to={`/members/${member._id}`}>
-                        <Button size="icon" variant="ghost" className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"><Eye className="h-4 w-4" /></Button>
                       </Link>
                       <Link to={`/members/edit/${member._id}`}>
-                        <Button size="icon" variant="ghost" className="h-8 w-8"><Edit className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"><Edit className="h-4 w-4" /></Button>
                       </Link>
                     </TableCell>
                   </TableRow>
