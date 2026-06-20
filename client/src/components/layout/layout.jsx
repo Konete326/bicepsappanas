@@ -35,7 +35,7 @@ export function Layout({ children, title, description }) {
                     <Button
                         size="sm"
                         onClick={() => setSidebarOpen(true)}
-                        className="p-2 bg-stone-800 text-stone-50 hover:bg-stone-700 border border-stone-900"
+                        className="p-2 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900"
                     >
                         <Menu className="h-6 w-6" />
                     </Button>
@@ -59,7 +59,7 @@ export function Layout({ children, title, description }) {
                                             <Button
                                                 size="icon"
                                                 asChild
-                                                className="relative bg-stone-800 text-stone-50 hover:bg-stone-700 border border-stone-900"
+                                                className="relative bg-white text-stone-900 hover:bg-stone-100 border border-stone-900"
                                             >
                                                 <Link to="/changelog">
                                                     <History className="h-5 w-5" />
