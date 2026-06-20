@@ -1,0 +1,100 @@
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import {
+  LayoutDashboard,
+  Users,
+  Receipt,
+  UserCheck,
+  Scale,
+  Dumbbell,
+  Bell,
+  TrendingUp,
+  Info,
+  LogOut,
+  X
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+
+const navItems = [
+  { title: "Dashboard", href: "/", icon: LayoutDashboard },
+  { title: "Members", href: "/members", icon: Users },
+  { title: "Payments", href: "/payments", icon: Receipt },
+  { title: "Trainers", href: "/trainers", icon: UserCheck },
+  { title: "Measurements", href: "/measurements", icon: Scale },
+  { title: "Routines", href: "/routines", icon: Dumbbell },
+  { title: "Notifications", href: "/notifications", icon: Bell },
+  { title: "Reports", href: "/reports", icon: TrendingUp },
+  { title: "About Wreck & Build", href: "/about", icon: Info }
+];
+
+export function Sidebar({ onClose }) {
+  const location = useLocation();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/sign-in");
+  };
+
+  return (
+    <aside className="w-60 bg-white lg:bg-transparent flex flex-col relative z-10 h-full border-r border-stone-200 lg:border-0">
+      <div className="p-6 pb-0 relative z-10 flex items-center justify-between font-outfit">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full border-2 border-stone-100 overflow-hidden bg-stone-50 shrink-0 shadow-sm transition-transform hover:scale-105 duration-300 flex items-center justify-center bg-black">
+            <span className="text-white font-bold text-lg font-outfit">B</span>
+          </div>
+          <h1 className="text-base font-bold tracking-tight text-stone-900 uppercase truncate max-w-[140px]">
+            BicepsApp
+          </h1>
+        </div>
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="lg:hidden p-1 text-stone-600 hover:text-stone-900 hover:bg-stone-100"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        )}
+      </div>
+
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar relative z-10 flex flex-col justify-between">
+        <div className="space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.href || (item.href !== "/" && location.pathname.startsWith(item.href));
+            return (
+              <NavLink key={item.href} to={item.href}>
+                <div
+                  className={cn(
+                    "flex items-center text-sm font-normal rounded-lg cursor-pointer px-3 py-2 transition-all duration-200",
+                    isActive
+                      ? "shadow-sm hover:shadow-md bg-stone-800 hover:bg-stone-700 relative bg-gradient-to-b from-stone-700 to-stone-800 border border-stone-900 text-stone-50"
+                      : "text-stone-700 hover:bg-stone-100 border border-transparent"
+                  )}
+                >
+                  <Icon className="mr-3 w-4 h-4" />
+                  {item.title}
+                </div>
+              </NavLink>
+            );
+          })}
+        </div>
+
+        <div className="pt-4 border-t border-stone-200">
+          <div
+            onClick={handleLogout}
+            className="flex items-center text-sm font-normal rounded-lg cursor-pointer px-3 py-2 text-stone-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+          >
+            <LogOut className="mr-3 w-4 h-4" />
+            Logout
+          </div>
+        </div>
+      </nav>
+    </aside>
+  );
+}
+

@@ -1,0 +1,150 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import API from "@/api/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+
+export default function PaymentForm() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [memberId, setMemberId] = useState("");
+  const [amountReceived, setAmountReceived] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState("Cash");
+  const [trxNo, setTrxNo] = useState("");
+
+  const { data: members, isLoading: loadingMembers } = useQuery({
+    queryKey: ["members-lookup"],
+    queryFn: async () => {
+      const res = await API.get("/members");
+      return res.data.data || [];
+    }
+  });
+
+  const selectedMember = members?.find((m) => m._id === memberId);
+  const planPrice = selectedMember?.planLink?.price || 0;
+  const outstandingDues = Math.max(0, planPrice - amountReceived);
+
+  const mutation = useMutation({
+    mutationFn: async (payload) => {
+      const res = await API.post("/payments", payload);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast({ title: "Payment recorded successfully" });
+      navigate(`/payments/receipt/${data.data?._id || ""}`);
+    },
+    onError: (err) => {
+      toast({
+        title: "Failed to record payment",
+        description: err.response?.data?.message || "Verify your inputs and try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!memberId) {
+      toast({ title: "Please select a member", variant: "destructive" });
+      return;
+    }
+    mutation.mutate({
+      memberId,
+      amountReceived,
+      paymentMethod,
+      chequeOrTransactionNo: paymentMethod !== "Cash" ? trxNo : null
+    });
+  };
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <h2 className="text-xl font-bold mb-6 font-outfit uppercase">Record Fees Payment</h2>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
+        <div>
+          <Label htmlFor="memberSelect">Select Member</Label>
+          {loadingMembers ? (
+            <div className="flex items-center gap-2 text-stone-500 text-sm">
+              <Loader2 className="animate-spin h-4 w-4" /> Loading members...
+            </div>
+          ) : (
+            <Select value={memberId} onValueChange={setMemberId}>
+              <SelectTrigger id="memberSelect"><SelectValue placeholder="Choose member" /></SelectTrigger>
+              <SelectContent>
+                {members?.map((m) => (
+                  <SelectItem key={m._id} value={m._id}>
+                    {m.fullName} ({m.rollNo})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+
+        {selectedMember && (
+          <div className="p-3 bg-stone-50 rounded-lg text-xs space-y-1 text-stone-600 border border-stone-100">
+            <p><strong>Membership Plan:</strong> {selectedMember.planLink?.planName || "N/A"}</p>
+            <p><strong>Base Price:</strong> PKR {planPrice}</p>
+            <p><strong>Renewal Date:</strong> {new Date(selectedMember.renewalDate).toLocaleDateString()}</p>
+          </div>
+        )}
+
+        <div>
+          <Label htmlFor="amount">Amount Received (PKR)</Label>
+          <Input
+            id="amount"
+            type="number"
+            min={0}
+            value={amountReceived}
+            onChange={(e) => setAmountReceived(parseInt(e.target.value) || 0)}
+            required
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="method">Payment Method</Label>
+          <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+            <SelectTrigger id="method"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Cash">Cash</SelectItem>
+              <SelectItem value="Cheque">Cheque</SelectItem>
+              <SelectItem value="UPI/Online">UPI / Online Transfer</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {paymentMethod !== "Cash" && (
+          <div>
+            <Label htmlFor="trxNo">Cheque or Transaction Reference No</Label>
+            <Input
+              id="trxNo"
+              value={trxNo}
+              onChange={(e) => setTrxNo(e.target.value)}
+              required
+            />
+          </div>
+        )}
+
+        {selectedMember && (
+          <div className="flex justify-between items-center text-sm font-bold pt-2 border-t border-stone-100">
+            <span className="text-stone-700">Calculated Outstanding Dues:</span>
+            <span className={outstandingDues > 0 ? "text-red-600" : "text-green-600"}>
+              PKR {outstandingDues}
+            </span>
+          </div>
+        )}
+
+        <div className="sm:col-span-4 flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={() => navigate("/payments")}>Cancel</Button>
+          <Button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "Recording..." : "Record Payment"}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
