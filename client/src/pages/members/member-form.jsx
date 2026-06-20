@@ -117,7 +117,7 @@ export default function MemberForm() {
     mutation.mutate(formData);
   };
 
-  if (loadingMember || loadingPlans) {
+  if (loadingMember) {
     return (
       <div className="flex justify-center p-8">
         <Loader2 className="animate-spin text-stone-500" />
