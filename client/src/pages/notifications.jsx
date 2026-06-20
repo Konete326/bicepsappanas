@@ -2,14 +2,17 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Bell, CheckCircle, Trash2, Circle } from "lucide-react";
+import { Loader2, Bell, CheckCircle, Trash2, Circle, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Notifications() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [filter, setFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ["notifications"],
@@ -17,6 +20,19 @@ export default function Notifications() {
       const res = await API.get("/notifications");
       return res.data.data || [];
     }
+  });
+
+  const filtered = (notifications || []).filter((n) => {
+    if (filter === "unread") return !n.isRead;
+    if (filter === "read") return n.isRead;
+    return true;
+  }).filter((n) => {
+    if (typeFilter !== "all") return n.type === typeFilter;
+    return true;
+  }).filter((n) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return n.title.toLowerCase().includes(q) || n.message.toLowerCase().includes(q);
   });
 
   const clearMutation = useMutation({
@@ -53,15 +69,41 @@ export default function Notifications() {
         )}
       </div>
 
-      <div className="max-w-xs">
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger><SelectValue placeholder="Filter" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Notifications</SelectItem>
-            <SelectItem value="unread">Unread Only</SelectItem>
-            <SelectItem value="read">Read Only</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+        <div className="relative sm:col-span-5">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+          <Input
+            placeholder="Search notifications..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <div className="sm:col-span-3">
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="expiry">Expiry</SelectItem>
+              <SelectItem value="dues">Dues</SelectItem>
+              <SelectItem value="system">System</SelectItem>
+              <SelectItem value="measurement">Measurement</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-2">
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="unread">Unread</SelectItem>
+              <SelectItem value="read">Read</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-2 flex items-center text-sm text-stone-500 border border-stone-200 rounded-md bg-stone-50 px-3 justify-center">
+          {filtered.length} result(s)
+        </div>
       </div>
 
       {isLoading ? (
@@ -70,28 +112,14 @@ export default function Notifications() {
         </div>
       ) : (
         <div className="border border-stone-200 rounded-lg overflow-hidden bg-white shadow-sm">
-          {notifications.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="p-6 text-center text-stone-500 space-y-2">
               <Bell className="mx-auto h-8 w-8 text-stone-300" />
               <p className="text-xs">No active alerts or notifications.</p>
             </div>
           ) : (
             <div className="divide-y divide-stone-100">
-              {notifications.filter((n) => {
-                if (filter === "unread") return !n.isRead;
-                if (filter === "read") return n.isRead;
-                return true;
-              }).length === 0 ? (
-                <div className="p-6 text-center text-stone-500 space-y-2">
-                  <Bell className="mx-auto h-8 w-8 text-stone-300" />
-                  <p className="text-xs">No {filter !== "all" ? filter : ""} notifications.</p>
-                </div>
-              ) : (
-                notifications.filter((n) => {
-                  if (filter === "unread") return !n.isRead;
-                  if (filter === "read") return n.isRead;
-                  return true;
-                }).map((n) => (
+              {filtered.map((n) => (
                 <div key={n._id} className={`p-4 hover:bg-stone-50 transition-colors flex items-start gap-3 ${!n.isRead ? "bg-stone-50/50" : ""}`}>
                   <Button
                     size="icon"
@@ -124,8 +152,7 @@ export default function Notifications() {
                     <Trash2 className="h-4 w-4 text-stone-400 hover:text-red-500" />
                   </Button>
                 </div>
-              ))
-              )}
+              ))}
             </div>
           )}
         </div>
