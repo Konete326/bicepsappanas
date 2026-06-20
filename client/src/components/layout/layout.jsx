@@ -33,10 +33,9 @@ export function Layout({ children, title, description }) {
             <main className="flex-1 relative z-10 flex flex-col min-h-0">
                 <div className="lg:hidden mb-4 flex items-center justify-between p-3 shrink-0">
                     <Button
-                        variant="ghost"
                         size="sm"
                         onClick={() => setSidebarOpen(true)}
-                        className="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100"
+                        className="p-2 bg-stone-800 text-stone-50 hover:bg-stone-700 border border-stone-900"
                     >
                         <Menu className="h-6 w-6" />
                     </Button>
@@ -58,10 +57,9 @@ export function Layout({ children, title, description }) {
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
-                                                variant="ghost"
                                                 size="icon"
                                                 asChild
-                                                className="relative text-stone-600 hover:text-stone-900 border-none bg-transparent"
+                                                className="relative bg-stone-800 text-stone-50 hover:bg-stone-700 border border-stone-900"
                                             >
                                                 <Link to="/changelog">
                                                     <History className="h-5 w-5" />

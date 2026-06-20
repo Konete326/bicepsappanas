@@ -7,6 +7,7 @@ router.use(protect);
 
 router.post("/", memberController.createMember);
 router.get("/", memberController.getMembers);
+router.get("/next-roll-no", memberController.getNextRollNo);
 router.get("/payment-grid/:memberId", memberController.getPaymentGrid);
 router.get("/:id", memberController.getMember);
 router.put("/:id", memberController.updateMember);

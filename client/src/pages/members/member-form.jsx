@@ -32,7 +32,6 @@ export default function MemberForm() {
 
   const validate = (field, value) => {
     const rules = {
-      rollNo: validators.rollNo,
       fullName: validators.name,
       fatherName: validators.name,
       email: validators.email,
@@ -46,13 +45,28 @@ export default function MemberForm() {
 
   const hasErrors = Object.values(errors).some((e) => e !== "");
 
-  const { data: plans, isLoading: loadingPlans } = useQuery({
+  const { data: plans, isLoading: loadingPlans, isError: plansError } = useQuery({
     queryKey: ["plans"],
     queryFn: async () => {
       const res = await API.get("/plans");
       return res.data.data || [];
     }
   });
+
+  const { data: nextRollNo } = useQuery({
+    queryKey: ["nextRollNo"],
+    queryFn: async () => {
+      const res = await API.get("/members/next-roll-no");
+      return res.data.data;
+    },
+    enabled: !id
+  });
+
+  useEffect(() => {
+    if (nextRollNo && !id) {
+      setFormData((prev) => ({ ...prev, rollNo: nextRollNo }));
+    }
+  }, [nextRollNo, id]);
 
   const { isLoading: loadingMember } = useQuery({
     queryKey: ["member", id],
@@ -117,8 +131,7 @@ export default function MemberForm() {
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
         <div>
           <Label htmlFor="rollNo">Roll Number</Label>
-          <Input id="rollNo" className={getErrClass(errors, "rollNo")} value={formData.rollNo} onChange={(e) => { setFormData({ ...formData, rollNo: e.target.value }); validate("rollNo", e.target.value); }} onBlur={(e) => validate("rollNo", e.target.value)} required />
-          {errors.rollNo && <p className="text-[11px] text-red-500 mt-1">{errors.rollNo}</p>}
+          <Input id="rollNo" value={formData.rollNo} readOnly className="bg-stone-50 text-stone-500 cursor-not-allowed" />
         </div>
         <div>
           <Label htmlFor="fullName">Full Name</Label>
@@ -156,12 +169,12 @@ export default function MemberForm() {
         <div>
           <Label htmlFor="planLink">Select Plan</Label>
           <Select value={formData.planLink} onValueChange={(val) => setFormData({ ...formData, planLink: val })}>
-            <SelectTrigger><SelectValue placeholder="Choose a plan" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={loadingPlans ? "Loading plans..." : plansError ? "Failed to load plans" : "Choose a plan"} /></SelectTrigger>
             <SelectContent>
               {plans?.length > 0 ? (
-                plans.map((p) => <SelectItem key={p._id} value={p._id}>{p.planName} (PKR {p.price})</SelectItem>)
+                plans.map((p) => <SelectItem key={p._id} value={p._id}>{p.planName} — PKR {p.price.toLocaleString()}</SelectItem>)
               ) : (
-                <SelectItem value="__none__" disabled>No plans found</SelectItem>
+                <SelectItem value="__none__" disabled>{plansError ? "Check server connection" : "No plans available"}</SelectItem>
               )}
             </SelectContent>
           </Select>

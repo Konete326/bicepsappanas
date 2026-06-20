@@ -1,15 +1,28 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Plus, Eye, AlertCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Plus, Eye, AlertCircle, Search } from "lucide-react";
 
 export default function PaymentList() {
+  const [search, setSearch] = useState("");
+  const [method, setMethod] = useState("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const { data: payments, isLoading } = useQuery({
-    queryKey: ["payments"],
+    queryKey: ["payments", method, startDate, endDate, search],
     queryFn: async () => {
-      const res = await API.get("/payments");
+      const params = {};
+      if (method !== "all") params.method = method;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      if (search) params.search = search;
+      const res = await API.get("/payments", { params });
       return res.data.data || [];
     }
   });
@@ -29,6 +42,30 @@ export default function PaymentList() {
               <Plus className="mr-2 h-4 w-4" /> Record Payment
             </Button>
           </Link>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+        <div className="relative sm:col-span-5">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
+          <Input placeholder="Search by member name or roll no..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        </div>
+        <div className="sm:col-span-3">
+          <Select value={method} onValueChange={setMethod}>
+            <SelectTrigger className="w-full"><SelectValue placeholder="Payment Method" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Methods</SelectItem>
+              <SelectItem value="Cash">Cash</SelectItem>
+              <SelectItem value="Cheque">Cheque</SelectItem>
+              <SelectItem value="UPI/Online">UPI / Online</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-2">
+          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+        </div>
+        <div className="sm:col-span-2">
+          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </div>
       </div>
 

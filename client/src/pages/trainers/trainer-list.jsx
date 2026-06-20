@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Plus, Edit, BookOpen } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Plus, Edit, BookOpen, Search } from "lucide-react";
 
 export default function TrainerList() {
+  const [search, setSearch] = useState("");
+
   const { data: trainers, isLoading } = useQuery({
     queryKey: ["trainers"],
     queryFn: async () => {
@@ -14,6 +18,11 @@ export default function TrainerList() {
     }
   });
 
+  const filtered = trainers?.filter((t) => {
+    const q = search.toLowerCase();
+    return t.fullName?.toLowerCase().includes(q) || t.phone?.toLowerCase().includes(q) || t.email?.toLowerCase().includes(q);
+  }) || [];
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -21,6 +30,16 @@ export default function TrainerList() {
         <Link to="/trainers/new">
           <Button><Plus className="mr-2 h-4 w-4" /> Register Trainer</Button>
         </Link>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+        <div className="relative sm:col-span-9">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
+          <Input placeholder="Search by name, phone or email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        </div>
+        <div className="sm:col-span-3 flex items-center px-3 text-sm text-stone-500 border border-stone-200 rounded-md bg-stone-50">
+          {filtered.length} trainer(s)
+        </div>
       </div>
 
       {isLoading ? (
@@ -42,17 +61,17 @@ export default function TrainerList() {
             </TableHeader>
             <TableBody>
               {(() => {
-                const list = trainers || [];
-                if (list.length === 0) {
+                if (isLoading) return null;
+                if (filtered.length === 0) {
                   return (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center text-stone-500 py-6">
-                        No trainers registered yet.
+                        {search ? "No trainers match your search." : "No trainers registered yet."}
                       </TableCell>
                     </TableRow>
                   );
                 }
-                return list.map((t) => (
+                return filtered.map((t) => (
                   <TableRow key={t._id}>
                     <TableCell className="font-semibold text-stone-900">{t.fullName}</TableCell>
                     <TableCell>{t.phone}</TableCell>

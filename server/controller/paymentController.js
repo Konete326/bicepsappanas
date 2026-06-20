@@ -36,17 +36,26 @@ exports.createPayment = catchAsync(async (req, res) => {
 });
 
 exports.getPayments = catchAsync(async (req, res) => {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, method, search } = req.query;
     let filter = {};
     if (startDate || endDate) {
         filter.date = {};
         if (startDate) filter.date.$gte = new Date(startDate);
         if (endDate) filter.date.$lte = new Date(endDate);
     }
+    if (method) filter.paymentMethod = method;
     const payments = await Payment.find(filter)
         .populate("memberId", "fullName rollNo cellNo")
         .sort({ createdAt: -1 });
-    res.status(200).json({ status: "success", results: payments.length, data: payments });
+    let result = payments;
+    if (search) {
+        const q = search.toLowerCase();
+        result = payments.filter((p) =>
+            p.memberId?.fullName?.toLowerCase().includes(q) ||
+            p.memberId?.rollNo?.toLowerCase().includes(q)
+        );
+    }
+    res.status(200).json({ status: "success", results: result.length, data: result });
 });
 
 exports.getPayment = catchAsync(async (req, res, next) => {

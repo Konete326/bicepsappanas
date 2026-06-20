@@ -93,21 +93,14 @@ export default function License() {
                       {String(idx + 1).padStart(2, "0")}. {section.title.split(" ").slice(0, 3).join(" ")}
                     </span>
                   </div>
-                  <p className={`text-[10px] font-medium pl-5 ${isActive ? "text-stone-400" : "text-stone-400"}`}>
-                    {section.short}
-                  </p>
+
                 </button>
               );
             })}
           </div>
         </ScrollArea>
 
-        {/* Bottom stamp */}
-        <div className="px-4 py-3 border-t border-stone-100">
-          <p className="text-[9px] font-bold text-stone-300 uppercase tracking-wider text-center">
-            © 2026 · All Rights Reserved
-          </p>
-        </div>
+
       </div>
 
       {/* ── RIGHT PANEL: selected clause detail ──────────────────────── */}
@@ -144,14 +137,7 @@ export default function License() {
           </div>
         </ScrollArea>
 
-        {/* Bottom bar */}
-        <div className="shrink-0 border-t border-stone-100 bg-stone-900 px-6 py-3">
-          <p className="text-[10px] text-stone-400 font-medium text-center">
-            This software is the intellectual property of{" "}
-            <span className="text-white font-black">Konete326</span> and is protected under applicable
-            software copyright laws. Unauthorized use may result in severe civil and criminal penalties.
-          </p>
-        </div>
+
       </div>
 
     </div>

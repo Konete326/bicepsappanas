@@ -1,12 +1,15 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Bell, CheckCircle, Trash2, Circle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Notifications() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [filter, setFilter] = useState("all");
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ["notifications"],
@@ -50,6 +53,17 @@ export default function Notifications() {
         )}
       </div>
 
+      <div className="max-w-xs">
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger><SelectValue placeholder="Filter" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Notifications</SelectItem>
+            <SelectItem value="unread">Unread Only</SelectItem>
+            <SelectItem value="read">Read Only</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {isLoading ? (
         <div className="flex justify-center p-8">
           <Loader2 className="animate-spin text-stone-500" />
@@ -63,7 +77,21 @@ export default function Notifications() {
             </div>
           ) : (
             <div className="divide-y divide-stone-100">
-              {notifications.map((n) => (
+              {notifications.filter((n) => {
+                if (filter === "unread") return !n.isRead;
+                if (filter === "read") return n.isRead;
+                return true;
+              }).length === 0 ? (
+                <div className="p-6 text-center text-stone-500 space-y-2">
+                  <Bell className="mx-auto h-8 w-8 text-stone-300" />
+                  <p className="text-xs">No {filter !== "all" ? filter : ""} notifications.</p>
+                </div>
+              ) : (
+                notifications.filter((n) => {
+                  if (filter === "unread") return !n.isRead;
+                  if (filter === "read") return n.isRead;
+                  return true;
+                }).map((n) => (
                 <div key={n._id} className={`p-4 hover:bg-stone-50 transition-colors flex items-start gap-3 ${!n.isRead ? "bg-stone-50/50" : ""}`}>
                   <Button
                     size="icon"
@@ -96,7 +124,8 @@ export default function Notifications() {
                     <Trash2 className="h-4 w-4 text-stone-400 hover:text-red-500" />
                   </Button>
                 </div>
-              ))}
+              ))
+              )}
             </div>
           )}
         </div>

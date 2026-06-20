@@ -4,6 +4,13 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 exports.createMember = catchAsync(async (req, res) => {
+    const lastMember = await Member.findOne().sort({ createdAt: -1 }).select("rollNo");
+    let nextRoll = 1;
+    if (lastMember) {
+        const num = parseInt(lastMember.rollNo.replace(/[^0-9]/g, ""));
+        if (!isNaN(num)) nextRoll = num + 1;
+    }
+    req.body.rollNo = String(nextRoll).padStart(4, "0");
     const member = await Member.create(req.body);
     res.status(201).json({ status: "success", data: member });
 });
@@ -44,4 +51,14 @@ exports.getPaymentGrid = catchAsync(async (req, res, next) => {
     if (!member) return next(new AppError("Member not found", 404));
     const payments = await Payment.find({ memberId: member._id }).sort({ date: 1 });
     res.status(200).json({ status: "success", data: { member, payments, paymentGrid: member.paymentGrid } });
+});
+
+exports.getNextRollNo = catchAsync(async (req, res) => {
+    const lastMember = await Member.findOne().sort({ createdAt: -1 }).select("rollNo");
+    let nextRoll = 1;
+    if (lastMember) {
+        const num = parseInt(lastMember.rollNo.replace(/[^0-9]/g, ""));
+        if (!isNaN(num)) nextRoll = num + 1;
+    }
+    res.status(200).json({ status: "success", data: String(nextRoll).padStart(4, "0") });
 });
