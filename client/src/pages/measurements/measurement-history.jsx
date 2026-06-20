@@ -49,7 +49,11 @@ export default function MeasurementHistory() {
         <Select value={memberId} onValueChange={setMemberId}>
           <SelectTrigger><SelectValue placeholder="Choose member to track" /></SelectTrigger>
           <SelectContent>
-            {members?.map((m) => <SelectItem key={m._id} value={m._id}>{m.fullName} ({m.rollNo})</SelectItem>)}
+            {members?.length > 0 ? (
+              members.map((m) => <SelectItem key={m._id} value={m._id}>{m.fullName} ({m.rollNo})</SelectItem>)
+            ) : (
+              <SelectItem value="__none__" disabled>No members found</SelectItem>
+            )}
           </SelectContent>
         </Select>
       </div>

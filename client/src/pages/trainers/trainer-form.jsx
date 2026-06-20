@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { validators, getErrClass } from "@/utils/validation";
 
 export default function TrainerForm() {
   const { id } = useParams();
@@ -20,6 +21,23 @@ export default function TrainerForm() {
     baseSalary: 0,
     commissionRate: 0
   });
+
+  const [errors, setErrors] = useState({});
+
+  const validate = (field, value) => {
+    const rules = {
+      fullName: validators.name,
+      email: validators.email,
+      phone: validators.phone,
+      baseSalary: validators.nonNegNum,
+      commissionRate: validators.nonNegNum,
+    };
+    if (rules[field]) {
+      setErrors((prev) => ({ ...prev, [field]: rules[field](value) }));
+    }
+  };
+
+  const hasErrors = Object.values(errors).some((e) => e !== "");
 
   const { isLoading: loadingTrainer } = useQuery({
     queryKey: ["trainer", id],
@@ -77,29 +95,34 @@ export default function TrainerForm() {
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-xl font-bold mb-6 font-outfit uppercase">{id ? "Edit Trainer" : "Register Trainer"}</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
-        <div>
+        <div className="sm:col-span-2">
           <Label htmlFor="fullName">Full Name</Label>
-          <Input id="fullName" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} required />
+          <Input id="fullName" className={getErrClass(errors, "fullName")} value={formData.fullName} onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); validate("fullName", e.target.value); }} onBlur={(e) => validate("fullName", e.target.value)} required />
+          {errors.fullName && <p className="text-[11px] text-red-500 mt-1">{errors.fullName}</p>}
         </div>
         <div>
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+          <Input id="email" type="email" className={getErrClass(errors, "email")} value={formData.email} onChange={(e) => { setFormData({ ...formData, email: e.target.value }); validate("email", e.target.value); }} onBlur={(e) => validate("email", e.target.value)} />
+          {errors.email && <p className="text-[11px] text-red-500 mt-1">{errors.email}</p>}
         </div>
         <div>
           <Label htmlFor="phone">Phone Number</Label>
-          <Input id="phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} required />
+          <Input id="phone" className={getErrClass(errors, "phone")} value={formData.phone} onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); validate("phone", e.target.value); }} onBlur={(e) => validate("phone", e.target.value)} required />
+          {errors.phone && <p className="text-[11px] text-red-500 mt-1">{errors.phone}</p>}
         </div>
         <div>
           <Label htmlFor="baseSalary">Base Monthly Salary (PKR)</Label>
-          <Input id="baseSalary" type="number" min={0} value={formData.baseSalary} onChange={(e) => setFormData({ ...formData, baseSalary: parseInt(e.target.value) || 0 })} required />
+          <Input id="baseSalary" type="number" min={0} className={getErrClass(errors, "baseSalary")} value={formData.baseSalary} onChange={(e) => { setFormData({ ...formData, baseSalary: parseInt(e.target.value) || 0 }); validate("baseSalary", e.target.value); }} onBlur={(e) => validate("baseSalary", e.target.value)} required />
+          {errors.baseSalary && <p className="text-[11px] text-red-500 mt-1">{errors.baseSalary}</p>}
         </div>
         <div>
           <Label htmlFor="commission">Commission Rate Per Session (PKR)</Label>
-          <Input id="commission" type="number" min={0} value={formData.commissionRate} onChange={(e) => setFormData({ ...formData, commissionRate: parseInt(e.target.value) || 0 })} required />
+          <Input id="commission" type="number" min={0} className={getErrClass(errors, "commissionRate")} value={formData.commissionRate} onChange={(e) => { setFormData({ ...formData, commissionRate: parseInt(e.target.value) || 0 }); validate("commissionRate", e.target.value); }} onBlur={(e) => validate("commissionRate", e.target.value)} required />
+          {errors.commissionRate && <p className="text-[11px] text-red-500 mt-1">{errors.commissionRate}</p>}
         </div>
         <div className="sm:col-span-2 flex justify-end gap-2 pt-4 border-t border-stone-100">
           <Button type="button" onClick={() => navigate("/trainers")}>Cancel</Button>
-          <Button type="submit" disabled={mutation.isPending}>
+          <Button type="submit" disabled={mutation.isPending || hasErrors}>
             {mutation.isPending ? "Saving..." : "Save Trainer"}
           </Button>
         </div>

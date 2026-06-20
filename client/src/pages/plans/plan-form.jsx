@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { validators, getErrClass } from "@/utils/validation";
 
 export default function PlanForm({ plan, onSuccess, onCancel }) {
   const queryClient = useQueryClient();
@@ -15,6 +16,19 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
     price: plan?.price || 0,
     description: plan?.description || ""
   });
+
+  const [errors, setErrors] = useState({});
+
+  const validate = (field, value) => {
+    const rules = {
+      planName: validators.name,
+      duration: validators.positiveNum,
+      price: validators.nonNegNum,
+    };
+    if (rules[field]) setErrors((prev) => ({ ...prev, [field]: rules[field](value) }));
+  };
+
+  const hasErrors = Object.values(errors).some((e) => e !== "");
 
   const mutation = useMutation({
     mutationFn: async (payload) => {
@@ -46,34 +60,18 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
     <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto p-4 border border-stone-200 rounded-xl bg-white shadow-sm">
       <div>
         <Label htmlFor="planName">Plan Name</Label>
-        <Input
-          id="planName"
-          value={formData.planName}
-          onChange={(e) => setFormData({ ...formData, planName: e.target.value })}
-          required
-        />
+        <Input id="planName" className={getErrClass(errors, "planName")} value={formData.planName} onChange={(e) => { setFormData({ ...formData, planName: e.target.value }); validate("planName", e.target.value); }} onBlur={(e) => validate("planName", e.target.value)} required />
+        {errors.planName && <p className="text-[11px] text-red-500 mt-1">{errors.planName}</p>}
       </div>
       <div>
         <Label htmlFor="duration">Duration (Months)</Label>
-        <Input
-          id="duration"
-          type="number"
-          min={1}
-          value={formData.duration}
-          onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 1 })}
-          required
-        />
+        <Input id="duration" type="number" min={1} className={getErrClass(errors, "duration")} value={formData.duration} onChange={(e) => { setFormData({ ...formData, duration: parseInt(e.target.value) || 1 }); validate("duration", e.target.value); }} onBlur={(e) => validate("duration", e.target.value)} required />
+        {errors.duration && <p className="text-[11px] text-red-500 mt-1">{errors.duration}</p>}
       </div>
       <div>
         <Label htmlFor="price">Price (PKR)</Label>
-        <Input
-          id="price"
-          type="number"
-          min={0}
-          value={formData.price}
-          onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
-          required
-        />
+        <Input id="price" type="number" min={0} className={getErrClass(errors, "price")} value={formData.price} onChange={(e) => { setFormData({ ...formData, price: parseInt(e.target.value) || 0 }); validate("price", e.target.value); }} onBlur={(e) => validate("price", e.target.value)} required />
+        {errors.price && <p className="text-[11px] text-red-500 mt-1">{errors.price}</p>}
       </div>
       <div>
         <Label htmlFor="description">Description</Label>
@@ -89,7 +87,7 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={mutation.isPending}>
+        <Button type="submit" disabled={mutation.isPending || hasErrors}>
           {mutation.isPending ? "Saving..." : "Save Plan"}
         </Button>
       </div>

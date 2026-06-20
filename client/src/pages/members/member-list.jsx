@@ -38,8 +38,8 @@ export default function MemberList() {
         </Link>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full sm:max-w-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+        <div className="relative sm:col-span-9">
           <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
           <Input
             placeholder="Search Roll No or Name..."
@@ -48,17 +48,19 @@ export default function MemberList() {
             className="pl-9"
           />
         </div>
-        <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Filter Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Members</SelectItem>
-            <SelectItem value="Active">Active</SelectItem>
-            <SelectItem value="Expired">Expired</SelectItem>
-            <SelectItem value="Frozen">Frozen</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="sm:col-span-3">
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Members</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Expired">Expired</SelectItem>
+              <SelectItem value="Frozen">Frozen</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {isLoading ? (

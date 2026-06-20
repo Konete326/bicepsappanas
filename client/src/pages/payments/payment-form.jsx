@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { validators, getErrClass } from "@/utils/validation";
 
 export default function PaymentForm() {
   const navigate = useNavigate();
@@ -16,6 +17,14 @@ export default function PaymentForm() {
   const [amountReceived, setAmountReceived] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [trxNo, setTrxNo] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const validate = (field, value) => {
+    const rules = { amount: validators.positiveNum, trxNo: validators.text };
+    if (rules[field]) setErrors((prev) => ({ ...prev, [field]: rules[field](value) }));
+  };
+
+  const hasErrors = Object.values(errors).some((e) => e !== "");
 
   const { data: members, isLoading: loadingMembers } = useQuery({
     queryKey: ["members-lookup"],
@@ -75,11 +84,15 @@ export default function PaymentForm() {
             <Select value={memberId} onValueChange={setMemberId}>
               <SelectTrigger id="memberSelect"><SelectValue placeholder="Choose member" /></SelectTrigger>
               <SelectContent>
-                {members?.map((m) => (
-                  <SelectItem key={m._id} value={m._id}>
-                    {m.fullName} ({m.rollNo})
-                  </SelectItem>
-                ))}
+                {members?.length > 0 ? (
+                  members.map((m) => (
+                    <SelectItem key={m._id} value={m._id}>
+                      {m.fullName} ({m.rollNo})
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="__none__" disabled>No members found</SelectItem>
+                )}
               </SelectContent>
             </Select>
           )}
@@ -99,13 +112,16 @@ export default function PaymentForm() {
             id="amount"
             type="number"
             min={0}
+            className={getErrClass(errors, "amount")}
             value={amountReceived}
-            onChange={(e) => setAmountReceived(parseInt(e.target.value) || 0)}
+            onChange={(e) => { setAmountReceived(parseInt(e.target.value) || 0); validate("amount", e.target.value); }}
+            onBlur={(e) => validate("amount", e.target.value)}
             required
           />
+          {errors.amount && <p className="text-[11px] text-red-500 mt-1">{errors.amount}</p>}
         </div>
 
-        <div>
+        <div className="sm:col-span-2">
           <Label htmlFor="method">Payment Method</Label>
           <Select value={paymentMethod} onValueChange={setPaymentMethod}>
             <SelectTrigger id="method"><SelectValue /></SelectTrigger>
@@ -122,10 +138,13 @@ export default function PaymentForm() {
             <Label htmlFor="trxNo">Cheque or Transaction Reference No</Label>
             <Input
               id="trxNo"
+              className={getErrClass(errors, "trxNo")}
               value={trxNo}
-              onChange={(e) => setTrxNo(e.target.value)}
+              onChange={(e) => { setTrxNo(e.target.value); validate("trxNo", e.target.value); }}
+              onBlur={(e) => validate("trxNo", e.target.value)}
               required
             />
+            {errors.trxNo && <p className="text-[11px] text-red-500 mt-1">{errors.trxNo}</p>}
           </div>
         )}
 
@@ -140,7 +159,7 @@ export default function PaymentForm() {
 
         <div className="sm:col-span-2 flex justify-end gap-2 pt-4">
           <Button type="button" onClick={() => navigate("/payments")}>Cancel</Button>
-          <Button type="submit" disabled={mutation.isPending}>
+          <Button type="submit" disabled={mutation.isPending || hasErrors}>
             {mutation.isPending ? "Recording..." : "Record Payment"}
           </Button>
         </div>

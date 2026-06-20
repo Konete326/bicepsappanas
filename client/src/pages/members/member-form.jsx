@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { validators, getErrClass } from "@/utils/validation";
 
 export default function MemberForm() {
   const { id } = useParams();
@@ -26,6 +27,24 @@ export default function MemberForm() {
     status: "Active",
     planLink: ""
   });
+
+  const [errors, setErrors] = useState({});
+
+  const validate = (field, value) => {
+    const rules = {
+      rollNo: validators.rollNo,
+      fullName: validators.name,
+      fatherName: validators.name,
+      email: validators.email,
+      cellNo: validators.phone,
+      address: validators.text,
+    };
+    if (rules[field]) {
+      setErrors((prev) => ({ ...prev, [field]: rules[field](value) }));
+    }
+  };
+
+  const hasErrors = Object.values(errors).some((e) => e !== "");
 
   const { data: plans, isLoading: loadingPlans } = useQuery({
     queryKey: ["plans"],
@@ -98,27 +117,33 @@ export default function MemberForm() {
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 border border-stone-200 rounded-xl p-6 bg-white shadow-sm">
         <div>
           <Label htmlFor="rollNo">Roll Number</Label>
-          <Input id="rollNo" value={formData.rollNo} onChange={(e) => setFormData({ ...formData, rollNo: e.target.value })} required />
+          <Input id="rollNo" className={getErrClass(errors, "rollNo")} value={formData.rollNo} onChange={(e) => { setFormData({ ...formData, rollNo: e.target.value }); validate("rollNo", e.target.value); }} onBlur={(e) => validate("rollNo", e.target.value)} required />
+          {errors.rollNo && <p className="text-[11px] text-red-500 mt-1">{errors.rollNo}</p>}
         </div>
         <div>
           <Label htmlFor="fullName">Full Name</Label>
-          <Input id="fullName" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} required />
+          <Input id="fullName" className={getErrClass(errors, "fullName")} value={formData.fullName} onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); validate("fullName", e.target.value); }} onBlur={(e) => validate("fullName", e.target.value)} required />
+          {errors.fullName && <p className="text-[11px] text-red-500 mt-1">{errors.fullName}</p>}
         </div>
         <div>
           <Label htmlFor="fatherName">Father's Name</Label>
-          <Input id="fatherName" value={formData.fatherName} onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })} required />
+          <Input id="fatherName" className={getErrClass(errors, "fatherName")} value={formData.fatherName} onChange={(e) => { setFormData({ ...formData, fatherName: e.target.value }); validate("fatherName", e.target.value); }} onBlur={(e) => validate("fatherName", e.target.value)} required />
+          {errors.fatherName && <p className="text-[11px] text-red-500 mt-1">{errors.fatherName}</p>}
         </div>
         <div>
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+          <Input id="email" type="email" className={getErrClass(errors, "email")} value={formData.email} onChange={(e) => { setFormData({ ...formData, email: e.target.value }); validate("email", e.target.value); }} onBlur={(e) => validate("email", e.target.value)} />
+          {errors.email && <p className="text-[11px] text-red-500 mt-1">{errors.email}</p>}
         </div>
         <div>
           <Label htmlFor="cellNo">Cell Number</Label>
-          <Input id="cellNo" value={formData.cellNo} onChange={(e) => setFormData({ ...formData, cellNo: e.target.value })} placeholder="+923000000000" required />
+          <Input id="cellNo" className={getErrClass(errors, "cellNo")} value={formData.cellNo} onChange={(e) => { setFormData({ ...formData, cellNo: e.target.value }); validate("cellNo", e.target.value); }} onBlur={(e) => validate("cellNo", e.target.value)} placeholder="+923000000000" required />
+          {errors.cellNo && <p className="text-[11px] text-red-500 mt-1">{errors.cellNo}</p>}
         </div>
         <div>
           <Label htmlFor="address">Address</Label>
-          <Input id="address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} required />
+          <Input id="address" className={getErrClass(errors, "address")} value={formData.address} onChange={(e) => { setFormData({ ...formData, address: e.target.value }); validate("address", e.target.value); }} onBlur={(e) => validate("address", e.target.value)} required />
+          {errors.address && <p className="text-[11px] text-red-500 mt-1">{errors.address}</p>}
         </div>
         <div>
           <Label htmlFor="joiningDate">Joining Date</Label>
@@ -133,7 +158,11 @@ export default function MemberForm() {
           <Select value={formData.planLink} onValueChange={(val) => setFormData({ ...formData, planLink: val })}>
             <SelectTrigger><SelectValue placeholder="Choose a plan" /></SelectTrigger>
             <SelectContent>
-              {plans?.map((p) => <SelectItem key={p._id} value={p._id}>{p.planName} (PKR {p.price})</SelectItem>)}
+              {plans?.length > 0 ? (
+                plans.map((p) => <SelectItem key={p._id} value={p._id}>{p.planName} (PKR {p.price})</SelectItem>)
+              ) : (
+                <SelectItem value="__none__" disabled>No plans found</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -150,7 +179,7 @@ export default function MemberForm() {
         </div>
         <div className="sm:col-span-4 flex justify-end gap-2 pt-4 border-t border-stone-100">
           <Button type="button" onClick={() => navigate("/members")}>Cancel</Button>
-          <Button type="submit" disabled={mutation.isPending}>
+          <Button type="submit" disabled={mutation.isPending || hasErrors}>
             {mutation.isPending ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
             Save Member
           </Button>
