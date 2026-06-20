@@ -52,6 +52,7 @@ export default function TrainerList() {
             <TableHeader>
               <TableRow>
                 <TableHead>Full Name</TableHead>
+                <TableHead>Gender</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Base Salary</TableHead>
@@ -65,7 +66,7 @@ export default function TrainerList() {
                 if (filtered.length === 0) {
                   return (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-stone-500 py-6">
+                      <TableCell colSpan={7} className="text-center text-stone-500 py-6">
                         {search ? "No trainers match your search." : "No trainers registered yet."}
                       </TableCell>
                     </TableRow>
@@ -74,6 +75,7 @@ export default function TrainerList() {
                 return filtered.map((t) => (
                   <TableRow key={t._id}>
                     <TableCell className="font-semibold text-stone-900">{t.fullName}</TableCell>
+                    <TableCell>{t.gender || "N/A"}</TableCell>
                     <TableCell>{t.phone}</TableCell>
                     <TableCell>{t.email || "N/A"}</TableCell>
                     <TableCell>PKR {t.baseSalary}</TableCell>
@@ -85,7 +87,7 @@ export default function TrainerList() {
                         </Button>
                       </Link>
                       <Link to={`/trainers/edit/${t._id}`}>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
+                        <Button size="icon" className="h-8 w-8">
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>

@@ -4,13 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Plus, LineChart as ChartIcon } from "lucide-react";
+import { Loader2, Plus, LineChart as ChartIcon, Search } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
 export default function MeasurementHistory() {
   const [memberId, setMemberId] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const { data: members, isLoading: loadingMembers } = useQuery({
     queryKey: ["members-lookup-history"],
@@ -29,12 +32,21 @@ export default function MeasurementHistory() {
     enabled: !!memberId
   });
 
-  const chartData = history?.map((h) => ({
+  const filteredHistory = (history || []).filter((h) => {
+    const d = new Date(h.createdAt || Date.now());
+    if (startDate && d < new Date(startDate)) return false;
+    if (endDate && d > new Date(endDate)) return false;
+    return true;
+  });
+
+  const chartData = filteredHistory.map((h) => ({
     date: new Date(h.createdAt || Date.now()).toLocaleDateString(),
     weight: h.weightHistory?.[h.weightHistory.length - 1] || 0,
     bicep: h.bicepHistory?.[h.bicepHistory.length - 1] || 0,
     waist: h.waistHistory?.[h.waistHistory.length - 1] || 0
   })) || [];
+
+  const list = filteredHistory;
 
   return (
     <div className="p-6 space-y-6">
@@ -45,17 +57,28 @@ export default function MeasurementHistory() {
         </Link>
       </div>
 
-      <div className="max-w-xs">
-        <Select value={memberId} onValueChange={setMemberId}>
-          <SelectTrigger><SelectValue placeholder="Choose member to track" /></SelectTrigger>
-          <SelectContent>
-            {members?.length > 0 ? (
-              members.map((m) => <SelectItem key={m._id} value={m._id}>{m.fullName} ({m.rollNo})</SelectItem>)
-            ) : (
-              <SelectItem value="__none__" disabled>No members found</SelectItem>
-            )}
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+        <div className="relative sm:col-span-5">
+          <Select value={memberId} onValueChange={setMemberId}>
+            <SelectTrigger><SelectValue placeholder="Choose member to track" /></SelectTrigger>
+            <SelectContent>
+              {members?.length > 0 ? (
+                members.map((m) => <SelectItem key={m._id} value={m._id}>{m.fullName} ({m.rollNo})</SelectItem>)
+              ) : (
+                <SelectItem value="__none__" disabled>No members found</SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-3">
+          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} placeholder="From" />
+        </div>
+        <div className="sm:col-span-2">
+          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} placeholder="To" />
+        </div>
+        <div className="sm:col-span-2 flex items-center text-sm text-stone-500 border border-stone-200 rounded-md bg-stone-50 px-3 justify-center">
+          {list.length} record(s)
+        </div>
       </div>
 
       {memberId && (
@@ -109,11 +132,10 @@ export default function MeasurementHistory() {
                     </TableHeader>
                     <TableBody>
                       {(() => {
-                        const list = history || [];
                         if (list.length === 0) {
                           return (
                             <TableRow>
-                              <TableCell colSpan={4} className="text-center py-4">No records yet.</TableCell>
+                              <TableCell colSpan={4} className="text-center py-4">No records found.</TableCell>
                             </TableRow>
                           );
                         }

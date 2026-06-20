@@ -127,6 +127,8 @@ export default function PaymentForm() {
             <SelectTrigger id="method"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="Cash">Cash</SelectItem>
+              <SelectItem value="Easy Paisa">Easy Paisa</SelectItem>
+              <SelectItem value="Jazz Cash">Jazz Cash</SelectItem>
               <SelectItem value="Cheque">Cheque</SelectItem>
               <SelectItem value="UPI/Online">UPI / Online Transfer</SelectItem>
             </SelectContent>

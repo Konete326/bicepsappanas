@@ -18,6 +18,11 @@ const trainerSchema = new mongoose.Schema({
         required: [true, "Phone number is required"],
         trim: true,
     },
+    gender: {
+        type: String,
+        enum: ["Male", "Female"],
+        required: [true, "Gender is required"],
+    },
     baseSalary: {
         type: Number,
         required: [true, "Base salary is required"],

@@ -166,7 +166,7 @@ export default function MemberForm() {
           <Label htmlFor="renewalDate">Renewal Date</Label>
           <Input id="renewalDate" type="date" value={formData.renewalDate} onChange={(e) => setFormData({ ...formData, renewalDate: e.target.value })} required />
         </div>
-        <div>
+        <div className="sm:col-span-2">
           <Label htmlFor="planLink">Select Plan</Label>
           <Select value={formData.planLink} onValueChange={(val) => setFormData({ ...formData, planLink: val })}>
             <SelectTrigger><SelectValue placeholder={loadingPlans ? "Loading plans..." : plansError ? "Failed to load plans" : "Choose a plan"} /></SelectTrigger>
@@ -179,7 +179,7 @@ export default function MemberForm() {
             </SelectContent>
           </Select>
         </div>
-        <div>
+        <div className="sm:col-span-2">
           <Label htmlFor="status">Status</Label>
           <Select value={formData.status} onValueChange={(val) => setFormData({ ...formData, status: val })}>
             <SelectTrigger><SelectValue /></SelectTrigger>

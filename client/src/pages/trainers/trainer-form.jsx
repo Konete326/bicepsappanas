@@ -5,6 +5,7 @@ import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { validators, getErrClass } from "@/utils/validation";
@@ -18,6 +19,7 @@ export default function TrainerForm() {
     fullName: "",
     email: "",
     phone: "",
+    gender: "Male",
     baseSalary: 0,
     commissionRate: 0
   });
@@ -49,6 +51,7 @@ export default function TrainerForm() {
           fullName: data.fullName || "",
           email: data.email || "",
           phone: data.phone || "",
+          gender: data.gender || "Male",
           baseSalary: data.baseSalary || 0,
           commissionRate: data.commissionRate || 0
         });
@@ -109,6 +112,16 @@ export default function TrainerForm() {
           <Label htmlFor="phone">Phone Number</Label>
           <Input id="phone" type="tel" className={getErrClass(errors, "phone")} value={formData.phone} onChange={(e) => { const v = e.target.value.replace(/[^0-9+]/g, ""); setFormData({ ...formData, phone: v }); validate("phone", v); }} onBlur={(e) => validate("phone", formData.phone)} required />
           {errors.phone && <p className="text-[11px] text-red-500 mt-1">{errors.phone}</p>}
+        </div>
+        <div>
+          <Label htmlFor="gender">Gender</Label>
+          <Select value={formData.gender} onValueChange={(val) => setFormData({ ...formData, gender: val })}>
+            <SelectTrigger id="gender"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Male">Male</SelectItem>
+              <SelectItem value="Female">Female</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="baseSalary">Base Monthly Salary (PKR)</Label>

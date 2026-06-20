@@ -38,17 +38,22 @@ export default function RoutineView() {
         )}
       </div>
 
-      <div className="max-w-xs">
-        <Select value={memberId} onValueChange={setMemberId}>
-          <SelectTrigger><SelectValue placeholder="Choose member" /></SelectTrigger>
-          <SelectContent>
-            {members?.length > 0 ? (
-              members.map((m) => <SelectItem key={m._id} value={m._id}>{m.fullName} ({m.rollNo})</SelectItem>)
-            ) : (
-              <SelectItem value="__none__" disabled>No members found</SelectItem>
-            )}
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+        <div className="sm:col-span-9">
+          <Select value={memberId} onValueChange={setMemberId}>
+            <SelectTrigger><SelectValue placeholder="Choose member" /></SelectTrigger>
+            <SelectContent>
+              {members?.length > 0 ? (
+                members.map((m) => <SelectItem key={m._id} value={m._id}>{m.fullName} ({m.rollNo})</SelectItem>)
+              ) : (
+                <SelectItem value="__none__" disabled>No members found</SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-3 flex items-center text-sm text-stone-500 border border-stone-200 rounded-md bg-stone-50 px-3 justify-center">
+          {members?.length || 0} member(s)
+        </div>
       </div>
 
       {memberId && (

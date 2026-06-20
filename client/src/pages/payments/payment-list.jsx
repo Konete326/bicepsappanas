@@ -56,6 +56,8 @@ export default function PaymentList() {
             <SelectContent>
               <SelectItem value="all">All Methods</SelectItem>
               <SelectItem value="Cash">Cash</SelectItem>
+              <SelectItem value="Easy Paisa">Easy Paisa</SelectItem>
+              <SelectItem value="Jazz Cash">Jazz Cash</SelectItem>
               <SelectItem value="Cheque">Cheque</SelectItem>
               <SelectItem value="UPI/Online">UPI / Online</SelectItem>
             </SelectContent>
