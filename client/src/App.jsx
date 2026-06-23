@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout/layout";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { Agentation } from "agentation";
 
 import Dashboard from "@/pages/dashboard";
 import Notifications from "@/pages/notifications";
@@ -89,6 +90,7 @@ export default function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
+            {import.meta.env.DEV && <Agentation />}
           </TooltipProvider>
         </QueryClientProvider>
       </RouterComponent>

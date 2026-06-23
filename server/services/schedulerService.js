@@ -1,5 +1,7 @@
 const Member = require("../model/member");
 const Payment = require("../model/payment");
+const Trainer = require("../model/trainer");
+const SalaryLedger = require("../model/salaryLedger");
 const Notification = require("../model/notification");
 const { triggerWhatsAppDuesAlert, triggerExpiryReminder } = require("./whatsappService");
 
@@ -61,6 +63,38 @@ const runDailyChecks = async () => {
                 }
             }
         }
+
+        const todayDay = today.getDate();
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+
+        const trainers = await Trainer.find({ isActive: true, joiningDate: { $exists: true } });
+        for (const trainer of trainers) {
+            const joiningDay = new Date(trainer.joiningDate).getDate();
+            if (joiningDay !== todayDay) continue;
+
+            const salariedThisMonth = await SalaryLedger.findOne({
+                trainerId: trainer._id,
+                transactionType: "salary",
+                createdAt: { $gte: monthStart, $lt: monthEnd }
+            });
+            if (salariedThisMonth) continue;
+
+            const existing = await Notification.findOne({
+                trainer: trainer._id,
+                type: "salary",
+                createdAt: { $gte: today }
+            });
+            if (!existing) {
+                await Notification.create({
+                    type: "salary",
+                    title: "Trainer Salary Due",
+                    message: `${trainer.fullName}'s salary of PKR ${trainer.baseSalary} is due today (joined on ${new Date(trainer.joiningDate).toLocaleDateString()}).`,
+                    trainer: trainer._id
+                });
+            }
+        }
+
         console.log("Daily scheduler checks completed.");
     } catch (err) {
         console.error("Scheduler error:", err.message);
@@ -74,3 +108,4 @@ const startScheduler = () => {
 };
 
 module.exports = { startScheduler, runDailyChecks };
+

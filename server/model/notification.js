@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const notificationSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: ["expiry", "dues", "system", "measurement"],
+        enum: ["expiry", "dues", "system", "measurement", "salary"],
         default: "system",
     },
     title: {
@@ -17,6 +17,11 @@ const notificationSchema = new mongoose.Schema({
     member: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Member",
+        default: null,
+    },
+    trainer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Trainer",
         default: null,
     },
     isRead: {

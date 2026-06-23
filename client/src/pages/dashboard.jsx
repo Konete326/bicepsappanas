@@ -17,7 +17,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex flex-1 items-center justify-center h-[50vh]">
         <Loader2 className="animate-spin text-stone-500 h-10 w-10" />
       </div>
     );

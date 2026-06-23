@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
@@ -7,11 +7,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Search, Eye, Edit } from "lucide-react";
+import { Loader2, Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 export default function MemberList() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
+  const [paymentStatus, setPaymentStatus] = useState("all");
+  const [confirmState, setConfirmState] = useState({ open: false, id: null, name: "" });
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: members, isLoading } = useQuery({
     queryKey: ["members", search, status],
@@ -21,11 +27,61 @@ export default function MemberList() {
     }
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      return API.delete(`/members/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      toast({ title: "Member successfully deleted" });
+    },
+    onError: (err) => {
+      toast({
+        title: "Error deleting member",
+        description: err.response?.data?.message || "Something went wrong.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleDelete = (member) => {
+    setConfirmState({ open: true, id: member._id, name: member.fullName });
+  };
+
+  const confirmDelete = () => {
+    deleteMutation.mutate(confirmState.id);
+    setConfirmState({ open: false, id: null, name: "" });
+  };
+
+  const cancelDelete = () => {
+    setConfirmState({ open: false, id: null, name: "" });
+  };
+
   const getStatusBadge = (s) => {
     switch (s) {
       case "Active": return <Badge variant="default">Active</Badge>;
       case "Expired": return <Badge variant="destructive">Expired</Badge>;
       default: return <Badge variant="secondary">{s}</Badge>;
+    }
+  };
+
+  const getPaymentStatus = (renewalDate) => {
+    if (!renewalDate) return { label: "Unpaid", value: "unpaid", className: "bg-red-50 text-red-700 border-red-200/50 hover:bg-red-50/80" };
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const renewal = new Date(renewalDate);
+    renewal.setHours(0, 0, 0, 0);
+
+    const diffTime = renewal.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return { label: "Unpaid", value: "unpaid", className: "bg-red-50 text-red-700 border-red-200/50 hover:bg-red-50/80" };
+    } else if (diffDays <= 7) {
+      return { label: "Due Soon", value: "due_soon", className: "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-50/80" };
+    } else {
+      return { label: "Paid", value: "paid", className: "bg-green-50 text-green-700 border-green-200/50 hover:bg-green-50/80" };
     }
   };
 
@@ -39,7 +95,7 @@ export default function MemberList() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-        <div className="relative sm:col-span-9">
+        <div className="relative sm:col-span-6">
           <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
           <Input
             placeholder="Search Roll No or Name..."
@@ -61,10 +117,23 @@ export default function MemberList() {
             </SelectContent>
           </Select>
         </div>
+        <div className="sm:col-span-3">
+          <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter Payment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Payments</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="due_soon">Due Soon</SelectItem>
+              <SelectItem value="unpaid">Unpaid</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center p-8">
+        <div className="flex flex-1 items-center justify-center h-[50vh]">
           <Loader2 className="animate-spin text-stone-500" />
         </div>
       ) : (
@@ -76,6 +145,7 @@ export default function MemberList() {
                 <TableHead>Full Name</TableHead>
                 <TableHead>Cell Number</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Payment Status</TableHead>
                 <TableHead>Renewal Date</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -83,37 +153,59 @@ export default function MemberList() {
             <TableBody>
               {(() => {
                 const list = members || [];
-                if (list.length === 0) {
+                const filteredList = list.filter((member) => {
+                  if (paymentStatus === "all") return true;
+                  return getPaymentStatus(member.renewalDate).value === paymentStatus;
+                });
+                if (filteredList.length === 0) {
                   return (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-stone-500 py-6">
+                      <TableCell colSpan={7} className="text-center text-stone-500 py-6">
                         No members found.
                       </TableCell>
                     </TableRow>
                   );
                 }
-                return list.map((member) => (
-                  <TableRow key={member._id}>
-                    <TableCell className="font-semibold">{member.rollNo}</TableCell>
-                    <TableCell>{member.fullName}</TableCell>
-                    <TableCell>{member.cellNo}</TableCell>
-                    <TableCell>{getStatusBadge(member.status)}</TableCell>
-                    <TableCell>{new Date(member.renewalDate).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Link to={`/members/${member._id}`}>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"><Eye className="h-4 w-4" /></Button>
-                      </Link>
-                      <Link to={`/members/edit/${member._id}`}>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"><Edit className="h-4 w-4" /></Button>
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ));
+                return filteredList.map((member) => {
+                  const payStatus = getPaymentStatus(member.renewalDate);
+                  return (
+                    <TableRow key={member._id}>
+                      <TableCell className="font-semibold">{member.rollNo}</TableCell>
+                      <TableCell>{member.fullName}</TableCell>
+                      <TableCell>{member.cellNo}</TableCell>
+                      <TableCell>{getStatusBadge(member.status)}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={payStatus.className}>
+                          {payStatus.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{new Date(member.renewalDate).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Link to={`/members/${member._id}`}>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"><Eye className="h-4 w-4" /></Button>
+                        </Link>
+                        <Link to={`/members/edit/${member._id}`}>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"><Edit className="h-4 w-4" /></Button>
+                        </Link>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-red-600 hover:bg-red-50 hover:text-red-700 border border-red-200 rounded-lg" onClick={() => handleDelete(member)} disabled={deleteMutation.isPending}><Trash2 className="h-4 w-4" /></Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                });
               })()}
             </TableBody>
           </Table>
         </div>
       )}
+
+      <ConfirmModal
+        open={confirmState.open}
+        title="Delete Member"
+        message={`Are you sure you want to delete "${confirmState.name}"? This action cannot be undone.`}
+        confirmLabel="Yes, Delete"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </div>
   );
 }

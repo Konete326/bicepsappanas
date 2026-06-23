@@ -59,7 +59,7 @@ export default function RoutineView() {
       {memberId && (
         <>
           {loadingRoutine ? (
-            <div className="flex justify-center p-8"><Loader2 className="animate-spin text-stone-500" /></div>
+            <div className="flex flex-1 items-center justify-center h-[50vh]"><Loader2 className="animate-spin text-stone-500" /></div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="border border-stone-200 shadow-sm">

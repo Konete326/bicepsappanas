@@ -20,14 +20,23 @@ const salaryLedgerSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    paymentDate: {
+        type: Date,
+        default: Date.now,
+    },
+    paymentMethod: {
+        type: String,
+        enum: ["cash", "bank_transfer", "jazzcash", "easypaisa", "cheque", "other"],
+        default: "cash",
+    },
+    salaryMonth: {
+        type: String, // e.g. "June 2026"
+    },
     baseSalary: {
         type: Number,
         default: 0,
     },
-    commissionRate: {
-        type: Number,
-        default: 0,
-    },
+
     sessionsCompleted: {
         type: Number,
         default: 0,

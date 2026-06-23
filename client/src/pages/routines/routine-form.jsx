@@ -38,7 +38,9 @@ export default function RoutineForm() {
       const res = await API.get(`/members/${id || defaultMemberId}`);
       return res.data.data;
     },
-    enabled: !!(id || defaultMemberId)
+    enabled: !!(id || defaultMemberId),
+    staleTime: 0,
+    refetchOnMount: "always"
   });
 
   const { isLoading: loadingRoutine } = useQuery({
@@ -53,7 +55,9 @@ export default function RoutineForm() {
       }
       return data;
     },
-    enabled: !!(id || defaultMemberId)
+    enabled: !!(id || defaultMemberId),
+    staleTime: 0,
+    refetchOnMount: "always"
   });
 
   const mutation = useMutation({
@@ -85,7 +89,7 @@ export default function RoutineForm() {
 
   if (loadingRoutine) {
     return (
-      <div className="flex justify-center p-8">
+      <div className="flex flex-1 items-center justify-center h-[50vh]">
         <Loader2 className="animate-spin text-stone-500" />
       </div>
     );

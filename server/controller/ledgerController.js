@@ -4,7 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 exports.createLedgerEntry = catchAsync(async (req, res, next) => {
-    const { trainerId, transactionType, amount, referenceNote, sessionsCompleted } = req.body;
+    const { trainerId, transactionType, amount, referenceNote, sessionsCompleted, paymentDate, paymentMethod, salaryMonth } = req.body;
     const trainer = await Trainer.findById(trainerId);
     if (!trainer) return next(new AppError("Trainer not found", 404));
 
@@ -22,8 +22,8 @@ exports.createLedgerEntry = catchAsync(async (req, res, next) => {
 
     const entry = await SalaryLedger.create({
         trainerId, transactionType, amount, referenceNote,
+        paymentDate, paymentMethod, salaryMonth,
         baseSalary: trainer.baseSalary,
-        commissionRate: trainer.commissionRate,
         sessionsCompleted: sessionsCompleted || 0,
         advanceBalance
     });
@@ -49,4 +49,30 @@ exports.getLedger = catchAsync(async (req, res, next) => {
             summary: { totalSalary, totalAdvance, totalCommission, totalDeductions, currentAdvance, netSalary }
         }
     });
+});
+
+exports.deleteLedgerEntry = catchAsync(async (req, res, next) => {
+    const entry = await SalaryLedger.findById(req.params.id);
+    if (!entry) return next(new AppError("Ledger entry not found", 404));
+
+    const trainerId = entry.trainerId;
+    await entry.deleteOne();
+
+    const entries = await SalaryLedger.find({ trainerId }).sort({ createdAt: 1 });
+    let balance = 0;
+    for (let e of entries) {
+        if (e.transactionType === "advance") {
+            balance += e.amount;
+        } else if (e.transactionType === "salary") {
+            balance = 0;
+        } else if (e.transactionType === "deduction") {
+            balance += e.amount;
+        }
+        if (e.advanceBalance !== balance) {
+            e.advanceBalance = balance;
+            await e.save();
+        }
+    }
+
+    res.status(200).json({ status: "success", message: "Ledger entry deleted" });
 });

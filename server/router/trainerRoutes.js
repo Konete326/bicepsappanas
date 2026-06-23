@@ -6,13 +6,15 @@ const { protect } = require("../middleware/authMiddleware");
 
 router.use(protect);
 
+router.post("/ledger", ledgerController.createLedgerEntry);
+router.get("/ledger/:trainerId", ledgerController.getLedger);
+router.delete("/ledger/:id", ledgerController.deleteLedgerEntry);
+
 router.post("/", trainerController.createTrainer);
+router.get("/salary-status", trainerController.getSalaryStatusAll);
 router.get("/", trainerController.getTrainers);
 router.get("/:id", trainerController.getTrainer);
 router.put("/:id", trainerController.updateTrainer);
 router.delete("/:id", trainerController.deleteTrainer);
-
-router.post("/ledger", ledgerController.createLedgerEntry);
-router.get("/ledger/:trainerId", ledgerController.getLedger);
 
 module.exports = router;

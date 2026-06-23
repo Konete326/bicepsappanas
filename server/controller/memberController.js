@@ -11,6 +11,16 @@ exports.createMember = catchAsync(async (req, res) => {
         if (!isNaN(num)) nextRoll = num + 1;
     }
     req.body.rollNo = String(nextRoll).padStart(4, "0");
+    
+    // Clear empty optional fields to prevent unique index validation issues
+    if (req.body.email === "") req.body.email = undefined;
+    if (req.body.address === "") req.body.address = undefined;
+    
+    // Force renewalDate to be identical to joiningDate
+    if (req.body.joiningDate) {
+        req.body.renewalDate = req.body.joiningDate;
+    }
+
     const member = await Member.create(req.body);
     res.status(201).json({ status: "success", data: member });
 });
@@ -39,6 +49,13 @@ exports.getMember = catchAsync(async (req, res, next) => {
 });
 
 exports.updateMember = catchAsync(async (req, res, next) => {
+    if (req.body.email === "") req.body.email = undefined;
+    if (req.body.address === "") req.body.address = undefined;
+    
+    if (req.body.joiningDate) {
+        req.body.renewalDate = req.body.joiningDate;
+    }
+
     const member = await Member.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!member) return next(new AppError("Member not found", 404));
     res.status(200).json({ status: "success", data: member });

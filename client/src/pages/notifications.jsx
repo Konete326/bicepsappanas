@@ -119,7 +119,7 @@ export default function Notifications() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center p-8">
+        <div className="flex flex-1 items-center justify-center h-[50vh]">
           <Loader2 className="animate-spin text-stone-500" />
         </div>
       ) : (

@@ -55,6 +55,11 @@ export const validators = {
     if (!/^[a-zA-Z0-9\s,.'#/-]+$/.test(v)) return "Contains invalid characters";
     return "";
   },
+  textOptional: (v) => {
+    if (!v || !v.trim()) return "";
+    if (!/^[a-zA-Z0-9\s,.'#/-]+$/.test(v)) return "Contains invalid characters";
+    return "";
+  },
 };
 
 export const getErrClass = (errors, field) =>

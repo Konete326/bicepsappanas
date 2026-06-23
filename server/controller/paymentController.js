@@ -9,7 +9,7 @@ const getNextSerialNo = async () => {
 };
 
 exports.createPayment = catchAsync(async (req, res, next) => {
-    const { memberId, amountReceived, paymentMethod, chequeOrTransactionNo } = req.body;
+    const { memberId, amountReceived, paymentMethod, chequeOrTransactionNo, monthIndex } = req.body;
     const member = await Member.findById(memberId);
     if (!member) return next(new AppError("Member not found", 404));
 
@@ -18,8 +18,8 @@ exports.createPayment = catchAsync(async (req, res, next) => {
         serialNo, memberId, amountReceived, paymentMethod, chequeOrTransactionNo
     });
 
-    const currentMonth = new Date().getMonth();
-    member.paymentGrid.set(String(currentMonth), true);
+    const monthToUpdate = monthIndex !== undefined ? Number(monthIndex) : new Date().getMonth();
+    member.paymentGrid.set(String(monthToUpdate), true);
     member.status = "Active";
     const renewal = new Date(member.renewalDate);
     renewal.setMonth(renewal.getMonth() + 1);

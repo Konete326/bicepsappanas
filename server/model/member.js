@@ -27,12 +27,11 @@ const memberSchema = new mongoose.Schema({
     cellNo: {
         type: String,
         required: [true, "Cell number is required"],
-        unique: true,
         trim: true,
     },
     address: {
         type: String,
-        required: [true, "Address is required"],
+        required: false,
     },
     joiningDate: {
         type: Date,
@@ -55,6 +54,15 @@ const memberSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Monthly fee is required"],
         min: [0, "Monthly fee cannot be negative"],
+    },
+    memberType: {
+        type: String,
+        enum: ["Basic", "Special", "VIP", "Premium", "Cardio", "CrossFit", "Personal Training"],
+        default: "Basic",
+    },
+    gender: {
+        type: String,
+        enum: ["Male", "Female", "Other"],
     },
     paymentGrid: {
         type: Map,
