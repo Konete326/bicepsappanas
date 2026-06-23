@@ -41,8 +41,10 @@ export default function MeasurementHistory() {
   const [chest, setChest] = useState("");
   const [waist, setWaist] = useState("");
   const [legs, setLegs] = useState("");
+  const [shoulder, setShoulder] = useState("");
+  const [calf, setCalf] = useState("");
 
-  const resetForm = () => { setAge(""); setHeight(""); setWeight(""); setBicep(""); setChest(""); setWaist(""); setLegs(""); };
+  const resetForm = () => { setAge(""); setHeight(""); setWeight(""); setBicep(""); setChest(""); setWaist(""); setLegs(""); setShoulder(""); setCalf(""); };
 
   const { data: members, isLoading: loadingMembers } = useQuery({
     queryKey: ["members-lookup-history"],
@@ -158,6 +160,8 @@ export default function MeasurementHistory() {
         chest: parseFloat(chest) || 0,
         waist: parseFloat(waist) || 0,
         leg: parseFloat(legs) || 0,
+        shoulder: parseFloat(shoulder) || 0,
+        calf: parseFloat(calf) || 0,
       }
     });
   };
@@ -170,6 +174,8 @@ export default function MeasurementHistory() {
     setChest(entry.chest || "");
     setWaist(entry.waist || "");
     setLegs(entry.leg || "");
+    setShoulder(entry.shoulder || "");
+    setCalf(entry.calf || "");
     setUpdateModalData({ memberId: entry.member._id, index: entry.originalIndex, entry });
   };
 
@@ -349,7 +355,9 @@ export default function MeasurementHistory() {
                 <div><Label htmlFor="e-bicep">Bicep (in)</Label><Input id="e-bicep" type="number" step="0.1" value={bicep} onChange={(e) => setBicep(e.target.value)} /></div>
                 <div><Label htmlFor="e-chest">Chest (in)</Label><Input id="e-chest" type="number" step="0.1" value={chest} onChange={(e) => setChest(e.target.value)} /></div>
                 <div><Label htmlFor="e-waist">Waist (in)</Label><Input id="e-waist" type="number" step="0.1" value={waist} onChange={(e) => setWaist(e.target.value)} /></div>
-                <div className="col-span-2"><Label htmlFor="e-legs">Legs (in)</Label><Input id="e-legs" type="number" step="0.1" value={legs} onChange={(e) => setLegs(e.target.value)} /></div>
+                <div><Label htmlFor="e-legs">Legs (in)</Label><Input id="e-legs" type="number" step="0.1" value={legs} onChange={(e) => setLegs(e.target.value)} /></div>
+                <div><Label htmlFor="e-shoulder">Shoulder (in)</Label><Input id="e-shoulder" type="number" step="0.1" value={shoulder} onChange={(e) => setShoulder(e.target.value)} /></div>
+                <div className="col-span-2"><Label htmlFor="e-calf">Calves (in)</Label><Input id="e-calf" type="number" step="0.1" value={calf} onChange={(e) => setCalf(e.target.value)} /></div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={() => { setUpdateModalData(null); resetForm(); }}>Cancel</Button>
