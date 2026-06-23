@@ -70,3 +70,75 @@ exports.getLatestMeasurement = catchAsync(async (req, res, next) => {
     const { bmi, category } = calculateBMI(latestWeight, measurement.heightFeetInches);
     res.status(200).json({ status: "success", data: { ...measurement.toObject(), currentBMI: bmi, bmiCategory: category } });
 });
+
+exports.updateMeasurementEntry = catchAsync(async (req, res, next) => {
+    const { memberId, index } = req.params;
+    const { weight, bicep, shoulder, chest, waist, calf, leg, age, heightFeetInches } = req.body;
+    
+    const measurement = await PhysicalMeasurement.findOne({ memberId });
+    if (!measurement) return next(new AppError("No measurements found", 404));
+
+    const i = parseInt(index);
+    if (isNaN(i) || i < 0 || i >= measurement.weightHistory.length) {
+        return next(new AppError("Invalid measurement entry index", 400));
+    }
+
+    if (weight) measurement.weightHistory[i].value = weight;
+    if (bicep && measurement.bicepHistory[i]) measurement.bicepHistory[i].value = bicep;
+    if (shoulder && measurement.shoulderHistory[i]) measurement.shoulderHistory[i].value = shoulder;
+    if (chest && measurement.chestHistory[i]) measurement.chestHistory[i].value = chest;
+    if (waist && measurement.waistHistory[i]) measurement.waistHistory[i].value = waist;
+    if (calf && measurement.calfHistory[i]) measurement.calfHistory[i].value = calf;
+    if (leg && measurement.legHistory[i]) measurement.legHistory[i].value = leg;
+
+    if (age) measurement.age = age;
+    if (heightFeetInches) measurement.heightFeetInches = heightFeetInches;
+
+    const latestWeight = measurement.weightHistory[measurement.weightHistory.length - 1]?.value || 0;
+    const { category } = calculateBMI(latestWeight, measurement.heightFeetInches);
+    measurement.bmiCategory = category;
+
+    // Use markModified to ensure Mongoose detects array updates
+    measurement.markModified("weightHistory");
+    measurement.markModified("bicepHistory");
+    measurement.markModified("shoulderHistory");
+    measurement.markModified("chestHistory");
+    measurement.markModified("waistHistory");
+    measurement.markModified("calfHistory");
+    measurement.markModified("legHistory");
+    
+    await measurement.save();
+    res.status(200).json({ status: "success", data: measurement });
+});
+
+exports.deleteMeasurementEntry = catchAsync(async (req, res, next) => {
+    const { memberId, index } = req.params;
+    
+    const measurement = await PhysicalMeasurement.findOne({ memberId });
+    if (!measurement) return next(new AppError("No measurements found", 404));
+
+    const i = parseInt(index);
+    if (isNaN(i) || i < 0 || i >= measurement.weightHistory.length) {
+        return next(new AppError("Invalid measurement entry index", 400));
+    }
+
+    measurement.weightHistory.splice(i, 1);
+    if (measurement.bicepHistory.length > i) measurement.bicepHistory.splice(i, 1);
+    if (measurement.shoulderHistory.length > i) measurement.shoulderHistory.splice(i, 1);
+    if (measurement.chestHistory.length > i) measurement.chestHistory.splice(i, 1);
+    if (measurement.waistHistory.length > i) measurement.waistHistory.splice(i, 1);
+    if (measurement.calfHistory.length > i) measurement.calfHistory.splice(i, 1);
+    if (measurement.legHistory.length > i) measurement.legHistory.splice(i, 1);
+
+    if (measurement.weightHistory.length > 0) {
+        const latestWeight = measurement.weightHistory[measurement.weightHistory.length - 1]?.value || 0;
+        const { category } = calculateBMI(latestWeight, measurement.heightFeetInches);
+        measurement.bmiCategory = category;
+        await measurement.save();
+        res.status(200).json({ status: "success", message: "Entry deleted successfully", data: measurement });
+    } else {
+        // If it was the last entry, delete the entire document
+        await PhysicalMeasurement.deleteOne({ memberId });
+        res.status(200).json({ status: "success", message: "Measurement history deleted" });
+    }
+});
