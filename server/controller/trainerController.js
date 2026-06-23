@@ -42,6 +42,7 @@ exports.getSalaryStatusAll = catchAsync(async (req, res) => {
     const entries = await SalaryLedger.find({
         $or: [
             { transactionType: "salary", salaryMonth: currentSalaryMonth },
+            { transactionType: "salary", salaryMonth: { $exists: false }, createdAt: { $gte: monthStart, $lt: monthEnd } },
             { transactionType: "advance", createdAt: { $gte: monthStart, $lt: monthEnd } }
         ]
     }).select("trainerId transactionType");
