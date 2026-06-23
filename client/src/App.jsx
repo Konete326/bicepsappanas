@@ -26,6 +26,7 @@ import LedgerView from "@/pages/trainers/ledger-view";
 import LedgerEntryForm from "@/pages/trainers/ledger-entry-form";
 import MeasurementForm from "@/pages/measurements/measurement-form";
 import MeasurementHistory from "@/pages/measurements/measurement-history";
+import MeasurementView from "@/pages/measurements/measurement-view";
 import RoutineForm from "@/pages/routines/routine-form";
 import RoutineView from "@/pages/routines/routine-view";
 import Reports from "@/pages/reports";
@@ -65,6 +66,7 @@ function Router() {
 
       <Route path="/measurements" element={<ProtectedRoute><Layout title="Physical Tracking"><MeasurementHistory /></Layout></ProtectedRoute>} />
       <Route path="/measurements/new" element={<ProtectedRoute><Layout title="Log Body Measurements"><MeasurementForm /></Layout></ProtectedRoute>} />
+      <Route path="/measurements/:id" element={<ProtectedRoute><Layout title="View Measurements"><MeasurementView /></Layout></ProtectedRoute>} />
 
       <Route path="/routines" element={<ProtectedRoute><Layout title="Workout & Nutrition"><RoutineView /></Layout></ProtectedRoute>} />
       <Route path="/routines/edit/:id" element={<ProtectedRoute><Layout title="Edit Routine"><RoutineForm /></Layout></ProtectedRoute>} />

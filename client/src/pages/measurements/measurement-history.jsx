@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Plus, Edit, Eye, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { Loader2, Plus, Edit, Eye, Trash2, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
@@ -20,19 +19,19 @@ import {
 } from "@/components/ui/dialog";
 
 export default function MeasurementHistory() {
-  const [memberId, setMemberId] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [bmiFilter, setBmiFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
+  const navigate = useNavigate();
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Modals state
-  const [viewModalData, setViewModalData] = useState(null); // null or entry data
-  const [updateModalData, setUpdateModalData] = useState(null); // null or { index, entry }
-  const [confirmDeleteState, setConfirmDeleteState] = useState({ open: false, index: null, dateStr: "" });
+  const [updateModalData, setUpdateModalData] = useState(null); // null or { memberId, index, entry }
+  const [confirmDeleteState, setConfirmDeleteState] = useState({ open: false, memberId: null, index: null, dateStr: "" });
 
   // Update Form State
   const [age, setAge] = useState("");
@@ -53,83 +52,74 @@ export default function MeasurementHistory() {
     }
   });
 
-  const { data: history, isLoading: loadingHistory } = useQuery({
-    queryKey: ["measurements-history", memberId],
+  const { data: historyData, isLoading: loadingHistory } = useQuery({
+    queryKey: ["measurements-all"],
     queryFn: async () => {
-      const res = await API.get(`/measurements/${memberId}`);
-      const m = res.data.data;
-      if (!m) return [];
-      
-      const entries = (m.weightHistory || []).map((w, i) => ({
-        originalIndex: i,
-        _id: `${m._id}-${i}`,
-        createdAt: w.date,
-        age: m.age,
-        heightFeetInches: m.heightFeetInches,
-        bmiCategory: m.bmiCategory || "Normal",
-        weight: w.value,
-        bicep: m.bicepHistory?.[i]?.value || 0,
-        waist: m.waistHistory?.[i]?.value || 0,
-        shoulder: m.shoulderHistory?.[i]?.value || 0,
-        chest: m.chestHistory?.[i]?.value || 0,
-        calf: m.calfHistory?.[i]?.value || 0,
-        leg: m.legHistory?.[i]?.value || 0,
-      }));
-      // Sort by date descending for the list
-      return entries.reverse();
-    },
-    enabled: !!memberId
+      const res = await API.get("/measurements");
+      return res.data.data || [];
+    }
   });
 
-  const filteredHistory = (history || []).filter((h) => {
-    const d = new Date(h.createdAt || Date.now());
-    if (startDate && d < new Date(startDate)) return false;
-    if (endDate && d > new Date(endDate)) return false;
+  // Only show members who have measurement data logged
+  const combinedData = (historyData?.map((mDoc) => {
+    const memberRef = mDoc.memberId;
+    if (!memberRef) return null;
+    const member = typeof memberRef === 'object' ? memberRef : members?.find(m => m._id === memberRef);
+    if (!member) return null;
+    if (!mDoc.weightHistory?.length) return null;
+
+    const latestIdx = mDoc.weightHistory.length - 1;
+    const latest = mDoc.weightHistory[latestIdx];
+    return {
+      member,
+      hasData: true,
+      _id: `${member._id}-latest`,
+      originalIndex: latestIdx,
+      createdAt: latest.date,
+      age: mDoc.age,
+      heightFeetInches: mDoc.heightFeetInches,
+      bmiCategory: mDoc.bmiCategory || "Normal",
+      weight: latest.value,
+      bicep: mDoc.bicepHistory?.[latestIdx]?.value || 0,
+      chest: mDoc.chestHistory?.[latestIdx]?.value || 0,
+      waist: mDoc.waistHistory?.[latestIdx]?.value || 0,
+      shoulder: mDoc.shoulderHistory?.[latestIdx]?.value || 0,
+      calf: mDoc.calfHistory?.[latestIdx]?.value || 0,
+      leg: mDoc.legHistory?.[latestIdx]?.value || 0,
+    };
+  }).filter(Boolean)) || [];
+
+  const filteredData = combinedData.filter((h) => {
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchName = h.member?.fullName?.toLowerCase().includes(query);
+      const matchRoll = h.member?.rollNo?.toLowerCase().includes(query);
+      if (!matchName && !matchRoll) return false;
+    }
+    if (bmiFilter !== "all") {
+      if (h.bmiCategory?.toLowerCase() !== bmiFilter.toLowerCase()) return false;
+    }
     return true;
   });
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredHistory.length / itemsPerPage) || 1;
-  const paginatedList = filteredHistory.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
+  const paginatedList = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  // Ensure current page is valid when filters change
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
     }
-  }, [filteredHistory.length, totalPages, currentPage]);
-
-  const chartData = [...filteredHistory].reverse().map((h) => ({
-    date: new Date(h.createdAt || Date.now()).toLocaleDateString(),
-    weight: h.weight || 0,
-    bicep: h.bicep || 0,
-    waist: h.waist || 0
-  }));
-
-  // Create Mutation
-  const createMutation = useMutation({
-    mutationFn: async (payload) => {
-      const res = await API.post("/measurements", payload);
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["measurements-history"] });
-      toast({ title: "Measurements logged successfully" });
-      resetForm();
-    },
-    onError: (err) => {
-      toast({ title: "Failed", description: err.response?.data?.message || "Invalid values.", variant: "destructive" });
-    }
-  });
+  }, [filteredData.length, totalPages, currentPage]);
 
   // Update Mutation
   const updateMutation = useMutation({
     mutationFn: async (payload) => {
-      const res = await API.put(`/measurements/${memberId}/entries/${payload.index}`, payload.data);
+      const res = await API.put(`/measurements/${payload.memberId}/entries/${payload.index}`, payload.data);
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["measurements-history"] });
+      queryClient.invalidateQueries({ queryKey: ["measurements-all"] });
       toast({ title: "Measurement entry updated" });
       setUpdateModalData(null);
     },
@@ -140,39 +130,25 @@ export default function MeasurementHistory() {
 
   // Delete Mutation
   const deleteMutation = useMutation({
-    mutationFn: async (index) => {
+    mutationFn: async ({ memberId, index }) => {
       const res = await API.delete(`/measurements/${memberId}/entries/${index}`);
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["measurements-history"] });
+      queryClient.invalidateQueries({ queryKey: ["measurements-all"] });
       toast({ title: "Measurement entry deleted" });
-      setConfirmDeleteState({ open: false, index: null, dateStr: "" });
+      setConfirmDeleteState({ open: false, memberId: null, index: null, dateStr: "" });
     },
     onError: (err) => {
       toast({ title: "Delete failed", description: err.response?.data?.message || "Something went wrong.", variant: "destructive" });
     }
   });
 
-  const handleCreate = (e) => {
-    e.preventDefault();
-    if (!memberId) return;
-    createMutation.mutate({
-      memberId,
-      age: parseInt(age) || 0,
-      heightFeetInches: height,
-      weight: parseFloat(weight) || 0,
-      bicep: parseFloat(bicep) || 0,
-      chest: parseFloat(chest) || 0,
-      waist: parseFloat(waist) || 0,
-      leg: parseFloat(legs) || 0,
-    });
-  };
-
   const handleUpdateSubmit = (e) => {
     e.preventDefault();
-    if (!memberId || !updateModalData) return;
+    if (!updateModalData) return;
     updateMutation.mutate({
+      memberId: updateModalData.memberId,
       index: updateModalData.index,
       data: {
         age: parseInt(age) || 0,
@@ -194,7 +170,7 @@ export default function MeasurementHistory() {
     setChest(entry.chest || "");
     setWaist(entry.waist || "");
     setLegs(entry.leg || "");
-    setUpdateModalData({ index: entry.originalIndex, entry });
+    setUpdateModalData({ memberId: entry.member._id, index: entry.originalIndex, entry });
   };
 
   return (
@@ -202,103 +178,65 @@ export default function MeasurementHistory() {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-stone-900 font-outfit uppercase">Progress Charts & Tracking</h2>
         <Link to="/measurements/new">
-          <Button><Plus className="mr-2 h-4 w-4" /> Log Stats</Button>
+          <Button><Plus className="mr-2 h-4 w-4" /> Add Measurement</Button>
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-        <div className="relative sm:col-span-5">
-          <Select value={memberId} onValueChange={setMemberId}>
-            <SelectTrigger><SelectValue placeholder="Choose member to track" /></SelectTrigger>
+      <div className="w-full flex space-x-2 items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-stone-500" />
+          <Input 
+            type="text" 
+            placeholder="Search member..." 
+            className="pl-9 w-full"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="flex-1">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
-              {members?.length > 0 ? (
-                members.map((m) => <SelectItem key={m._id} value={m._id}>{m.fullName} ({m.rollNo})</SelectItem>)
-              ) : (
-                <SelectItem value="__none__" disabled>No members found</SelectItem>
-              )}
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="measured">Has Data</SelectItem>
+              <SelectItem value="missing">Missing Data</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <div className="sm:col-span-3">
-          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} placeholder="From" />
+        <div className="flex-1">
+          <Select value={bmiFilter} onValueChange={setBmiFilter}>
+            <SelectTrigger className="w-full"><SelectValue placeholder="BMI Category" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="normal">Normal</SelectItem>
+              <SelectItem value="underweight">Underweight</SelectItem>
+              <SelectItem value="overweight">Overweight</SelectItem>
+              <SelectItem value="obesity">Obesity</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div className="sm:col-span-2">
-          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} placeholder="To" />
-        </div>
-        <div className="sm:col-span-2 flex items-center text-sm text-stone-500 border border-stone-200 rounded-md bg-stone-50 px-3 justify-center">
-          {filteredHistory.length} record(s)
+        <div className="flex items-center text-sm text-stone-500 border border-stone-200 rounded-md bg-stone-50 px-3 h-10 whitespace-nowrap">
+          {filteredData.length} member(s)
         </div>
       </div>
 
-      {memberId && (
-        <>
-          {loadingHistory ? (
+      <div className="w-full mx-auto" style={{ maxWidth: '1055px' }}>
+        {loadingHistory || loadingMembers ? (
             <div className="flex flex-1 items-center justify-center h-[50vh]"><Loader2 className="animate-spin text-stone-500" /></div>
           ) : (
             <div className="flex flex-col lg:flex-row gap-6 items-stretch">
-              
-              {/* Left Side — Create Form */}
-              <div className="w-full lg:w-[320px] shrink-0 border border-stone-200 rounded-xl p-4 bg-white shadow-sm">
-                <h3 className="text-sm font-bold text-stone-900 font-outfit uppercase border-b border-stone-100 pb-2 mb-3">Add New Stats</h3>
-                <form onSubmit={handleCreate} className="space-y-2.5 text-[11px]">
-                  <div><Label htmlFor="c-age">Age</Label><Input id="c-age" type="number" placeholder="e.g. 18" value={age} onChange={(e) => setAge(e.target.value)} required /></div>
-                  <div><Label htmlFor="c-height">Height (Ft.In)</Label><Input id="c-height" placeholder="e.g. 5.7" value={height} onChange={(e) => setHeight(e.target.value)} required /></div>
-                  <div><Label htmlFor="c-weight">Weight (kg)</Label><Input id="c-weight" type="number" step="0.1" placeholder="e.g. 70.5" value={weight} onChange={(e) => setWeight(e.target.value)} required /></div>
-                  <div><Label htmlFor="c-bicep">Bicep (in)</Label><Input id="c-bicep" type="number" step="0.1" placeholder="e.g. 14.5" value={bicep} onChange={(e) => setBicep(e.target.value)} /></div>
-                  <div><Label htmlFor="c-chest">Chest (in)</Label><Input id="c-chest" type="number" step="0.1" placeholder="e.g. 40" value={chest} onChange={(e) => setChest(e.target.value)} /></div>
-                  <div><Label htmlFor="c-waist">Waist (in)</Label><Input id="c-waist" type="number" step="0.1" placeholder="e.g. 32" value={waist} onChange={(e) => setWaist(e.target.value)} /></div>
-                  <div><Label htmlFor="c-legs">Legs (in)</Label><Input id="c-legs" type="number" step="0.1" placeholder="e.g. 22" value={legs} onChange={(e) => setLegs(e.target.value)} /></div>
-                  <Button type="submit" className="w-full" disabled={createMutation.isPending}>
-                    {createMutation.isPending ? <Loader2 className="animate-spin mr-2 h-3 w-3" /> : <Plus className="mr-2 h-3 w-3" />}
-                    Log New Entry
-                  </Button>
-                </form>
-              </div>
-
-              {/* Right Side — Charts & History */}
+              {/* Right Side — History */}
               <div className="flex-1 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="border border-stone-200 p-4 shadow-sm">
-                    <CardHeader className="pb-2"><CardTitle className="text-sm font-semibold">Weight Progression (kg)</CardTitle></CardHeader>
-                    <CardContent className="h-48">
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 1, height: 1 }}>
-                        <LineChart data={chartData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="date" />
-                          <YAxis />
-                          <Tooltip />
-                          <Line type="monotone" dataKey="weight" stroke="#18181b" strokeWidth={2} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border border-stone-200 p-4 shadow-sm">
-                    <CardHeader className="pb-2"><CardTitle className="text-sm font-semibold">Muscle Dynamics (inches)</CardTitle></CardHeader>
-                    <CardContent className="h-48">
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 1, height: 1 }}>
-                        <LineChart data={chartData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="date" />
-                          <YAxis />
-                          <Tooltip />
-                          <Line type="monotone" dataKey="bicep" stroke="#2563eb" strokeWidth={2} name="Bicep" />
-                          <Line type="monotone" dataKey="waist" stroke="#dc2626" strokeWidth={2} name="Waist" />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
-                </div>
-
                 <Card className="border border-stone-200 shadow-sm flex flex-col">
                   <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-stone-100">
-                    <CardTitle className="text-base font-semibold">Measurement Logs</CardTitle>
+                    <CardTitle className="text-base font-semibold">Measurement Logs (Latest)</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0 flex-1 flex flex-col">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Date</TableHead>
+                          <TableHead>Member</TableHead>
+                          <TableHead>Latest Date</TableHead>
                           <TableHead>Weight</TableHead>
                           <TableHead>BMI Category</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
@@ -307,34 +245,45 @@ export default function MeasurementHistory() {
                       <TableBody>
                         {paginatedList.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={4} className="text-center py-8 text-stone-500">No records found.</TableCell>
+                            <TableCell colSpan={5} className="text-center py-8 text-stone-500">No members found.</TableCell>
                           </TableRow>
                         ) : (
                           paginatedList.map((h) => (
                             <TableRow key={h._id}>
-                              <TableCell className="font-semibold text-stone-800">
-                                {new Date(h.createdAt || Date.now()).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
-                              </TableCell>
-                              <TableCell>{h.weight} kg</TableCell>
+                                <TableCell className="font-medium text-stone-700">
+                                  {h.member.fullName} <span className="text-xs text-stone-400">({h.member.rollNo})</span>
+                                </TableCell>
+                                <TableCell className="text-stone-800">
+                                  {h.hasData ? new Date(h.createdAt || Date.now()).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : <span className="text-stone-400 italic">No Data</span>}
+                                </TableCell>
+                                <TableCell>{h.hasData ? `${h.weight} kg` : "-"}</TableCell>
                               <TableCell>
-                                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                                  h.bmiCategory === 'Normal' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                                  h.bmiCategory === 'Underweight' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                                  'bg-rose-50 text-rose-700 border border-rose-200'
-                                }`}>
-                                  {h.bmiCategory || "Normal"}
-                                </span>
+                                {h.hasData ? (
+                                  <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                    h.bmiCategory === 'Normal' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                                    h.bmiCategory === 'Underweight' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                                    'bg-rose-50 text-rose-700 border border-rose-200'
+                                  }`}>
+                                    {h.bmiCategory}
+                                  </span>
+                                ) : (
+                                  <span className="text-stone-400 text-sm">-</span>
+                                )}
                               </TableCell>
-                              <TableCell className="text-right space-x-1.5">
-                                <Button size="icon" variant="outline" className="h-7 w-7 text-stone-500" onClick={() => setViewModalData(h)}>
-                                  <Eye className="h-3 w-3" />
-                                </Button>
-                                <Button size="icon" variant="outline" className="h-7 w-7 text-stone-500" onClick={() => openUpdateModal(h)}>
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button size="icon" variant="outline" className="h-7 w-7 text-rose-500 hover:text-rose-600 hover:bg-rose-50" onClick={() => setConfirmDeleteState({ open: true, index: h.originalIndex, dateStr: new Date(h.createdAt).toLocaleDateString() })}>
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end items-center space-x-1.5">
+                                  <Link to={`/measurements/${h.member._id}`}>
+                                    <Button size="icon" variant="outline" className="h-7 w-7 rounded-full text-stone-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-colors">
+                                      <Eye className="h-3 w-3" />
+                                    </Button>
+                                  </Link>
+                                  <Button size="icon" variant="outline" className="h-7 w-7 rounded-full text-stone-500 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition-colors" onClick={() => openUpdateModal(h)}>
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                  <Button size="icon" variant="outline" className="h-7 w-7 rounded-full text-stone-500 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-colors" onClick={() => setConfirmDeleteState({ open: true, memberId: h.member._id, index: h.originalIndex, dateStr: new Date(h.createdAt).toLocaleDateString() })}>
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))
@@ -346,7 +295,7 @@ export default function MeasurementHistory() {
                     {totalPages > 1 && (
                       <div className="flex items-center justify-between px-4 py-3 border-t border-stone-100 bg-stone-50 mt-auto">
                         <p className="text-xs text-stone-500">
-                          Showing <span className="font-semibold text-stone-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-semibold text-stone-900">{Math.min(currentPage * itemsPerPage, filteredHistory.length)}</span> of <span className="font-semibold text-stone-900">{filteredHistory.length}</span> entries
+                          Showing <span className="font-semibold text-stone-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-semibold text-stone-900">{Math.min(currentPage * itemsPerPage, filteredData.length)}</span> of <span className="font-semibold text-stone-900">{filteredData.length}</span> members
                         </p>
                         <div className="flex items-center space-x-2">
                           <Button 
@@ -378,47 +327,18 @@ export default function MeasurementHistory() {
               </div>
             </div>
           )}
-        </>
-      )}
-
-      {/* View Modal */}
-      <Dialog open={!!viewModalData} onOpenChange={(open) => !open && setViewModalData(null)}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="uppercase font-outfit text-stone-900">Measurement Details</DialogTitle>
-          </DialogHeader>
-          {viewModalData && (
-            <div className="space-y-4 pt-4">
-              <div className="grid grid-cols-2 gap-4 text-sm border-b border-stone-100 pb-4">
-                <div><span className="text-stone-500 text-xs uppercase font-bold tracking-wider block">Date</span><span className="font-semibold">{new Date(viewModalData.createdAt).toLocaleDateString()}</span></div>
-                <div><span className="text-stone-500 text-xs uppercase font-bold tracking-wider block">BMI Category</span><span className="font-semibold text-stone-900">{viewModalData.bmiCategory}</span></div>
-                <div><span className="text-stone-500 text-xs uppercase font-bold tracking-wider block">Age</span><span className="font-semibold">{viewModalData.age}</span></div>
-                <div><span className="text-stone-500 text-xs uppercase font-bold tracking-wider block">Height</span><span className="font-semibold">{viewModalData.heightFeetInches}</span></div>
-              </div>
-              <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
-                <div className="flex justify-between items-center"><span className="text-stone-600">Weight</span><span className="font-bold">{viewModalData.weight} kg</span></div>
-                <div className="flex justify-between items-center"><span className="text-stone-600">Bicep</span><span className="font-bold">{viewModalData.bicep} in</span></div>
-                <div className="flex justify-between items-center"><span className="text-stone-600">Chest</span><span className="font-bold">{viewModalData.chest} in</span></div>
-                <div className="flex justify-between items-center"><span className="text-stone-600">Waist</span><span className="font-bold">{viewModalData.waist} in</span></div>
-                <div className="flex justify-between items-center"><span className="text-stone-600">Shoulder</span><span className="font-bold">{viewModalData.shoulder} in</span></div>
-                <div className="flex justify-between items-center"><span className="text-stone-600">Calf</span><span className="font-bold">{viewModalData.calf} in</span></div>
-                <div className="flex justify-between items-center"><span className="text-stone-600">Legs</span><span className="font-bold">{viewModalData.leg} in</span></div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      </div>
 
       {/* Update Modal */}
       <Dialog open={!!updateModalData} onOpenChange={(open) => {
         if (!open) {
           setUpdateModalData(null);
-          resetForm(); // Clear the form when closing update modal
+          resetForm();
         }
       }}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="uppercase font-outfit text-stone-900">Update Measurement</DialogTitle>
+            <DialogTitle className="uppercase font-outfit text-stone-900">Update Measurement - {updateModalData?.entry?.member?.fullName}</DialogTitle>
           </DialogHeader>
           {updateModalData && (
             <form onSubmit={handleUpdateSubmit} className="space-y-3 pt-4 text-sm">
@@ -448,8 +368,8 @@ export default function MeasurementHistory() {
         title="Delete Measurement"
         message={`Are you sure you want to delete the measurement entry for ${confirmDeleteState.dateStr}? This action cannot be undone.`}
         confirmLabel="Yes, Delete"
-        onConfirm={() => deleteMutation.mutate(confirmDeleteState.index)}
-        onCancel={() => setConfirmDeleteState({ open: false, index: null, dateStr: "" })}
+        onConfirm={() => deleteMutation.mutate({ memberId: confirmDeleteState.memberId, index: confirmDeleteState.index })}
+        onCancel={() => setConfirmDeleteState({ open: false, memberId: null, index: null, dateStr: "" })}
       />
     </div>
   );

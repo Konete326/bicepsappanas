@@ -5,6 +5,7 @@ const { protect } = require("../middleware/authMiddleware");
 
 router.use(protect);
 
+router.get("/", measurementController.getAllMeasurements);
 router.post("/", measurementController.createMeasurement);
 router.get("/:memberId", measurementController.getMeasurementHistory);
 router.get("/:memberId/latest", measurementController.getLatestMeasurement);

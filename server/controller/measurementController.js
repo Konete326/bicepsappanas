@@ -71,6 +71,11 @@ exports.getLatestMeasurement = catchAsync(async (req, res, next) => {
     res.status(200).json({ status: "success", data: { ...measurement.toObject(), currentBMI: bmi, bmiCategory: category } });
 });
 
+exports.getAllMeasurements = catchAsync(async (req, res, next) => {
+    const measurements = await PhysicalMeasurement.find().populate("memberId", "fullName rollNo");
+    res.status(200).json({ status: "success", data: measurements });
+});
+
 exports.updateMeasurementEntry = catchAsync(async (req, res, next) => {
     const { memberId, index } = req.params;
     const { weight, bicep, shoulder, chest, waist, calf, leg, age, heightFeetInches } = req.body;
