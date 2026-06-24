@@ -59,4 +59,4 @@ jobs:
         working-directory: client
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --win --publish always
+        run: npx electron-builder --win --publish always --draft
