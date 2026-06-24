@@ -100,8 +100,7 @@
     "publish": {
       "provider": "github",
       "owner": "Konete326",
-      "repo": "bicepsappanas",
-      "draft": true
+      "repo": "bicepsappanas"
     },
     "win": {
       "target": "nsis"
