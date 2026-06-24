@@ -5,7 +5,10 @@ export default function About() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 p-6">
       <div className="bg-stone-900 rounded-3xl p-12 text-center text-white relative overflow-hidden">
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="mb-6 w-24 h-24 rounded-2xl bg-white/10 ring-1 ring-white/20 shadow-2xl flex items-center justify-center backdrop-blur-sm">
+            <img src="/logo.png" alt="BicepsApp Logo" className="w-16 h-16 object-contain drop-shadow-lg" />
+          </div>
           <h1 className="text-4xl font-bold mb-4 font-outfit uppercase">Wreck & Build Gym</h1>
           <p className="text-stone-400 max-w-2xl mx-auto text-lg">
             BicepsApp digitizes workflows for Nazimabad's premier fitness destination, ensuring seamless membership tracks, payments, and progress.

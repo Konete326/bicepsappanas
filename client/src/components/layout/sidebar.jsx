@@ -42,8 +42,8 @@ export function Sidebar({ onClose }) {
     <aside className="w-60 bg-white lg:bg-transparent flex flex-col relative z-10 h-full border-r border-stone-200 lg:border-0">
       <div className="p-6 pb-0 relative z-10 flex items-center justify-between font-outfit">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full border-2 border-stone-100 overflow-hidden bg-stone-50 shrink-0 shadow-sm transition-transform hover:scale-105 duration-300 flex items-center justify-center bg-black">
-            <span className="text-white font-bold text-lg font-outfit">B</span>
+          <div className="w-10 h-10 shrink-0 transition-transform hover:scale-105 duration-300 flex items-center justify-center">
+            <img src="/logo.png" alt="BicepsApp Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-base font-bold tracking-tight text-stone-900 uppercase truncate max-w-[140px]">
             BicepsApp

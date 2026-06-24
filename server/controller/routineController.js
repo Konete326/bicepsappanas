@@ -22,3 +22,32 @@ exports.getRoutine = catchAsync(async (req, res, next) => {
     if (!measurement) return next(new AppError("No routine found", 404));
     res.status(200).json({ status: "success", data: { exerciseSchedule: measurement.exerciseSchedule, mealPlan: measurement.mealPlan } });
 });
+
+exports.getAllRoutines = catchAsync(async (req, res, next) => {
+    const measurements = await PhysicalMeasurement.find({
+        $or: [
+            { exerciseSchedule: { $exists: true, $ne: [] } },
+            { mealPlan: { $exists: true, $ne: [] } },
+        ],
+    }).populate("memberId", "fullName rollNo status");
+    res.status(200).json({ status: "success", data: measurements });
+});
+
+exports.deleteRoutine = catchAsync(async (req, res, next) => {
+    const measurement = await PhysicalMeasurement.findOne({ memberId: req.params.memberId });
+    if (!measurement) return next(new AppError("No routine found", 404));
+
+    const hasMeasurements =
+        (measurement.weightHistory && measurement.weightHistory.length > 0) ||
+        (measurement.bicepHistory && measurement.bicepHistory.length > 0);
+
+    if (hasMeasurements) {
+        measurement.exerciseSchedule = [];
+        measurement.mealPlan = [];
+        await measurement.save();
+    } else {
+        await PhysicalMeasurement.deleteOne({ memberId: req.params.memberId });
+    }
+
+    res.status(200).json({ status: "success", message: "Routine deleted" });
+});

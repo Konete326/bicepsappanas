@@ -53,6 +53,9 @@ export default function SignIn() {
       <div className="max-w-md w-full space-y-8">
         <Card className="shadow-lg border border-stone-200">
           <CardHeader className="text-center space-y-2">
+            <div className="flex justify-center mb-2">
+              <img src="/logo.png" alt="BicepsApp Logo" className="w-16 h-16 object-contain" />
+            </div>
             <CardTitle className="text-3xl font-bold text-stone-900 font-outfit uppercase tracking-tight">
               BicepsApp
             </CardTitle>

@@ -1,16 +1,30 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Loader2, Bell, CheckCircle, Trash2, Circle, Search } from "lucide-react";
+import { Loader2, Bell, CheckCircle, Trash2, Circle, Search, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+function getNotificationRoute(n) {
+  const memberId = n.member?._id || n.member;
+  const trainerId = n.trainer?._id || n.trainer;
+  switch (n.type) {
+    case "expiry":      return memberId ? `/members/${memberId}` : "/members";
+    case "dues":        return "/payments/dues";
+    case "measurement": return memberId ? `/measurements/${memberId}` : "/measurements";
+    case "salary":      return trainerId ? `/trainers/${trainerId}/ledger` : "/trainers";
+    default:            return "/";
+  }
+}
 
 export default function Notifications() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [filter, setFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -43,6 +57,8 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries(["notifications"]);
       toast({ title: "All notifications cleared" });
+      setIsDialogOpen(false);
+      setDeleteTarget(null);
     }
   });
 
@@ -69,6 +85,11 @@ export default function Notifications() {
       queryClient.invalidateQueries(["notifications"]);
     }
   });
+
+  const handleNotificationClick = (n) => {
+    if (!n.isRead) readMutation.mutate(n._id);
+    navigate(getNotificationRoute(n));
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -146,8 +167,14 @@ export default function Notifications() {
                       <Circle className="h-4 w-4 text-stone-400" />
                     )}
                   </Button>
-                  <div className="flex-1 space-y-1">
-                    <p className="font-semibold text-stone-950 text-sm">{n.title}</p>
+                  <div
+                    className="flex-1 space-y-1 cursor-pointer group"
+                    onClick={() => handleNotificationClick(n)}
+                  >
+                    <p className="font-semibold text-stone-950 text-sm flex items-center gap-1.5">
+                      {n.title}
+                      <ExternalLink className="h-3 w-3 text-stone-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </p>
                     <p className="text-xs text-stone-600">{n.message}</p>
                     <span className="text-[10px] text-stone-400">
                       {new Date(n.createdAt || Date.now()).toLocaleString()}
@@ -182,7 +209,7 @@ export default function Notifications() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDelete} className="bg-red-600 hover:bg-red-700">
               {(deleteTarget === "all" ? clearMutation.isPending : deleteMutation.isPending) ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
               {deleteTarget === "all" ? "Clear All" : "Delete"}

@@ -1,21 +1,28 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sparkles, Wrench, Bug, Clock, Inbox } from "lucide-react";
+import { Sparkles, Wrench, Bug } from "lucide-react";
 
 // ─── Add real changelog entries here when updates happen ───────────────────
 const changelog = [
-  // Example shape — uncomment and fill when a real update is released:
-  // {
-  //   version: "v1.0.0",
-  //   date: "June 2026",
-  //   label: "latest",          // "latest" | "stable" | null
-  //   summary: "Initial release",
-  //   changes: [
-  //     { type: "feature",     text: "..." },
-  //     { type: "improvement", text: "..." },
-  //     { type: "fix",         text: "..." },
-  //   ],
-  // },
+  {
+    version: "v1.1.0",
+    date: "June 2026",
+    label: "latest",
+    summary: "Logo integration, branding polish & CORS fix",
+    changes: [
+      { type: "feature",     text: "Official BicepsApp logo now displayed in the sidebar next to the app name" },
+      { type: "feature",     text: "Logo added to Sign In page header for a branded login experience" },
+      { type: "feature",     text: "Logo added to Sign Up page header for consistent auth branding" },
+      { type: "feature",     text: "Logo added to About page hero banner with frosted glass tile effect" },
+      { type: "feature",     text: "Logo shown in Changelog panel header, empty state, and version detail view" },
+      { type: "feature",     text: "App favicon updated to use the official BicepsApp logo" },
+      { type: "improvement", text: "Logo file renamed from 'logo (2).png' to 'logo.png' to avoid URL encoding issues in production" },
+      { type: "improvement", text: "All logo references across the codebase updated to use the clean filename" },
+      { type: "fix",         text: "Fixed CORS policy error blocking API requests from localhost during development" },
+      { type: "fix",         text: "Backend now properly handles OPTIONS preflight requests on Vercel serverless" },
+      { type: "fix",         text: "Fixed broken fallback logo path in the Gym Profile page" },
+    ],
+  },
 ];
 // ────────────────────────────────────────────────────────────────────────────
 
@@ -40,7 +47,7 @@ export default function Changelog() {
       <div className="w-56 shrink-0 border-r border-stone-100 flex flex-col">
         <div className="px-4 py-4 border-b border-stone-100">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-stone-400" />
+            <img src="/logo.png" alt="BicepsApp" className="h-5 w-5 object-contain" />
             <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">
               Changelog
             </span>
@@ -108,8 +115,8 @@ export default function Changelog() {
         {changelog.length === 0 || !selected ? (
           /* Empty state */
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-8">
-            <div className="h-14 w-14 rounded-2xl bg-stone-100 flex items-center justify-center">
-              <Inbox className="h-6 w-6 text-stone-300" />
+            <div className="h-20 w-20 rounded-2xl bg-stone-50 border border-stone-100 flex items-center justify-center shadow-sm">
+              <img src="/logo.png" alt="BicepsApp" className="h-12 w-12 object-contain opacity-40" />
             </div>
             <div>
               <p className="text-sm font-bold text-stone-400">No updates yet</p>
@@ -123,6 +130,10 @@ export default function Changelog() {
             <div className="p-6 lg:p-8">
               {/* Version header */}
               <div className="mb-6 pb-5 border-b border-stone-100">
+                <div className="flex items-center gap-3 mb-3">
+                  <img src="/logo.png" alt="BicepsApp" className="h-8 w-8 object-contain" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">BicepsApp</span>
+                </div>
                 <div className="flex items-center gap-3 mb-1">
                   <h2 className="text-2xl font-black text-stone-900">{selected.version}</h2>
                   {selected.label && (
