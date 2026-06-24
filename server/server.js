@@ -41,9 +41,9 @@ if (!isVercel) {
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
     }));
-    app.options("*", cors());
+    app.options("*path", cors());
 } else {
-    app.options("*", (req, res) => res.status(204).end());
+    app.options("*path", (req, res) => res.status(204).end());
 }
 app.use(express.json({ limit: "50mb" }));
 
