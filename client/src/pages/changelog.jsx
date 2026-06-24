@@ -5,9 +5,26 @@ import { Sparkles, Wrench, Bug } from "lucide-react";
 // ─── Add real changelog entries here when updates happen ───────────────────
 const changelog = [
   {
-    version: "v1.1.0",
+    version: "v1.2.0",
     date: "June 2026",
     label: "latest",
+    summary: "Reports rebuild, footer update & changelog branding",
+    changes: [
+      { type: "feature",     text: "Reports page completely rebuilt with real live data from database" },
+      { type: "feature",     text: "New dedicated /api/reports backend endpoint with 7 aggregated queries" },
+      { type: "feature",     text: "Reports now shows: Total Revenue, This Month, Today's Revenue stats" },
+      { type: "feature",     text: "Member status breakdown (Active/Expired/Frozen) with progress bars" },
+      { type: "feature",     text: "Payment method split — Cash, Cheque, UPI etc. with PKR totals" },
+      { type: "feature",     text: "6-month revenue trend bar chart added to reports" },
+      { type: "feature",     text: "Recent payments table with Serial No, Member, Method, Date & Amount" },
+      { type: "improvement", text: "Footer updated — credit now shows 'elitedevagency'" },
+      { type: "improvement", text: "Logo visible in Changelog header, empty state & version detail view" },
+    ],
+  },
+  {
+    version: "v1.1.0",
+    date: "June 2026",
+    label: "stable",
     summary: "Logo integration, branding polish & CORS fix",
     changes: [
       { type: "feature",     text: "Official BicepsApp logo now displayed in the sidebar next to the app name" },
