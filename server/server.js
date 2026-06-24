@@ -20,25 +20,31 @@ const app = express();
 connectDB();
 startScheduler();
 
-const allowedOrigins = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    process.env.CLIENT_URL,
-].filter(Boolean);
+const isVercel = process.env.VERCEL === "1";
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-}));
-app.options("*", cors());
+if (!isVercel) {
+    const allowedOrigins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        process.env.CLIENT_URL,
+    ].filter(Boolean);
+
+    app.use(cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    }));
+    app.options("*", cors());
+} else {
+    app.options("*", (req, res) => res.status(204).end());
+}
 app.use(express.json({ limit: "50mb" }));
 
 app.use("/api/auth", authRoutes);
