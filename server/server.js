@@ -13,6 +13,7 @@ const routineRoutes = require("./router/routineRoutes");
 const dashboardRoutes = require("./router/dashboardRoutes");
 const employeeRoutes = require("./router/employeeRouter");
 const notificationRoutes = require("./router/notificationRoutes");
+const reportsRoutes = require("./router/reportsRoutes");
 const { startScheduler } = require("./services/schedulerService");
 
 const app = express();
@@ -50,6 +51,7 @@ app.use("/api/routines", routineRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/reports", reportsRoutes);
 
 const globalErrorHandler = require("./middleware/errorMiddleware");
 app.use(globalErrorHandler);
