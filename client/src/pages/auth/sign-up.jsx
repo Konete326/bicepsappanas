@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import API from "@/api/api";
 import { useToast } from "@/hooks/use-toast";
+import logoUrl from "@/assets/logo.png";
 
 export default function SignUp() {
   const { signup } = useAuth();
@@ -72,7 +73,7 @@ export default function SignUp() {
         <Card className="shadow-lg border border-gray-200">
           <CardHeader className="text-center space-y-2">
             <div className="flex justify-center mb-2">
-              <img src="/logo.png" alt="BicepsApp Logo" className="w-16 h-16 object-contain" />
+              <img src={logoUrl} alt="BicepsApp Logo" className="w-16 h-16 object-contain" />
             </div>
             <CardTitle className="text-3xl font-bold text-gray-900">
               Sign Up

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import logoUrl from "@/assets/logo.png";
 import API from "@/api/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -54,7 +55,7 @@ export default function SignIn() {
         <Card className="shadow-lg border border-stone-200">
           <CardHeader className="text-center space-y-2">
             <div className="flex justify-center mb-2">
-              <img src="/logo.png" alt="BicepsApp Logo" className="w-16 h-16 object-contain" />
+              <img src={logoUrl} alt="BicepsApp Logo" className="w-16 h-16 object-contain" />
             </div>
             <CardTitle className="text-3xl font-bold text-stone-900 font-outfit uppercase tracking-tight">
               BicepsApp

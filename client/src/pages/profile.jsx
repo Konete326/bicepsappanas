@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import logoUrl from "@/assets/logo.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import {
   User as UserIcon,
@@ -134,7 +135,7 @@ export default function Profile() {
                 {formData.gymLogo ? (
                   <AvatarImage src={formData.gymLogo} className="object-cover" />
                 ) : (
-                  <AvatarImage src="/logo.png" className="object-cover opacity-50" />
+                  <AvatarImage src={logoUrl} className="object-cover opacity-50" />
                 )}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   {isEditing ? <Camera className="w-6 h-6" /> : <Eye className="w-6 h-6" />}

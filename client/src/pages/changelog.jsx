@@ -1,13 +1,28 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sparkles, Wrench, Bug } from "lucide-react";
+import logoUrl from "@/assets/logo.png";
 
 // ─── Add real changelog entries here when updates happen ───────────────────
 const changelog = [
   {
-    version: "v1.2.0",
+    version: "v1.3.0",
     date: "June 2026",
     label: "latest",
+    summary: "Dynamic Trainer Permissions and Dedicated System Access",
+    changes: [
+      { type: "feature",     text: "Dedicated System Access Management page for creating admin and trainer logins" },
+      { type: "feature",     text: "2-step account creation wizard for assigning granular permissions to staff" },
+      { type: "feature",     text: "Dynamic Sidebar that only shows modules the logged-in trainer has permission for" },
+      { type: "feature",     text: "System Access accounts can now be directly edited (Password, Role, Permissions)" },
+      { type: "improvement", text: "Protected the Main Admin account from accidental deletion or modification" },
+      { type: "improvement", text: "Refactored the Trainer HR form to separate basic profile data from System Login access" },
+    ],
+  },
+  {
+    version: "v1.2.0",
+    date: "June 2026",
+    label: "stable",
     summary: "Reports rebuild, footer update & changelog branding",
     changes: [
       { type: "feature",     text: "Reports page completely rebuilt with real live data from database" },
@@ -64,7 +79,7 @@ export default function Changelog() {
       <div className="w-56 shrink-0 border-r border-stone-100 flex flex-col">
         <div className="px-4 py-4 border-b border-stone-100">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="BicepsApp" className="h-5 w-5 object-contain" />
+            <img src={logoUrl} alt="BicepsApp" className="h-5 w-5 object-contain" />
             <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">
               Changelog
             </span>
@@ -133,7 +148,7 @@ export default function Changelog() {
           /* Empty state */
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-8">
             <div className="h-20 w-20 rounded-2xl bg-stone-50 border border-stone-100 flex items-center justify-center shadow-sm">
-              <img src="/logo.png" alt="BicepsApp" className="h-12 w-12 object-contain opacity-40" />
+              <img src={logoUrl} alt="BicepsApp" className="h-12 w-12 object-contain opacity-40" />
             </div>
             <div>
               <p className="text-sm font-bold text-stone-400">No updates yet</p>
@@ -148,7 +163,7 @@ export default function Changelog() {
               {/* Version header */}
               <div className="mb-6 pb-5 border-b border-stone-100">
                 <div className="flex items-center gap-3 mb-3">
-                  <img src="/logo.png" alt="BicepsApp" className="h-8 w-8 object-contain" />
+                  <img src={logoUrl} alt="BicepsApp" className="h-8 w-8 object-contain" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">BicepsApp</span>
                 </div>
                 <div className="flex items-center gap-3 mb-1">
