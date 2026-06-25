@@ -54,6 +54,14 @@ exports.createMeasurement = catchAsync(async (req, res, next) => {
     measurement.bmiCategory = category;
     await measurement.save();
 
+    const Notification = require("../model/notification");
+    await Notification.create({
+        type: "measurement",
+        title: "New Measurement Logged",
+        message: `New body measurements logged for ${member.fullName}.`,
+        member: member._id
+    });
+
     res.status(201).json({ status: "success", data: measurement });
 });
 

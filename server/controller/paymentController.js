@@ -27,6 +27,14 @@ exports.createPayment = catchAsync(async (req, res, next) => {
     member.renewalDate = renewal;
     await member.save();
 
+    const Notification = require("../model/notification");
+    await Notification.create({
+        type: "payment",
+        title: "Fee Payment Received",
+        message: `Payment of PKR ${amountReceived} received from ${member.fullName}.`,
+        member: member._id
+    });
+
     res.status(201).json({ status: "success", data: payment });
 });
 

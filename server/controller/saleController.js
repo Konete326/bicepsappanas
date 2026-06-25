@@ -33,7 +33,15 @@ exports.createSale = catchAsync(async (req, res, next) => {
         }
 
         for (const item of items) {
-            await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+            const updatedProduct = await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } }, { new: true });
+            if (updatedProduct.stock <= updatedProduct.lowStockThreshold) {
+                const Notification = require("../model/notification");
+                await Notification.create({
+                    type: "inventory",
+                    title: "Low Stock Alert",
+                    message: `Inventory Alert: ${updatedProduct.name} has dropped to ${updatedProduct.stock} items.`
+                });
+            }
         }
 
         const sale = await Sale.create({

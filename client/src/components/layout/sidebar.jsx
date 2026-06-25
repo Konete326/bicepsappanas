@@ -13,29 +13,30 @@ import {
   LogOut,
   X,
   Package,
-  ShoppingCart
+  ShoppingCart,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
-  { title: "Dashboard", href: "/", icon: LayoutDashboard },
-  { title: "Members", href: "/members", icon: Users },
-  { title: "Payments", href: "/payments", icon: Receipt },
-  { title: "Trainers", href: "/trainers", icon: UserCheck },
-  { title: "Measurements", href: "/measurements", icon: Scale },
-  { title: "Routines", href: "/routines", icon: Dumbbell },
-  { title: "Notifications", href: "/notifications", icon: Bell },
-  { title: "Reports", href: "/reports", icon: TrendingUp },
-  { title: "Inventory", href: "/inventory", icon: Package },
-  { title: "Shop", href: "/pos", icon: ShoppingCart },
-  { title: "Shop Sales", href: "/sales", icon: Receipt },
-  { title: "About Wreck & Build", href: "/about", icon: Info }
+  { title: "Dashboard", href: "/", icon: LayoutDashboard, roles: ["admin", "trainer"] },
+  { title: "Members", href: "/members", icon: Users, roles: ["admin", "trainer"] },
+  { title: "Payments", href: "/payments", icon: Receipt, roles: ["admin"] },
+  { title: "Trainers", href: "/trainers", icon: UserCheck, roles: ["admin"] },
+  { title: "Measurements", href: "/measurements", icon: Scale, roles: ["admin", "trainer"] },
+  { title: "Routines", href: "/routines", icon: Dumbbell, roles: ["admin", "trainer"] },
+  { title: "Reports", href: "/reports", icon: TrendingUp, roles: ["admin"] },
+  { title: "Inventory", href: "/inventory", icon: Package, roles: ["admin"] },
+  { title: "Shop", href: "/pos", icon: ShoppingCart, roles: ["admin"] },
+  { title: "Shop Sales", href: "/sales", icon: Receipt, roles: ["admin"] },
+  { title: "Notifications", href: "/notifications", icon: Bell, roles: ["admin", "trainer"] },
+  { title: "System Admins", href: "/admins", icon: Shield, roles: ["admin"] }
 ];
 
 export function Sidebar({ onClose }) {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -67,15 +68,15 @@ export function Sidebar({ onClose }) {
       </div>
 
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar relative z-10 flex flex-col justify-between">
-        <div className="space-y-1">
-          {navItems.map((item) => {
+        <div className="space-y-0.5">
+          {navItems.filter(item => !item.roles || item.roles.includes(user?.role || "admin")).map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href || (item.href !== "/" && location.pathname.startsWith(item.href));
             return (
               <NavLink key={item.href} to={item.href}>
                 <div
                   className={cn(
-                    "flex items-center text-sm font-normal rounded-lg cursor-pointer px-3 py-2 transition-all duration-200",
+                    "flex items-center text-sm font-normal rounded-lg cursor-pointer px-3 py-1.5 transition-all duration-200",
                     isActive
                       ? "shadow-sm hover:shadow-md bg-stone-800 hover:bg-stone-700 relative bg-gradient-to-b from-stone-700 to-stone-800 border border-stone-900 text-stone-50"
                       : "text-stone-700 hover:bg-stone-100 border border-transparent"

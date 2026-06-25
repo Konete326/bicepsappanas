@@ -30,8 +30,10 @@ export default function LedgerView() {
       await API.delete(`/trainers/ledger/${entryId}`);
     },
     onSuccess: () => {
-      toast({ title: "Success", description: "Ledger entry deleted successfully." });
       queryClient.invalidateQueries({ queryKey: ["ledger", id] });
+      queryClient.invalidateQueries({ queryKey: ["trainer-salary-status"] });
+      queryClient.invalidateQueries({ queryKey: ["trainers"] });
+      toast({ title: "Success", description: "Ledger entry deleted successfully." });
       setDeleteTarget(null);
     },
     onError: (err) => {

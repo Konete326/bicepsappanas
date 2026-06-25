@@ -2,6 +2,7 @@ const Member = require("../model/member");
 const Payment = require("../model/payment");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const Notification = require("../model/notification");
 
 exports.createMember = catchAsync(async (req, res) => {
     const lastMember = await Member.findOne().sort({ createdAt: -1 }).select("rollNo");
@@ -21,6 +22,14 @@ exports.createMember = catchAsync(async (req, res) => {
     }
 
     const member = await Member.create(req.body);
+    
+    await Notification.create({
+        type: "system",
+        title: "New Member Registration",
+        message: `New member ${member.fullName} (${member.rollNo}) has joined the gym.`,
+        member: member._id
+    });
+
     res.status(201).json({ status: "success", data: member });
 });
 

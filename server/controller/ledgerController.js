@@ -27,6 +27,15 @@ exports.createLedgerEntry = catchAsync(async (req, res, next) => {
         sessionsCompleted: sessionsCompleted || 0,
         advanceBalance
     });
+
+    const Notification = require("../model/notification");
+    await Notification.create({
+        type: "salary",
+        title: "Trainer Ledger Update",
+        message: `${transactionType.charAt(0).toUpperCase() + transactionType.slice(1)} of PKR ${amount} logged for trainer ${trainer.fullName}.`,
+        trainer: trainer._id
+    });
+
     res.status(201).json({ status: "success", data: entry });
 });
 

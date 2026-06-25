@@ -87,6 +87,9 @@ export default function LedgerEntryForm() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ledger", id] });
+      queryClient.invalidateQueries({ queryKey: ["trainer-salary-status"] });
+      queryClient.invalidateQueries({ queryKey: ["trainers"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-data"] });
       toast({ title: "Payment recorded successfully" });
       navigate(`/trainers/${id}/ledger`);
     },

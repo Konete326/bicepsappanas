@@ -1,4 +1,5 @@
 const Trainer = require("../model/trainer");
+const User = require("../model/user");
 const SalaryLedger = require("../model/salaryLedger");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -6,6 +7,22 @@ const AppError = require("../utils/appError");
 exports.createTrainer = catchAsync(async (req, res) => {
     if (!req.body.cnic?.trim()) delete req.body.cnic;
     const trainer = await Trainer.create(req.body);
+
+    if (req.body.email) {
+        try {
+            await User.create({
+                name: req.body.fullName,
+                email: req.body.email,
+                password: "trainer123",
+                role: "trainer",
+                trainerProfile: trainer._id,
+                phone: req.body.phone
+            });
+        } catch (error) {
+            console.error("Could not create User account for Trainer:", error.message);
+        }
+    }
+
     res.status(201).json({ status: "success", data: trainer });
 });
 

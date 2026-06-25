@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const planController = require("../controller/planController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, restrictTo } = require("../middleware/authMiddleware");
 
 router.use(protect);
+router.use(restrictTo("admin"));
 
 router.post("/", planController.createPlan);
 router.get("/", planController.getPlans);

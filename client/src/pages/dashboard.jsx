@@ -5,15 +5,37 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Loader2, Users, DollarSign, AlertCircle, Calendar, Package, AlertTriangle } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+
   const { data: dashData, isLoading } = useQuery({
     queryKey: ["dashboard-data"],
     queryFn: async () => {
       const res = await API.get("/dashboard");
       return res.data.data || {};
-    }
+    },
+    enabled: user?.role === "admin"
   });
+
+  if (user?.role === "trainer") {
+    return (
+      <div className="p-6 space-y-6">
+        <h1 className="text-2xl font-bold font-outfit text-stone-900">Trainer Dashboard</h1>
+        <p className="text-stone-600">Welcome, {user.name}! Use the sidebar to manage members, add measurements, and update routines.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <Card className="border border-stone-200 shadow-sm p-4 bg-white">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-stone-500 font-semibold">Your Tools</span>
+              <Users className="h-5 w-5 text-blue-600" />
+            </div>
+            <p className="text-sm font-medium text-stone-900">Manage Members & Measurements</p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

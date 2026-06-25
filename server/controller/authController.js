@@ -48,3 +48,17 @@ exports.changePassword = catchAsync(async (req, res, next) => {
     await user.save();
     res.status(200).json({ status: "success", message: "Password updated" });
 });
+
+exports.getAdmins = catchAsync(async (req, res, next) => {
+    const admins = await User.find({ role: "admin" }).select("-password");
+    res.status(200).json({ status: "success", data: admins });
+});
+
+exports.deleteAdmin = catchAsync(async (req, res, next) => {
+    if (req.params.id === req.user.id) {
+        return next(new AppError("You cannot delete your own account", 400));
+    }
+    const admin = await User.findOneAndDelete({ _id: req.params.id, role: "admin" });
+    if (!admin) return next(new AppError("Admin not found", 404));
+    res.status(200).json({ status: "success", message: "Admin account deleted successfully" });
+});

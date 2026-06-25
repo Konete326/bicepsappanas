@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const notificationSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: ["expiry", "dues", "system", "measurement", "salary"],
+        enum: ["expiry", "dues", "system", "measurement", "salary", "inventory", "payment"],
         default: "system",
     },
     title: {

@@ -35,6 +35,7 @@ import ProductList from "@/pages/inventory/product-list";
 import ProductForm from "@/pages/inventory/product-form";
 import POSPage from "@/pages/pos/pos-page";
 import SalesHistory from "@/pages/pos/sales-history";
+import AdminList from "@/pages/management/admin-list";
 import { Agentation } from "agentation";
 
 
@@ -42,6 +43,17 @@ function ProtectedRoute({ children }) {
   const { user } = useAuth();
   if (!user) {
     return <Navigate to="/auth/sign-in" replace />;
+  }
+  return children;
+}
+
+function AdminRoute({ children }) {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/auth/sign-in" replace />;
+  }
+  if (user.role && user.role !== "admin") {
+    return <Navigate to="/" replace />;
   }
   return children;
 }
@@ -58,16 +70,18 @@ function Router() {
       <Route path="/members/edit/:id" element={<ProtectedRoute><Layout title="Edit Member"><MemberForm /></Layout></ProtectedRoute>} />
       <Route path="/members/:id" element={<ProtectedRoute><Layout title="Member Profile"><MemberDetail /></Layout></ProtectedRoute>} />
 
-      <Route path="/payments" element={<ProtectedRoute><Layout title="Payment Receipts Log"><PaymentList /></Layout></ProtectedRoute>} />
-      <Route path="/payments/new" element={<ProtectedRoute><Layout title="Record Payment"><PaymentForm /></Layout></ProtectedRoute>} />
-      <Route path="/payments/receipt/:id" element={<ProtectedRoute><Layout title="Payment Receipt"><ReceiptView /></Layout></ProtectedRoute>} />
-      <Route path="/payments/dues" element={<ProtectedRoute><Layout title="Dues Report"><DuesReport /></Layout></ProtectedRoute>} />
+      <Route path="/payments" element={<AdminRoute><Layout title="Payment Receipts Log"><PaymentList /></Layout></AdminRoute>} />
+      <Route path="/payments/new" element={<AdminRoute><Layout title="Record Payment"><PaymentForm /></Layout></AdminRoute>} />
+      <Route path="/payments/receipt/:id" element={<AdminRoute><Layout title="Payment Receipt"><ReceiptView /></Layout></AdminRoute>} />
+      <Route path="/payments/dues" element={<AdminRoute><Layout title="Dues Report"><DuesReport /></Layout></AdminRoute>} />
 
-      <Route path="/trainers" element={<ProtectedRoute><Layout title="Trainer Management"><TrainerList /></Layout></ProtectedRoute>} />
-      <Route path="/trainers/new" element={<ProtectedRoute><Layout title="Register Trainer"><TrainerForm /></Layout></ProtectedRoute>} />
-      <Route path="/trainers/edit/:id" element={<ProtectedRoute><Layout title="Edit Trainer"><TrainerForm /></Layout></ProtectedRoute>} />
-      <Route path="/trainers/:id/ledger" element={<ProtectedRoute><Layout title="Trainer Ledger & Payout"><LedgerView /></Layout></ProtectedRoute>} />
-      <Route path="/trainers/:id/ledger/new" element={<ProtectedRoute><Layout title="Log Ledger Entry"><LedgerEntryForm /></Layout></ProtectedRoute>} />
+      <Route path="/trainers" element={<AdminRoute><Layout title="Trainer Management"><TrainerList /></Layout></AdminRoute>} />
+      <Route path="/trainers/new" element={<AdminRoute><Layout title="Register Trainer"><TrainerForm /></Layout></AdminRoute>} />
+      <Route path="/trainers/edit/:id" element={<AdminRoute><Layout title="Edit Trainer"><TrainerForm /></Layout></AdminRoute>} />
+      <Route path="/trainers/:id/ledger" element={<AdminRoute><Layout title="Trainer Ledger & Payout"><LedgerView /></Layout></AdminRoute>} />
+      <Route path="/trainers/:id/ledger/new" element={<AdminRoute><Layout title="Log Ledger Entry"><LedgerEntryForm /></Layout></AdminRoute>} />
+
+      <Route path="/admins" element={<AdminRoute><Layout title="System Admins"><AdminList /></Layout></AdminRoute>} />
 
       <Route path="/measurements" element={<ProtectedRoute><Layout title="Physical Tracking"><MeasurementHistory /></Layout></ProtectedRoute>} />
       <Route path="/measurements/new" element={<ProtectedRoute><Layout title="Log Body Measurements"><MeasurementForm /></Layout></ProtectedRoute>} />
@@ -77,15 +91,15 @@ function Router() {
       <Route path="/routines/edit/:id" element={<ProtectedRoute><Layout title="Edit Routine"><RoutineForm /></Layout></ProtectedRoute>} />
 
       <Route path="/notifications" element={<ProtectedRoute><Layout title="System Alerts"><Notifications /></Layout></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute><Layout title="Gym Financial Reports"><Reports /></Layout></ProtectedRoute>} />
+      <Route path="/reports" element={<AdminRoute><Layout title="Gym Financial Reports"><Reports /></Layout></AdminRoute>} />
       <Route path="/changelog" element={<ProtectedRoute><Layout title="Changelog"><Changelog /></Layout></ProtectedRoute>} />
       <Route path="/license" element={<Layout title="License & Legal"><License /></Layout>} />
       <Route path="/about" element={<Layout title="About Wreck & Build Gym"><About /></Layout>} />
-      <Route path="/inventory" element={<ProtectedRoute><Layout title="Inventory"><ProductList /></Layout></ProtectedRoute>} />
-      <Route path="/inventory/new" element={<ProtectedRoute><Layout title="Add Product"><ProductForm /></Layout></ProtectedRoute>} />
-      <Route path="/inventory/edit/:id" element={<ProtectedRoute><Layout title="Edit Product"><ProductForm /></Layout></ProtectedRoute>} />
-      <Route path="/pos" element={<ProtectedRoute><Layout title="Supplement Shop"><POSPage /></Layout></ProtectedRoute>} />
-      <Route path="/sales" element={<ProtectedRoute><Layout title="Shop Sales"><SalesHistory /></Layout></ProtectedRoute>} />
+      <Route path="/inventory" element={<AdminRoute><Layout title="Inventory"><ProductList /></Layout></AdminRoute>} />
+      <Route path="/inventory/new" element={<AdminRoute><Layout title="Add Product"><ProductForm /></Layout></AdminRoute>} />
+      <Route path="/inventory/edit/:id" element={<AdminRoute><Layout title="Edit Product"><ProductForm /></Layout></AdminRoute>} />
+      <Route path="/pos" element={<AdminRoute><Layout title="Supplement Shop"><POSPage /></Layout></AdminRoute>} />
+      <Route path="/sales" element={<AdminRoute><Layout title="Shop Sales"><SalesHistory /></Layout></AdminRoute>} />
       <Route path="/auth/sign-in" element={user ? <Navigate to="/" replace /> : <SignIn />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

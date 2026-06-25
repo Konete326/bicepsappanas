@@ -20,8 +20,12 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["admin"],
+        enum: ["admin", "trainer"],
         default: "admin",
+    },
+    trainerProfile: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Trainer",
     },
     gymName: {
         type: String,

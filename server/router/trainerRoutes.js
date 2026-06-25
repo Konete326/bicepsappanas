@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const trainerController = require("../controller/trainerController");
 const ledgerController = require("../controller/ledgerController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, restrictTo } = require("../middleware/authMiddleware");
 
 router.use(protect);
+router.use(restrictTo("admin"));
 
 router.post("/ledger", ledgerController.createLedgerEntry);
 router.get("/ledger/:trainerId", ledgerController.getLedger);
