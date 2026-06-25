@@ -10,6 +10,9 @@ exports.createSale = catchAsync(async (req, res, next) => {
     }
 
     try {
+        let totalProfit = 0;
+        const processedItems = [];
+
         for (const item of items) {
             const product = await Product.findById(item.productId);
             if (!product) {
@@ -18,6 +21,15 @@ exports.createSale = catchAsync(async (req, res, next) => {
             if (product.stock < item.quantity) {
                 throw new Error(`Insufficient stock for ${product.name}. Available: ${product.stock}`);
             }
+            
+            const costPrice = product.costPrice || 0;
+            const itemProfit = (item.unitPrice - costPrice) * item.quantity;
+            totalProfit += itemProfit;
+            
+            processedItems.push({
+                ...item,
+                costPrice
+            });
         }
 
         for (const item of items) {
@@ -25,8 +37,9 @@ exports.createSale = catchAsync(async (req, res, next) => {
         }
 
         const sale = await Sale.create({
-            items,
+            items: processedItems,
             totalAmount,
+            totalProfit,
             paymentMethod,
             customerName,
             notes

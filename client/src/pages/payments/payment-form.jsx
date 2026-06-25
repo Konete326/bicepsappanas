@@ -73,6 +73,9 @@ export default function PaymentForm() {
     onSuccess: (data) => {
       toast({ title: "Payment recorded successfully" });
       queryClient.invalidateQueries({ queryKey: ["payment-grid", memberId] });
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      queryClient.invalidateQueries({ queryKey: ["members-lookup"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-data"] });
       navigate(`/payments/receipt/${data.data?._id || ""}`);
     },
     onError: (err) => {

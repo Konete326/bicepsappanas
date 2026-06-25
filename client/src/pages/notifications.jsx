@@ -145,7 +145,7 @@ export default function Notifications() {
           <Loader2 className="animate-spin text-stone-500" />
         </div>
       ) : (
-        <div className="border border-stone-200 rounded-lg overflow-hidden bg-white shadow-sm">
+        <div className="border border-stone-200 rounded-lg overflow-x-auto bg-white shadow-sm">
           {filtered.length === 0 ? (
             <div className="p-6 text-center text-stone-500 space-y-2">
               <Bell className="mx-auto h-8 w-8 text-stone-300" />

@@ -84,8 +84,8 @@ function Router() {
       <Route path="/inventory" element={<ProtectedRoute><Layout title="Inventory"><ProductList /></Layout></ProtectedRoute>} />
       <Route path="/inventory/new" element={<ProtectedRoute><Layout title="Add Product"><ProductForm /></Layout></ProtectedRoute>} />
       <Route path="/inventory/edit/:id" element={<ProtectedRoute><Layout title="Edit Product"><ProductForm /></Layout></ProtectedRoute>} />
-      <Route path="/pos" element={<ProtectedRoute><Layout title="Point of Sale"><POSPage /></Layout></ProtectedRoute>} />
-      <Route path="/sales" element={<ProtectedRoute><Layout title="Sales History"><SalesHistory /></Layout></ProtectedRoute>} />
+      <Route path="/pos" element={<ProtectedRoute><Layout title="Supplement Shop"><POSPage /></Layout></ProtectedRoute>} />
+      <Route path="/sales" element={<ProtectedRoute><Layout title="Shop Sales"><SalesHistory /></Layout></ProtectedRoute>} />
       <Route path="/auth/sign-in" element={user ? <Navigate to="/" replace /> : <SignIn />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

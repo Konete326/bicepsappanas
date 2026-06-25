@@ -28,8 +28,8 @@ const navItems = [
   { title: "Notifications", href: "/notifications", icon: Bell },
   { title: "Reports", href: "/reports", icon: TrendingUp },
   { title: "Inventory", href: "/inventory", icon: Package },
-  { title: "POS", href: "/pos", icon: ShoppingCart },
-  { title: "Sales", href: "/sales", icon: Receipt },
+  { title: "Shop", href: "/pos", icon: ShoppingCart },
+  { title: "Shop Sales", href: "/sales", icon: Receipt },
   { title: "About Wreck & Build", href: "/about", icon: Info }
 ];
 

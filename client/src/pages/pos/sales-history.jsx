@@ -105,7 +105,7 @@ export default function SalesHistory() {
           <Loader2 className="animate-spin text-stone-500" />
         </div>
       ) : (
-        <div className="border border-stone-200 rounded-lg overflow-hidden bg-white">
+        <div className="border border-stone-200 rounded-lg overflow-x-auto bg-white">
           <Table>
             <TableHeader>
               <TableRow>
@@ -113,6 +113,7 @@ export default function SalesHistory() {
                 <TableHead>Customer</TableHead>
                 <TableHead>Items</TableHead>
                 <TableHead>Total</TableHead>
+                <TableHead className="text-green-600">Profit</TableHead>
                 <TableHead>Payment Method</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -137,6 +138,9 @@ export default function SalesHistory() {
                   </TableCell>
                   <TableCell className="font-semibold">
                     PKR {Number(sale.totalAmount).toLocaleString("en-PK")}
+                  </TableCell>
+                  <TableCell className="font-bold text-green-600 bg-green-50/50">
+                    PKR {Number(sale.totalProfit || 0).toLocaleString("en-PK")}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="flex items-center gap-1 w-fit">
@@ -190,13 +194,14 @@ export default function SalesHistory() {
                 </div>
               </div>
 
-              <div className="border border-stone-200 rounded-lg overflow-hidden">
+              <div className="border border-stone-200 rounded-lg overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead className="text-center">Qty</TableHead>
                       <TableHead className="text-right">Unit Price</TableHead>
+                      <TableHead className="text-right text-green-600">Margin</TableHead>
                       <TableHead className="text-right">Total</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -208,6 +213,9 @@ export default function SalesHistory() {
                         <TableCell className="text-right">
                           PKR {Number(item.unitPrice).toLocaleString("en-PK")}
                         </TableCell>
+                        <TableCell className="text-right font-medium text-green-600 bg-green-50/30">
+                          PKR {Number((item.unitPrice - (item.costPrice || 0)) * item.quantity).toLocaleString("en-PK")}
+                        </TableCell>
                         <TableCell className="text-right font-semibold">
                           PKR {Number(item.total).toLocaleString("en-PK")}
                         </TableCell>
@@ -217,11 +225,19 @@ export default function SalesHistory() {
                 </Table>
               </div>
 
-              <div className="flex items-center justify-between border-t border-stone-200 pt-3">
-                <span className="text-base font-bold text-stone-900">Grand Total</span>
-                <span className="text-lg font-bold text-stone-900">
-                  PKR {Number(selectedSale.totalAmount).toLocaleString("en-PK")}
-                </span>
+              <div className="flex flex-col gap-2 border-t border-stone-200 pt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-stone-600">Net Profit (Bachhat)</span>
+                  <span className="text-sm font-bold text-green-600">
+                    PKR {Number(selectedSale.totalProfit || 0).toLocaleString("en-PK")}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-bold text-stone-900">Grand Total</span>
+                  <span className="text-lg font-bold text-stone-900">
+                    PKR {Number(selectedSale.totalAmount).toLocaleString("en-PK")}
+                  </span>
+                </div>
               </div>
             </div>
           )}

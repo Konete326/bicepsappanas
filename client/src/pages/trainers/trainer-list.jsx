@@ -132,7 +132,7 @@ export default function TrainerList() {
           <Loader2 className="animate-spin text-stone-500" />
         </div>
       ) : (
-        <div className="border border-stone-200 rounded-lg overflow-hidden bg-white shadow-sm">
+        <div className="border border-stone-200 rounded-lg overflow-x-auto bg-white shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>

@@ -138,7 +138,7 @@ export default function MemberList() {
           <Loader2 className="animate-spin text-stone-500" />
         </div>
       ) : (
-        <div className="border border-stone-200 rounded-lg overflow-hidden bg-white">
+        <div className="border border-stone-200 rounded-lg overflow-x-auto bg-white">
           <Table>
             <TableHeader>
               <TableRow>

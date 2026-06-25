@@ -249,7 +249,7 @@ export default function EmployeeManagement() {
                 </Card>
             </div>
 
-            <Card className="border-stone-100 shadow-xl overflow-hidden bg-white">
+            <Card className="border-stone-100 shadow-xl overflow-x-auto bg-white">
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader className="bg-stone-50 border-b border-stone-200">
