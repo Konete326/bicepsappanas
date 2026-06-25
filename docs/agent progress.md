@@ -40,3 +40,11 @@
 - [x] 13.1 - 13.8 Completed final polish, checked file metrics (under 120 lines, no comments), and validated production bundle successfully
 
 ## Current Status: Frontend implementation (Milestones 8-13) fully complete and verified.
+
+## Recent Updates & Bug Fixes
+- [x] Fixed Point of Sale (POS) redirect to sales history after checkout.
+- [x] Styled POS dialog buttons with rounded borders for consistency.
+- [x] Expanded Sales History filters (added Payment Method and Customer Name search) and updated backend logic.
+- [x] Reorganized Sales History UI layout to allow a wider Customer Name search input.
+- [x] Implemented Product View Details modal in the Inventory table for quick data lookup.
+- [x] Resolved React object rendering crashes in Routine Details by formatting nested exercise/meal arrays correctly.
