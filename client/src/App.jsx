@@ -58,6 +58,14 @@ function AdminRoute({ children }) {
   return children;
 }
 
+function PermissionRoute({ children, permission }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/auth/sign-in" replace />;
+  if (user.role === "admin") return children;
+  if (user.permissions?.includes(permission)) return children;
+  return <Navigate to="/" replace />;
+}
+
 function Router() {
   const { user } = useAuth();
 
@@ -65,15 +73,15 @@ function Router() {
     <Routes>
       <Route path="/" element={<ProtectedRoute><Layout title="Gym Dashboard"><Dashboard /></Layout></ProtectedRoute>} />
       
-      <Route path="/members" element={<ProtectedRoute><Layout title="Members Directory"><MemberList /></Layout></ProtectedRoute>} />
-      <Route path="/members/new" element={<ProtectedRoute><Layout title="Register Member"><MemberForm /></Layout></ProtectedRoute>} />
-      <Route path="/members/edit/:id" element={<ProtectedRoute><Layout title="Edit Member"><MemberForm /></Layout></ProtectedRoute>} />
-      <Route path="/members/:id" element={<ProtectedRoute><Layout title="Member Profile"><MemberDetail /></Layout></ProtectedRoute>} />
+      <Route path="/members" element={<PermissionRoute permission="members"><Layout title="Members Directory"><MemberList /></Layout></PermissionRoute>} />
+      <Route path="/members/new" element={<PermissionRoute permission="members"><Layout title="Register Member"><MemberForm /></Layout></PermissionRoute>} />
+      <Route path="/members/edit/:id" element={<PermissionRoute permission="members"><Layout title="Edit Member"><MemberForm /></Layout></PermissionRoute>} />
+      <Route path="/members/:id" element={<PermissionRoute permission="members"><Layout title="Member Profile"><MemberDetail /></Layout></PermissionRoute>} />
 
-      <Route path="/payments" element={<AdminRoute><Layout title="Payment Receipts Log"><PaymentList /></Layout></AdminRoute>} />
-      <Route path="/payments/new" element={<AdminRoute><Layout title="Record Payment"><PaymentForm /></Layout></AdminRoute>} />
-      <Route path="/payments/receipt/:id" element={<AdminRoute><Layout title="Payment Receipt"><ReceiptView /></Layout></AdminRoute>} />
-      <Route path="/payments/dues" element={<AdminRoute><Layout title="Dues Report"><DuesReport /></Layout></AdminRoute>} />
+      <Route path="/payments" element={<PermissionRoute permission="payments"><Layout title="Payment Receipts Log"><PaymentList /></Layout></PermissionRoute>} />
+      <Route path="/payments/new" element={<PermissionRoute permission="payments"><Layout title="Record Payment"><PaymentForm /></Layout></PermissionRoute>} />
+      <Route path="/payments/receipt/:id" element={<PermissionRoute permission="payments"><Layout title="Payment Receipt"><ReceiptView /></Layout></PermissionRoute>} />
+      <Route path="/payments/dues" element={<PermissionRoute permission="payments"><Layout title="Dues Report"><DuesReport /></Layout></PermissionRoute>} />
 
       <Route path="/trainers" element={<AdminRoute><Layout title="Trainer Management"><TrainerList /></Layout></AdminRoute>} />
       <Route path="/trainers/new" element={<AdminRoute><Layout title="Register Trainer"><TrainerForm /></Layout></AdminRoute>} />
@@ -81,25 +89,23 @@ function Router() {
       <Route path="/trainers/:id/ledger" element={<AdminRoute><Layout title="Trainer Ledger & Payout"><LedgerView /></Layout></AdminRoute>} />
       <Route path="/trainers/:id/ledger/new" element={<AdminRoute><Layout title="Log Ledger Entry"><LedgerEntryForm /></Layout></AdminRoute>} />
 
-      <Route path="/admins" element={<AdminRoute><Layout title="System Admins"><AdminList /></Layout></AdminRoute>} />
+      <Route path="/measurements" element={<PermissionRoute permission="measurements"><Layout title="Physical Tracking"><MeasurementHistory /></Layout></PermissionRoute>} />
+      <Route path="/measurements/new" element={<PermissionRoute permission="measurements"><Layout title="Log Body Measurements"><MeasurementForm /></Layout></PermissionRoute>} />
+      <Route path="/measurements/:id" element={<PermissionRoute permission="measurements"><Layout title="View Measurements"><MeasurementView /></Layout></PermissionRoute>} />
 
-      <Route path="/measurements" element={<ProtectedRoute><Layout title="Physical Tracking"><MeasurementHistory /></Layout></ProtectedRoute>} />
-      <Route path="/measurements/new" element={<ProtectedRoute><Layout title="Log Body Measurements"><MeasurementForm /></Layout></ProtectedRoute>} />
-      <Route path="/measurements/:id" element={<ProtectedRoute><Layout title="View Measurements"><MeasurementView /></Layout></ProtectedRoute>} />
-
-      <Route path="/routines" element={<ProtectedRoute><Layout title="Workout & Nutrition"><RoutineView /></Layout></ProtectedRoute>} />
-      <Route path="/routines/edit/:id" element={<ProtectedRoute><Layout title="Edit Routine"><RoutineForm /></Layout></ProtectedRoute>} />
+      <Route path="/routines" element={<PermissionRoute permission="routines"><Layout title="Workout & Nutrition"><RoutineView /></Layout></PermissionRoute>} />
+      <Route path="/routines/edit/:id" element={<PermissionRoute permission="routines"><Layout title="Edit Routine"><RoutineForm /></Layout></PermissionRoute>} />
 
       <Route path="/notifications" element={<ProtectedRoute><Layout title="System Alerts"><Notifications /></Layout></ProtectedRoute>} />
-      <Route path="/reports" element={<AdminRoute><Layout title="Gym Financial Reports"><Reports /></Layout></AdminRoute>} />
+      <Route path="/reports" element={<PermissionRoute permission="reports"><Layout title="Gym Financial Reports"><Reports /></Layout></PermissionRoute>} />
       <Route path="/changelog" element={<ProtectedRoute><Layout title="Changelog"><Changelog /></Layout></ProtectedRoute>} />
       <Route path="/license" element={<Layout title="License & Legal"><License /></Layout>} />
       <Route path="/about" element={<Layout title="About Wreck & Build Gym"><About /></Layout>} />
-      <Route path="/inventory" element={<AdminRoute><Layout title="Inventory"><ProductList /></Layout></AdminRoute>} />
-      <Route path="/inventory/new" element={<AdminRoute><Layout title="Add Product"><ProductForm /></Layout></AdminRoute>} />
-      <Route path="/inventory/edit/:id" element={<AdminRoute><Layout title="Edit Product"><ProductForm /></Layout></AdminRoute>} />
-      <Route path="/pos" element={<AdminRoute><Layout title="Supplement Shop"><POSPage /></Layout></AdminRoute>} />
-      <Route path="/sales" element={<AdminRoute><Layout title="Shop Sales"><SalesHistory /></Layout></AdminRoute>} />
+      <Route path="/inventory" element={<PermissionRoute permission="inventory"><Layout title="Inventory"><ProductList /></Layout></PermissionRoute>} />
+      <Route path="/inventory/new" element={<PermissionRoute permission="inventory"><Layout title="Add Product"><ProductForm /></Layout></PermissionRoute>} />
+      <Route path="/inventory/edit/:id" element={<PermissionRoute permission="inventory"><Layout title="Edit Product"><ProductForm /></Layout></PermissionRoute>} />
+      <Route path="/pos" element={<PermissionRoute permission="pos"><Layout title="Supplement Shop"><POSPage /></Layout></PermissionRoute>} />
+      <Route path="/sales" element={<PermissionRoute permission="pos"><Layout title="Shop Sales"><SalesHistory /></Layout></PermissionRoute>} />
       <Route path="/auth/sign-in" element={user ? <Navigate to="/" replace /> : <SignIn />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

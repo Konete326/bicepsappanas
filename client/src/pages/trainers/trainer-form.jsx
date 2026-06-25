@@ -272,7 +272,7 @@ export default function TrainerForm() {
               <p className="text-[11px] text-stone-400 mt-1">Used to schedule monthly salary notifications.</p>
             </div>
 
-            <div className="sm:col-span-2 flex justify-end gap-2 pt-4 border-t border-stone-100">
+            <div className="sm:col-span-2 flex justify-end gap-2 pt-4 border-t border-stone-100 mt-4">
               <Button type="button" variant="outline" onClick={() => navigate("/trainers")} className="rounded-full">Cancel</Button>
               <Button type="submit" disabled={mutation.isPending || hasErrors} className="rounded-full">
                 {mutation.isPending ? "Saving..." : id ? "Update Trainer" : "Register Trainer"}

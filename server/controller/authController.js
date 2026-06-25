@@ -4,10 +4,17 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 exports.signup = catchAsync(async (req, res, next) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, role, permissions } = req.body;
     if (await User.findOne({ email })) return next(new AppError("User already exists", 400));
 
-    const newUser = await User.create({ name, email, password });
+    const newUser = await User.create({ 
+        name, 
+        email, 
+        password,
+        role: role || "admin",
+        permissions: role === "trainer" ? permissions : undefined
+    });
+    
     res.status(201).json({
         status: "success",
         token: authService.signToken(newUser._id),
@@ -50,15 +57,15 @@ exports.changePassword = catchAsync(async (req, res, next) => {
 });
 
 exports.getAdmins = catchAsync(async (req, res, next) => {
-    const admins = await User.find({ role: "admin" }).select("-password");
-    res.status(200).json({ status: "success", data: admins });
+    const users = await User.find().select("-password");
+    res.status(200).json({ status: "success", data: users });
 });
 
 exports.deleteAdmin = catchAsync(async (req, res, next) => {
     if (req.params.id === req.user.id) {
         return next(new AppError("You cannot delete your own account", 400));
     }
-    const admin = await User.findOneAndDelete({ _id: req.params.id, role: "admin" });
-    if (!admin) return next(new AppError("Admin not found", 404));
-    res.status(200).json({ status: "success", message: "Admin account deleted successfully" });
+    const user = await User.findOneAndDelete({ _id: req.params.id });
+    if (!user) return next(new AppError("User not found", 404));
+    res.status(200).json({ status: "success", message: "Account deleted successfully" });
 });

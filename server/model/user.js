@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Trainer",
     },
+    permissions: {
+        type: [String],
+        default: ["members", "measurements", "routines"]
+    },
     gymName: {
         type: String,
         default: "Wreck & Build Ladies & Gents Fitness Gym",

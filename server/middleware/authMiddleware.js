@@ -37,3 +37,12 @@ exports.restrictTo = (...roles) => {
         next();
     };
 };
+
+exports.hasPermission = (...requiredPerms) => {
+    return (req, res, next) => {
+        if (req.user.role === "admin") return next(); // Admins have all permissions automatically
+        const hasPerm = requiredPerms.some(p => req.user.permissions?.includes(p));
+        if (hasPerm) return next();
+        return res.status(403).json({ status: "fail", message: "You do not have permission to access this module" });
+    };
+};

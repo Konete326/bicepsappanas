@@ -20,18 +20,18 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
-  { title: "Dashboard", href: "/", icon: LayoutDashboard, roles: ["admin", "trainer"] },
-  { title: "Members", href: "/members", icon: Users, roles: ["admin", "trainer"] },
-  { title: "Payments", href: "/payments", icon: Receipt, roles: ["admin"] },
-  { title: "Trainers", href: "/trainers", icon: UserCheck, roles: ["admin"] },
-  { title: "Measurements", href: "/measurements", icon: Scale, roles: ["admin", "trainer"] },
-  { title: "Routines", href: "/routines", icon: Dumbbell, roles: ["admin", "trainer"] },
-  { title: "Reports", href: "/reports", icon: TrendingUp, roles: ["admin"] },
-  { title: "Inventory", href: "/inventory", icon: Package, roles: ["admin"] },
-  { title: "Shop", href: "/pos", icon: ShoppingCart, roles: ["admin"] },
-  { title: "Shop Sales", href: "/sales", icon: Receipt, roles: ["admin"] },
-  { title: "Notifications", href: "/notifications", icon: Bell, roles: ["admin", "trainer"] },
-  { title: "System Admins", href: "/admins", icon: Shield, roles: ["admin"] }
+  { title: "Dashboard", href: "/", icon: LayoutDashboard },
+  { title: "Members", href: "/members", icon: Users, permission: "members" },
+  { title: "Payments", href: "/payments", icon: Receipt, permission: "payments" },
+  { title: "Trainers", href: "/trainers", icon: UserCheck, adminOnly: true },
+  { title: "Measurements", href: "/measurements", icon: Scale, permission: "measurements" },
+  { title: "Routines", href: "/routines", icon: Dumbbell, permission: "routines" },
+  { title: "Reports", href: "/reports", icon: TrendingUp, permission: "reports" },
+  { title: "Inventory", href: "/inventory", icon: Package, permission: "inventory" },
+  { title: "Shop", href: "/pos", icon: ShoppingCart, permission: "pos" },
+  { title: "Shop Sales", href: "/sales", icon: Receipt, permission: "pos" },
+  { title: "Notifications", href: "/notifications", icon: Bell },
+  { title: "System Access", href: "/admins", icon: Shield, adminOnly: true }
 ];
 
 export function Sidebar({ onClose }) {
@@ -69,7 +69,12 @@ export function Sidebar({ onClose }) {
 
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar relative z-10 flex flex-col justify-between">
         <div className="space-y-0.5">
-          {navItems.filter(item => !item.roles || item.roles.includes(user?.role || "admin")).map((item) => {
+          {navItems.filter(item => {
+            if (user?.role === "admin") return true;
+            if (item.adminOnly) return false;
+            if (item.permission) return user?.permissions?.includes(item.permission);
+            return true;
+          }).map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href || (item.href !== "/" && location.pathname.startsWith(item.href));
             return (

@@ -9,9 +9,20 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Trash2, Shield, Plus, User } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { useAuth } from "@/context/AuthContext";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function AdminList() {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const { user } = useAuth();
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    email: "", 
+    password: "", 
+    role: "admin", 
+    permissions: ["members", "measurements", "routines"] 
+  });
+  const [step, setStep] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [confirmState, setConfirmState] = useState({ open: false, id: null, name: "" });
   const { toast } = useToast();
@@ -20,22 +31,23 @@ export default function AdminList() {
   const { data: admins, isLoading } = useQuery({
     queryKey: ["admins"],
     queryFn: async () => {
-      const res = await API.get("/admins");
+      const res = await API.get("/auth/admins");
       return res.data.data || [];
     }
   });
 
   const createMutation = useMutation({
-    mutationFn: async (payload) => API.post("/signup", payload),
+    mutationFn: async (payload) => API.post("/auth/signup", payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admins"] });
-      toast({ title: "Admin created successfully" });
-      setFormData({ name: "", email: "", password: "" });
+      toast({ title: "Account created successfully" });
+      setFormData({ name: "", email: "", password: "", role: "admin", permissions: ["members", "measurements", "routines"] });
+      setStep(1);
       setIsAdding(false);
     },
     onError: (err) => {
       toast({
-        title: "Failed to create admin",
+        title: "Failed to create account",
         description: err.response?.data?.message || "Something went wrong.",
         variant: "destructive"
       });
@@ -43,7 +55,7 @@ export default function AdminList() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id) => API.delete(`/admins/${id}`),
+    mutationFn: async (id) => API.delete(`/auth/admins/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admins"] });
       toast({ title: "Admin deleted successfully" });
@@ -59,12 +71,38 @@ export default function AdminList() {
     }
   });
 
-  const handleCreate = (e) => {
+  const availablePermissions = [
+    { id: "members", label: "Members Management" },
+    { id: "measurements", label: "Measurements" },
+    { id: "routines", label: "Workout Routines" },
+    { id: "payments", label: "Payments & Fees" },
+    { id: "inventory", label: "Inventory Management" },
+    { id: "pos", label: "Shop (POS)" },
+    { id: "reports", label: "Financial Reports" }
+  ];
+
+  const togglePermission = (permId) => {
+    setFormData(prev => {
+      const perms = prev.permissions || [];
+      if (perms.includes(permId)) return { ...prev, permissions: perms.filter(p => p !== permId) };
+      return { ...prev, permissions: [...perms, permId] };
+    });
+  };
+
+  const handleNextOrSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.password) {
-      return toast({ title: "Validation Error", description: "All fields are required.", variant: "destructive" });
+    if (step === 1) {
+      if (!formData.name || !formData.email || !formData.password) {
+        return toast({ title: "Validation Error", description: "All fields are required.", variant: "destructive" });
+      }
+      if (formData.role === "trainer") {
+        setStep(2);
+      } else {
+        createMutation.mutate(formData);
+      }
+    } else {
+      createMutation.mutate(formData);
     }
-    createMutation.mutate(formData);
   };
 
   return (
@@ -73,57 +111,91 @@ export default function AdminList() {
         <div>
           <h2 className="text-xl font-bold text-stone-900 font-outfit uppercase flex items-center gap-2">
             <Shield className="h-5 w-5 text-blue-600" />
-            System Admins
+            System Access
           </h2>
-          <p className="text-sm text-stone-500 mt-1">Manage secondary admin accounts with full dashboard access.</p>
+          <p className="text-sm text-stone-500 mt-1">Manage staff login accounts and system permissions.</p>
         </div>
-        <Button onClick={() => setIsAdding(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Create Admin
+        <Button onClick={() => { setStep(1); setIsAdding(true); }}>
+          <Plus className="mr-2 h-4 w-4" /> Create Account
         </Button>
       </div>
 
       <Dialog open={isAdding} onOpenChange={setIsAdding}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Register New Admin</DialogTitle>
+            <DialogTitle>{step === 1 ? "Register New Account" : "Assign Permissions"}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreate} className="space-y-4 mt-2">
-            <div>
-              <Label className="text-xs text-stone-500 font-semibold mb-1 block">Full Name</Label>
-              <Input
-                placeholder="e.g. John Doe"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="h-10"
-              />
-            </div>
-            <div>
-              <Label className="text-xs text-stone-500 font-semibold mb-1 block">Email</Label>
-              <Input
-                type="email"
-                placeholder="e.g. admin2@gym.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="h-10"
-              />
-            </div>
-            <div>
-              <Label className="text-xs text-stone-500 font-semibold mb-1 block">Password</Label>
-              <Input
-                type="password"
-                placeholder="Min 6 characters"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="h-10"
-              />
-            </div>
+          <form onSubmit={handleNextOrSubmit} className="space-y-4 mt-2">
+            {step === 1 ? (
+              <>
+                <div>
+                  <Label className="text-xs text-stone-500 font-semibold mb-1 block">Full Name</Label>
+                  <Input
+                    placeholder="e.g. John Doe"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="h-10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-stone-500 font-semibold mb-1 block">Email</Label>
+                  <Input
+                    type="email"
+                    placeholder="e.g. user@gym.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="h-10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-stone-500 font-semibold mb-1 block">Password</Label>
+                  <Input
+                    type="password"
+                    placeholder="Min 6 characters"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="h-10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-stone-500 font-semibold mb-1 block">Role</Label>
+                  <Select value={formData.role} onValueChange={(val) => setFormData({ ...formData, role: val })}>
+                    <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Admin (Full Access)</SelectItem>
+                      <SelectItem value="trainer">Trainer (Custom Access)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {availablePermissions.map((perm) => (
+                  <div key={perm.id} className="flex items-center space-x-3 p-2 border border-stone-100 rounded-lg">
+                    <Checkbox
+                      id={`perm-${perm.id}`}
+                      checked={(formData.permissions || []).includes(perm.id)}
+                      onCheckedChange={() => togglePermission(perm.id)}
+                    />
+                    <label htmlFor={`perm-${perm.id}`} className="text-sm font-semibold text-stone-800 cursor-pointer flex-1">
+                      {perm.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="flex justify-end gap-2 pt-4">
+              {step === 2 && (
+                <Button type="button" variant="outline" className="rounded-lg mr-auto" onClick={() => setStep(1)}>
+                  Back
+                </Button>
+              )}
               <Button type="button" variant="outline" className="rounded-lg" onClick={() => setIsAdding(false)}>
                 Cancel
               </Button>
               <Button type="submit" className="bg-stone-800 hover:bg-stone-700 text-white rounded-lg px-6" disabled={createMutation.isPending}>
                 {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Admin
+                {step === 1 && formData.role === "trainer" ? "Next" : "Save Account"}
               </Button>
             </div>
           </form>
@@ -156,19 +228,23 @@ export default function AdminList() {
                   </TableCell>
                   <TableCell className="text-stone-600">{admin.email}</TableCell>
                   <TableCell>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
-                      Admin
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
+                      admin.role === "admin" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-purple-50 text-purple-700 border-purple-200"
+                    }`}>
+                      {admin.role || "admin"}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-rose-600 hover:bg-rose-50 hover:text-rose-700 border border-transparent hover:border-rose-200 transition-colors"
-                      onClick={() => setConfirmState({ open: true, id: admin._id, name: admin.name })}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {admin._id !== user?._id && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-rose-600 hover:bg-rose-50 hover:text-rose-700 border border-transparent hover:border-rose-200 transition-colors"
+                        onClick={() => setConfirmState({ open: true, id: admin._id, name: admin.name })}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

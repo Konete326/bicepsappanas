@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const productController = require("../controller/productController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, hasPermission } = require("../middleware/authMiddleware");
 const { upload } = require("../middlewares/upload");
 
-router.use(protect);
+router.use(protect, hasPermission("inventory"));
 
 router.post("/", upload.array("images", 3), productController.createProduct);
 router.get("/", productController.getProducts);

@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const paymentController = require("../controller/paymentController");
-const { protect, restrictTo } = require("../middleware/authMiddleware");
+const { protect, hasPermission } = require("../middleware/authMiddleware");
 
-router.use(protect);
-router.use(restrictTo("admin"));
+router.use(protect, hasPermission("payments"));
 
 router.post("/", paymentController.createPayment);
 router.get("/", paymentController.getPayments);

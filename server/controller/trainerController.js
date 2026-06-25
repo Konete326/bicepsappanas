@@ -16,7 +16,8 @@ exports.createTrainer = catchAsync(async (req, res) => {
                 password: "trainer123",
                 role: "trainer",
                 trainerProfile: trainer._id,
-                phone: req.body.phone
+                phone: req.body.phone,
+                permissions: req.body.permissions || ["members", "measurements", "routines"]
             });
         } catch (error) {
             console.error("Could not create User account for Trainer:", error.message);
@@ -32,8 +33,16 @@ exports.getTrainers = catchAsync(async (req, res) => {
 });
 
 exports.getTrainer = catchAsync(async (req, res, next) => {
-    const trainer = await Trainer.findById(req.params.id);
+    const trainer = await Trainer.findById(req.params.id).lean();
     if (!trainer) return next(new AppError("Trainer not found", 404));
+    
+    const user = await User.findOne({ trainerProfile: trainer._id }).lean();
+    if (user && user.permissions) {
+        trainer.permissions = user.permissions;
+    } else {
+        trainer.permissions = ["members", "measurements", "routines"];
+    }
+
     res.status(200).json({ status: "success", data: trainer });
 });
 
@@ -41,6 +50,11 @@ exports.updateTrainer = catchAsync(async (req, res, next) => {
     if (!req.body.cnic?.trim()) delete req.body.cnic;
     const trainer = await Trainer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!trainer) return next(new AppError("Trainer not found", 404));
+
+    if (req.body.permissions) {
+        await User.findOneAndUpdate({ trainerProfile: trainer._id }, { permissions: req.body.permissions });
+    }
+
     res.status(200).json({ status: "success", data: trainer });
 });
 
