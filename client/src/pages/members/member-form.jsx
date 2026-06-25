@@ -8,12 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Loader2, Hash, User, Users, Mail, Phone, MapPin,
+  Loader2, Hash, User, Users, Mail, Phone, MapPin, CreditCard,
   CalendarDays, BadgeDollarSign, ShieldCheck, Crown, Venus, Mars
 } from "lucide-react";
 import { validators, getErrClass } from "@/utils/validation";
 
-/* ── tiny helper ── */
 function FieldIcon({ icon: Icon }) {
   return (
     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
@@ -68,6 +67,7 @@ export default function MemberForm() {
     fatherName: "",
     email: "",
     cellNo: "+92",
+    cnic: "",
     address: "",
     joiningDate: new Date().toISOString().split("T")[0],
     renewalDate: new Date().toISOString().split("T")[0],
@@ -85,6 +85,7 @@ export default function MemberForm() {
       fatherName: validators.name,
       email: validators.email,
       cellNo: validators.phone,
+      cnic: validators.cnic,
       address: validators.textOptional,
     };
     if (rules[field]) {
@@ -128,6 +129,7 @@ export default function MemberForm() {
         fatherName: memberData.fatherName || "",
         email: memberData.email || "",
         cellNo: memberData.cellNo || "+92",
+        cnic: memberData.cnic || "",
         address: memberData.address || "",
         joiningDate: new Date(memberData.joiningDate).toISOString().split("T")[0],
         renewalDate: new Date(memberData.renewalDate).toISOString().split("T")[0],
@@ -183,7 +185,7 @@ export default function MemberForm() {
     );
   }
 
-  /* ── status colour map ── */
+
   const statusColors = {
     Active: "bg-green-50 text-green-700 border-green-200",
     Expired: "bg-red-50 text-red-600 border-red-200",
@@ -204,25 +206,19 @@ export default function MemberForm() {
     <div className="p-6 w-full">
       <form onSubmit={handleSubmit}>
 
-        {/* ══════════════════════════════
-            TWO-COLUMN ROW: Left + Right
-        ══════════════════════════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
 
-          {/* ── LEFT — Personal Information ── */}
           <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
             <div className="px-5 py-3 border-b border-stone-100 bg-stone-50 flex items-center gap-2">
               <User size={13} className="text-stone-500" />
               <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">Personal Information</span>
-              {/* Roll No badge */}
               <div className="ml-auto flex items-center gap-1.5 bg-white border border-stone-200 rounded-md px-2.5 py-1">
                 <Hash size={12} className="text-stone-400" />
-                <span className="text-xs font-mono font-bold text-stone-600">{formData.rollNo || "—"}</span>
+                <span className="text-xs font-mono font-bold text-stone-600">{formData.rollNo || "\u2014"}</span>
               </div>
             </div>
             <div className="p-5 flex flex-col gap-4 flex-1">
 
-              {/* Full Name + Father's Name — same row */}
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Full Name" error={errors.fullName} icon={User}>
                   <Input
@@ -249,7 +245,6 @@ export default function MemberForm() {
                 </Field>
               </div>
 
-              {/* Gender toggle */}
               <Field label="Gender">
                 <div className="flex gap-2">
                   {["Male", "Female", "Other"].map((g) => (
@@ -269,7 +264,6 @@ export default function MemberForm() {
                 </div>
               </Field>
 
-              {/* Cell Number + Email — same row */}
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Cell Number" error={errors.cellNo} icon={Phone}>
                   <Input
@@ -301,7 +295,21 @@ export default function MemberForm() {
                 </Field>
               </div>
 
-              {/* Address — full width */}
+              <Field label="CNIC" optional error={errors.cnic} icon={CreditCard}>
+                <Input
+                  id="cnic"
+                  placeholder="42101-1234567-1"
+                  className={inputClass(true) + " " + getErrClass(errors, "cnic")}
+                  value={formData.cnic}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9-]/g, "");
+                    setFormData((p) => ({ ...p, cnic: val }));
+                    validate("cnic", val);
+                  }}
+                  onBlur={() => validate("cnic", formData.cnic)}
+                />
+              </Field>
+
               <Field label="Address" optional error={errors.address} icon={MapPin}>
                 <Input
                   id="address"
@@ -316,7 +324,6 @@ export default function MemberForm() {
             </div>
           </div>
 
-          {/* ── RIGHT — Membership Details ── */}
           <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
             <div className="px-5 py-3 border-b border-stone-100 bg-stone-50 flex items-center gap-2">
               <Crown size={13} className="text-stone-500" />
@@ -324,7 +331,6 @@ export default function MemberForm() {
             </div>
             <div className="p-5 flex flex-col gap-4 flex-1">
 
-              {/* Joining Date + Monthly Fee — same row */}
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Joining Date" icon={CalendarDays}>
                   <Input
@@ -356,7 +362,6 @@ export default function MemberForm() {
                 </Field>
               </div>
 
-              {/* Membership Type + Status — same row */}
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Membership Type" icon={Crown}>
                   <Select value={formData.memberType} onValueChange={(val) => setFormData((prev) => ({ ...prev, memberType: val }))}>
@@ -388,9 +393,8 @@ export default function MemberForm() {
             </div>
           </div>
 
-        </div>{/* end two-col grid */}
+        </div>
 
-        {/* ── Footer Actions ── */}
         <div className="flex items-center justify-between pt-2">
           <Button
             type="button"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatDate, formatDateTime } from "@/utils/format";
 import API from "@/api/api";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ export default function LedgerView() {
     },
     onSuccess: () => {
       toast({ title: "Success", description: "Ledger entry deleted successfully." });
-      queryClient.invalidateQueries(["ledger", id]);
+      queryClient.invalidateQueries({ queryKey: ["ledger", id] });
       setDeleteTarget(null);
     },
     onError: (err) => {
@@ -106,7 +107,7 @@ export default function LedgerView() {
             <div className="flex items-center gap-2">
               <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Joined</p>
               <p className="text-xs font-semibold text-stone-900">
-                {trainer?.joiningDate ? new Date(trainer.joiningDate).toLocaleDateString() : "N/A"}
+                {trainer?.joiningDate ? formatDate(trainer.joiningDate) : "N/A"}
               </p>
             </div>
           </div>
@@ -117,14 +118,14 @@ export default function LedgerView() {
         <Card className="border border-stone-200 shadow-sm md:col-span-1 p-6 space-y-4">
           <h3 className="text-lg font-bold font-outfit text-stone-900 uppercase">Ledger Summary</h3>
           <div className="space-y-2 text-sm border-t border-stone-100 pt-4">
-            <div className="flex justify-between text-stone-500"><span>Base Salary:</span><strong className="text-stone-900">PKR {basePay}</strong></div>
-            <div className="flex justify-between text-stone-500"><span>Total Salary Paid:</span><strong className="text-green-600">PKR {totalSalary}</strong></div>
-            <div className="flex justify-between text-stone-500"><span>Total Commissions:</span><strong className="text-green-600">PKR {totalCommission}</strong></div>
-            <div className="flex justify-between text-stone-500"><span>Total Advances:</span><strong className="text-stone-900">PKR {totalAdvance}</strong></div>
-            <div className="flex justify-between text-stone-500"><span>Total Deductions/Fines:</span><strong className="text-red-600">PKR {totalDeductions}</strong></div>
-            <div className="flex justify-between text-red-600 border-t border-stone-100 pt-2"><span>Current Advance Bal:</span><strong>PKR {advanceBalance}</strong></div>
+            <div className="flex justify-between text-stone-500"><span>Base Salary:</span><strong className="text-stone-900">PKR {Number(basePay).toLocaleString("en-PK")}</strong></div>
+            <div className="flex justify-between text-stone-500"><span>Total Salary Paid:</span><strong className="text-green-600">PKR {Number(totalSalary).toLocaleString("en-PK")}</strong></div>
+            <div className="flex justify-between text-stone-500"><span>Total Commissions:</span><strong className="text-green-600">PKR {Number(totalCommission).toLocaleString("en-PK")}</strong></div>
+            <div className="flex justify-between text-stone-500"><span>Total Advances:</span><strong className="text-stone-900">PKR {Number(totalAdvance).toLocaleString("en-PK")}</strong></div>
+            <div className="flex justify-between text-stone-500"><span>Total Deductions/Fines:</span><strong className="text-red-600">PKR {Number(totalDeductions).toLocaleString("en-PK")}</strong></div>
+            <div className="flex justify-between text-red-600 border-t border-stone-100 pt-2"><span>Current Advance Bal:</span><strong>PKR {Number(advanceBalance).toLocaleString("en-PK")}</strong></div>
             <div className="flex justify-between text-base font-bold border-t border-stone-200 pt-2 text-stone-900">
-              <span>Calculated Net Salary:</span><span>PKR {netSalary}</span>
+              <span>Calculated Net Salary:</span><span>PKR {Number(netSalary).toLocaleString("en-PK")}</span>
             </div>
           </div>
         </Card>
@@ -151,15 +152,7 @@ export default function LedgerView() {
                   validLedger.map((l) => (
                     <TableRow key={l._id}>
                       <TableCell className="whitespace-nowrap text-stone-600 text-xs">
-                        {new Date(l.createdAt || Date.now()).toLocaleString("en-PK", {
-                          timeZone: "Asia/Karachi",
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true
-                        })}
+                        {formatDateTime(l.createdAt || Date.now())}
                       </TableCell>
                       <TableCell>
                         <div className={`font-semibold capitalize ${(l.transactionType === "advance" || l.transactionType === "deduction") ? "text-red-600" : "text-green-600"}`}>
@@ -171,7 +164,7 @@ export default function LedgerView() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell>PKR {l.amount}</TableCell>
+                      <TableCell>PKR {Number(l.amount).toLocaleString("en-PK")}</TableCell>
                       <TableCell className="text-stone-600 text-xs">{l.referenceNote || "N/A"}</TableCell>
                       <TableCell>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => setDeleteTarget(l._id)}>

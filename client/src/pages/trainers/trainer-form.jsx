@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, User, Phone, Mail, CalendarDays, Banknote, BellRing } from "lucide-react";
+import { Loader2, ArrowLeft, User, Phone, Mail, CreditCard, CalendarDays, Banknote, BellRing } from "lucide-react";
 import { validators, getErrClass } from "@/utils/validation";
 
 function InfoRow({ label, value }) {
@@ -39,7 +40,7 @@ function SalaryDueInfo({ joiningDate }) {
       <BellRing className="w-4 h-4 mt-0.5 shrink-0" />
       <div>
         <p className="text-xs font-bold">Next Salary Due</p>
-        <p className="text-xs mt-0.5">{nextDue.toLocaleDateString("en-PK", { day: "numeric", month: "long", year: "numeric" })} — <span className="font-semibold">{label}</span></p>
+        <p className="text-xs mt-0.5">{formatDate(nextDue)} — <span className="font-semibold">{label}</span></p>
       </div>
     </div>
   );
@@ -55,6 +56,7 @@ export default function TrainerForm() {
     fullName: "",
     email: "",
     phone: "",
+    cnic: "",
     gender: "Male",
     baseSalary: "",
     joiningDate: ""
@@ -67,6 +69,7 @@ export default function TrainerForm() {
       fullName: validators.name,
       email: (v) => v ? validators.email(v) : "",
       phone: validators.phone,
+      cnic: validators.cnic,
       baseSalary: validators.nonNegNum,
     };
     if (rules[field]) {
@@ -104,6 +107,7 @@ export default function TrainerForm() {
         fullName: trainerData.fullName || "",
         email: trainerData.email || "",
         phone: trainerData.phone || "",
+        cnic: trainerData.cnic || "",
         gender: trainerData.gender || "Male",
         baseSalary: trainerData.baseSalary ?? "",
         joiningDate: trainerData.joiningDate ? trainerData.joiningDate.slice(0, 10) : ""
@@ -219,6 +223,28 @@ export default function TrainerForm() {
             </div>
 
             <div>
+              <Label htmlFor="cnic">CNIC <span className="text-stone-400 font-normal text-xs">(Optional)</span></Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
+                  <CreditCard size={15} />
+                </span>
+                <Input
+                  id="cnic"
+                  placeholder="42101-1234567-1"
+                  className={`pl-8 ${getErrClass(errors, "cnic")}`}
+                  value={formData.cnic}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9-]/g, "");
+                    setFormData((p) => ({ ...p, cnic: val }));
+                    validate("cnic", val);
+                  }}
+                  onBlur={() => validate("cnic", formData.cnic)}
+                />
+              </div>
+              {errors.cnic && <p className="text-[11px] text-red-500 mt-1">{errors.cnic}</p>}
+            </div>
+
+            <div>
               <Label htmlFor="baseSalary">Base Monthly Salary (PKR)</Label>
               <Input
                 id="baseSalary"
@@ -283,7 +309,7 @@ export default function TrainerForm() {
                 )}
                 <div className="flex items-center gap-2 text-stone-600">
                   <CalendarDays className="w-4 h-4 text-stone-400 shrink-0" />
-                  <span>{formData.joiningDate ? new Date(formData.joiningDate).toLocaleDateString("en-PK", { day: "numeric", month: "long", year: "numeric" }) : "No joining date"}</span>
+                  <span>{formData.joiningDate ? formatDate(formData.joiningDate) : "No joining date"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-stone-600">
                   <Banknote className="w-4 h-4 text-stone-400 shrink-0" />

@@ -86,7 +86,7 @@ export default function LedgerEntryForm() {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["ledger", id]);
+      queryClient.invalidateQueries({ queryKey: ["ledger", id] });
       toast({ title: "Payment recorded successfully" });
       navigate(`/trainers/${id}/ledger`);
     },

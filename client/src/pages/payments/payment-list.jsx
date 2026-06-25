@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -59,7 +60,7 @@ export default function PaymentList() {
               <SelectItem value="Easy Paisa">Easy Paisa</SelectItem>
               <SelectItem value="Jazz Cash">Jazz Cash</SelectItem>
               <SelectItem value="Cheque">Cheque</SelectItem>
-              <SelectItem value="UPI/Online">UPI / Online</SelectItem>
+              <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -107,9 +108,9 @@ export default function PaymentList() {
                       <div className="font-medium text-stone-900">{p.memberId?.fullName || "Deleted Member"}</div>
                       <div className="text-xs text-stone-500">{p.memberId?.rollNo || ""}</div>
                     </TableCell>
-                    <TableCell>{new Date(p.date).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatDate(p.date)}</TableCell>
                     <TableCell>{p.paymentMethod}</TableCell>
-                    <TableCell className="font-bold text-stone-850">PKR {p.amountReceived}</TableCell>
+                    <TableCell className="font-bold text-stone-850">PKR {Number(p.amountReceived).toLocaleString("en-PK")}</TableCell>
                     <TableCell className="text-right">
                       <Link to={`/payments/receipt/${p._id}`}>
                         <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg">

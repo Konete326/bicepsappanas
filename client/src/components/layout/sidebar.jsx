@@ -11,7 +11,9 @@ import {
   TrendingUp,
   Info,
   LogOut,
-  X
+  X,
+  Package,
+  ShoppingCart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -25,6 +27,9 @@ const navItems = [
   { title: "Routines", href: "/routines", icon: Dumbbell },
   { title: "Notifications", href: "/notifications", icon: Bell },
   { title: "Reports", href: "/reports", icon: TrendingUp },
+  { title: "Inventory", href: "/inventory", icon: Package },
+  { title: "POS", href: "/pos", icon: ShoppingCart },
+  { title: "Sales", href: "/sales", icon: Receipt },
   { title: "About Wreck & Build", href: "/about", icon: Info }
 ];
 

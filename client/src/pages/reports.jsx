@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -205,7 +206,7 @@ export default function Reports() {
                       <Badge variant="outline" className="text-[10px] font-semibold">{p.paymentMethod}</Badge>
                     </TableCell>
                     <TableCell className="text-xs text-stone-500">
-                      {new Date(p.date).toLocaleDateString("en-PK", { day: "2-digit", month: "short", year: "numeric" })}
+                      {formatDate(p.date)}
                     </TableCell>
                     <TableCell className="text-right font-black text-stone-900 font-outfit">
                       PKR {p.amountReceived.toLocaleString()}

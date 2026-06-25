@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Loader2, ArrowLeft, CreditCard, Ruler } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -87,16 +88,20 @@ export default function MemberDetail() {
               <p className="text-xs font-bold text-stone-800 leading-tight">{member.cellNo || "—"}</p>
             </div>
             <div>
+              <p className="text-[9px] font-medium text-stone-400 uppercase tracking-widest leading-tight">CNIC</p>
+              <p className="text-xs font-bold text-stone-800 leading-tight">{member.cnic || "N/A"}</p>
+            </div>
+            <div>
               <p className="text-[9px] font-medium text-stone-400 uppercase tracking-widest leading-tight">Type</p>
               <p className="text-xs font-bold text-stone-800 leading-tight">{member.memberType || "Basic"}</p>
             </div>
             <div>
               <p className="text-[9px] font-medium text-stone-400 uppercase tracking-widest leading-tight">Joined</p>
-              <p className="text-xs font-bold text-stone-800 leading-tight">{new Date(member.joiningDate).toLocaleDateString()}</p>
+              <p className="text-xs font-bold text-stone-800 leading-tight">{formatDate(member.joiningDate)}</p>
             </div>
             <div>
               <p className="text-[9px] font-medium text-stone-400 uppercase tracking-widest leading-tight">Renewal</p>
-              <p className="text-xs font-bold text-stone-800 leading-tight">{new Date(member.renewalDate).toLocaleDateString()}</p>
+              <p className="text-xs font-bold text-stone-800 leading-tight">{formatDate(member.renewalDate)}</p>
             </div>
           </div>
 

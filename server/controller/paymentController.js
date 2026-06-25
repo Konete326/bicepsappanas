@@ -10,7 +10,7 @@ const getNextSerialNo = async () => {
 
 exports.createPayment = catchAsync(async (req, res, next) => {
     const { memberId, amountReceived, paymentMethod, chequeOrTransactionNo, monthIndex } = req.body;
-    const member = await Member.findById(memberId);
+    const member = await Member.findById(memberId).populate("planLink", "duration");
     if (!member) return next(new AppError("Member not found", 404));
 
     const serialNo = await getNextSerialNo();
@@ -21,8 +21,9 @@ exports.createPayment = catchAsync(async (req, res, next) => {
     const monthToUpdate = monthIndex !== undefined ? Number(monthIndex) : new Date().getMonth();
     member.paymentGrid.set(String(monthToUpdate), true);
     member.status = "Active";
+    const planDuration = member.planLink?.duration || 1;
     const renewal = new Date(member.renewalDate);
-    renewal.setMonth(renewal.getMonth() + 1);
+    renewal.setMonth(renewal.getMonth() + planDuration);
     member.renewalDate = renewal;
     await member.save();
 
@@ -65,6 +66,7 @@ exports.getMemberPayments = catchAsync(async (req, res) => {
 
 exports.getOutstandingDues = catchAsync(async (req, res) => {
     const members = await Member.find({ status: "Active" });
+    const today = new Date();
     const duesList = [];
     for (const member of members) {
         const totalPaid = await Payment.aggregate([
@@ -72,8 +74,12 @@ exports.getOutstandingDues = catchAsync(async (req, res) => {
             { $group: { _id: null, total: { $sum: "$amountReceived" } } }
         ]);
         const fee = member.monthlyFee || 0;
+        const monthsSinceJoining = Math.ceil(
+            (today - new Date(member.joiningDate)) / (1000 * 60 * 60 * 24 * 30)
+        );
+        const totalDue = monthsSinceJoining * fee;
         const paid = totalPaid[0]?.total || 0;
-        const outstanding = fee - paid;
+        const outstanding = totalDue - paid;
         if (outstanding > 0) {
             duesList.push({
                 member: { id: member._id, fullName: member.fullName, rollNo: member.rollNo, cellNo: member.cellNo },

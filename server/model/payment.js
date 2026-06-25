@@ -22,7 +22,7 @@ const paymentSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ["Cash", "Cheque", "UPI/Online", "Easy Paisa", "Jazz Cash"],
+        enum: ["Cash", "Cheque", "Easy Paisa", "Jazz Cash", "Bank Transfer"],
         required: [true, "Payment method is required"],
     },
     chequeOrTransactionNo: {

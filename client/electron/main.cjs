@@ -1,8 +1,22 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
+const log = require("electron-log");
+
+log.transports.file.resolvePathFn = () =>
+    path.join(app.getPath("userData"), "logs", "main.log");
+log.transports.file.level = "info";
+log.transports.console.level = "debug";
+
+ipcMain.handle("log", (_event, { level, message }) => {
+    log[level](message);
+});
 
 let mainWindow = null;
+
+const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, "logo.png")
+    : path.join(__dirname, "../public/logo.png");
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -10,6 +24,7 @@ function createWindow() {
         height: 800,
         minWidth: 900,
         minHeight: 600,
+        icon: iconPath,
         webPreferences: {
             preload: path.join(__dirname, "preload.cjs"),
             contextIsolation: true,

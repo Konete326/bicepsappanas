@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -179,7 +180,7 @@ export default function MemberList() {
                           {payStatus.label}
                         </Badge>
                       </TableCell>
-                      <TableCell>{new Date(member.renewalDate).toLocaleDateString()}</TableCell>
+                      <TableCell>{formatDate(member.renewalDate)}</TableCell>
                       <TableCell className="text-right space-x-2">
                         <Link to={`/members/${member._id}`}>
                           <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"><Eye className="h-4 w-4" /></Button>

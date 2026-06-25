@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -56,8 +57,8 @@ export default function DuesReport() {
                   <TableRow key={m._id}>
                     <TableCell className="font-semibold">{m.rollNo}</TableCell>
                     <TableCell>{m.fullName}</TableCell>
-                    <TableCell className="font-semibold text-stone-700">PKR {m.monthlyFee || 0}</TableCell>
-                    <TableCell>{new Date(m.renewalDate).toLocaleDateString()}</TableCell>
+                    <TableCell className="font-semibold text-stone-700">PKR {Number(m.monthlyFee || 0).toLocaleString("en-PK")}</TableCell>
+                    <TableCell>{formatDate(m.renewalDate)}</TableCell>
                     <TableCell className="text-right">
                       <Link to={`/payments/new?memberId=${m._id}`}>
                         <Button size="sm" className="h-8">

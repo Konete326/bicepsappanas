@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { logError } from "@/lib/logger";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +74,7 @@ export function ThemeConfigurator({ isOpen, onClose }) {
         const parsed = JSON.parse(savedTheme);
         setTheme({ ...defaultTheme, ...parsed });
       } catch (e) {
-        console.error("Failed to parse saved theme:", e);
+        logError("Failed to parse saved theme: " + e.message);
       }
     }
   }, []);
@@ -186,7 +187,7 @@ export function ThemeConfigurator({ isOpen, onClose }) {
             applyTheme(newTheme);
           }
         } catch (error) {
-          console.error("Failed to import theme:", error);
+          logError("Failed to import theme: " + error.message);
         }
       };
       reader.readAsText(file);

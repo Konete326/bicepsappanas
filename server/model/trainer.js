@@ -13,6 +13,11 @@ const trainerSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
+    cnic: {
+        type: String,
+        sparse: true,
+        trim: true,
+    },
     phone: {
         type: String,
         required: [true, "Phone number is required"],

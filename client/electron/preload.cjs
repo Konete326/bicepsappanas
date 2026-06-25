@@ -7,4 +7,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
     receive: (channel, func) => {
         ipcRenderer.on(channel, (_event, ...args) => func(...args));
     },
+    log: (level, message) => ipcRenderer.invoke("log", { level, message }),
 });

@@ -38,8 +38,8 @@ API.interceptors.response.use(
         if (response && response.status === 401) {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
-            if (!window.location.pathname.includes("/login")) {
-                window.location.href = "/login";
+            if (!window.location.pathname.includes("/auth/sign-in")) {
+                window.location.href = "/auth/sign-in";
             }
             return Promise.reject(err);
         }

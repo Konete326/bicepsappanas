@@ -17,7 +17,7 @@ exports.createLedgerEntry = catchAsync(async (req, res, next) => {
     } else if (transactionType === "salary") {
         advanceBalance = 0;
     } else if (transactionType === "deduction") {
-        advanceBalance += amount;
+        advanceBalance -= amount;
     }
 
     const entry = await SalaryLedger.create({
@@ -40,7 +40,7 @@ exports.getLedger = catchAsync(async (req, res, next) => {
     const totalCommission = entries.filter(e => e.transactionType === "commission").reduce((sum, e) => sum + e.amount, 0);
     const totalDeductions = entries.filter(e => e.transactionType === "deduction").reduce((sum, e) => sum + e.amount, 0);
     const currentAdvance = entries.length ? entries[0].advanceBalance : 0;
-    const netSalary = (trainer.baseSalary + totalCommission) - currentAdvance;
+    const netSalary = (trainer.baseSalary + totalCommission) - (currentAdvance + totalDeductions);
 
     res.status(200).json({
         status: "success",
@@ -66,7 +66,7 @@ exports.deleteLedgerEntry = catchAsync(async (req, res, next) => {
         } else if (e.transactionType === "salary") {
             balance = 0;
         } else if (e.transactionType === "deduction") {
-            balance += e.amount;
+            balance -= e.amount;
         }
         if (e.advanceBalance !== balance) {
             e.advanceBalance = balance;

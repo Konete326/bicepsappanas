@@ -24,6 +24,11 @@ const memberSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
+    cnic: {
+        type: String,
+        sparse: true,
+        trim: true,
+    },
     cellNo: {
         type: String,
         required: [true, "Cell number is required"],

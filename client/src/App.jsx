@@ -31,6 +31,12 @@ import RoutineView from "@/pages/routines/routine-view";
 import Reports from "@/pages/reports";
 import Changelog from "@/pages/changelog";
 import License from "@/pages/license";
+import ProductList from "@/pages/inventory/product-list";
+import ProductForm from "@/pages/inventory/product-form";
+import POSPage from "@/pages/pos/pos-page";
+import SalesHistory from "@/pages/pos/sales-history";
+import { Agentation } from "agentation";
+
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -75,6 +81,11 @@ function Router() {
       <Route path="/changelog" element={<ProtectedRoute><Layout title="Changelog"><Changelog /></Layout></ProtectedRoute>} />
       <Route path="/license" element={<Layout title="License & Legal"><License /></Layout>} />
       <Route path="/about" element={<Layout title="About Wreck & Build Gym"><About /></Layout>} />
+      <Route path="/inventory" element={<ProtectedRoute><Layout title="Inventory"><ProductList /></Layout></ProtectedRoute>} />
+      <Route path="/inventory/new" element={<ProtectedRoute><Layout title="Add Product"><ProductForm /></Layout></ProtectedRoute>} />
+      <Route path="/inventory/edit/:id" element={<ProtectedRoute><Layout title="Edit Product"><ProductForm /></Layout></ProtectedRoute>} />
+      <Route path="/pos" element={<ProtectedRoute><Layout title="Point of Sale"><POSPage /></Layout></ProtectedRoute>} />
+      <Route path="/sales" element={<ProtectedRoute><Layout title="Sales History"><SalesHistory /></Layout></ProtectedRoute>} />
       <Route path="/auth/sign-in" element={user ? <Navigate to="/" replace /> : <SignIn />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -91,6 +102,14 @@ export default function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
+            {import.meta.env.DEV && (
+              <Agentation
+                endpoint="http://localhost:4747"
+                onSessionCreated={(sessionId) => {
+                  console.log("Session started:", sessionId);
+                }}
+              />
+            )}
           </TooltipProvider>
         </QueryClientProvider>
       </RouterComponent>

@@ -87,7 +87,7 @@ export default function PaymentGrid({ memberId }) {
       return res.data;
     },
     onSuccess: (_, monthIndex) => {
-      queryClient.invalidateQueries(["payment-grid", memberId]);
+      queryClient.invalidateQueries({ queryKey: ["payment-grid", memberId] });
       const wasPaid = grid && grid[monthIndex] === true;
       toast({
         title: wasPaid ? "Payment undone" : "Payment recorded",

@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, Printer } from "lucide-react";
@@ -57,15 +58,16 @@ export default function ReceiptView() {
             <div className="flex justify-between"><span className="text-stone-500">Father's Name</span><span className="font-semibold text-stone-900">{payment.memberId?.fatherName || "N/A"}</span></div>
             <div className="flex justify-between"><span className="text-stone-500">Roll Number</span><span className="font-semibold text-stone-900">{payment.memberId?.rollNo || "N/A"}</span></div>
             <div className="flex justify-between"><span className="text-stone-500">Cell Number</span><span className="font-semibold text-stone-900">{payment.memberId?.cellNo || "N/A"}</span></div>
+            <div className="flex justify-between"><span className="text-stone-500">CNIC</span><span className="font-semibold text-stone-900">{payment.memberId?.cnic || "N/A"}</span></div>
             <div className="border-t border-dashed border-stone-100 my-1"></div>
             <div className="flex justify-between"><span className="text-stone-500">Receipt S.No</span><span className="font-semibold text-stone-900">{String(payment.serialNo).padStart(3, "0")}</span></div>
-            <div className="flex justify-between"><span className="text-stone-500">Date</span><span className="font-semibold text-stone-900">{new Date(payment.date).toLocaleDateString()}</span></div>
+            <div className="flex justify-between"><span className="text-stone-500">Date</span><span className="font-semibold text-stone-900">{formatDate(payment.date)}</span></div>
             <div className="flex justify-between"><span className="text-stone-500">Payment Method</span><span className="font-semibold text-stone-900">{payment.paymentMethod}</span></div>
             {payment.chequeOrTransactionNo && (
               <div className="flex justify-between"><span className="text-stone-500">Ref Code</span><span className="font-mono text-stone-900">{payment.chequeOrTransactionNo}</span></div>
             )}
             <div className="border-t border-dashed border-stone-100 my-1"></div>
-            <div className="flex justify-between"><span className="text-stone-500">Amount Paid</span><span className="font-bold text-sm text-stone-900">PKR {payment.amountReceived}</span></div>
+            <div className="flex justify-between"><span className="text-stone-500">Amount Paid</span><span className="font-bold text-sm text-stone-900">PKR {Number(payment.amountReceived).toLocaleString("en-PK")}</span></div>
           </div>
         </div>
 
@@ -86,7 +88,7 @@ export default function ReceiptView() {
           </div>
           <div className="flex justify-between">
             <span className="text-stone-500">Date:</span>
-            <span className="font-semibold">{new Date(payment.date).toLocaleDateString()}</span>
+            <span className="font-semibold">{formatDate(payment.date)}</span>
           </div>
         </div>
 
@@ -99,6 +101,10 @@ export default function ReceiptView() {
           <div className="flex justify-between">
             <span className="text-stone-500">Roll No:</span>
             <span className="font-semibold">{payment.memberId?.rollNo || "N/A"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-stone-500">CNIC:</span>
+            <span className="font-semibold">{payment.memberId?.cnic || "N/A"}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-stone-500">Payment Method:</span>
@@ -116,7 +122,7 @@ export default function ReceiptView() {
         <div className="py-2 border-b border-dashed border-stone-300">
           <div className="flex justify-between items-center">
             <span className="font-bold text-sm">Total Paid:</span>
-            <span className="text-lg font-black">PKR {payment.amountReceived}</span>
+            <span className="text-lg font-black">PKR {Number(payment.amountReceived).toLocaleString("en-PK")}</span>
           </div>
         </div>
 

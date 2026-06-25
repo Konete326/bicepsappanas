@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -229,7 +230,7 @@ export default function PaymentForm() {
                   <SelectItem value="Easy Paisa">Easy Paisa</SelectItem>
                   <SelectItem value="Jazz Cash">Jazz Cash</SelectItem>
                   <SelectItem value="Cheque">Cheque</SelectItem>
-                  <SelectItem value="UPI/Online">UPI / Online Transfer</SelectItem>
+                  <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -280,11 +281,11 @@ export default function PaymentForm() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Monthly Fee</p>
-                    <p className="font-semibold text-stone-800">PKR {planPrice}</p>
+                    <p className="font-semibold text-stone-800">PKR {Number(planPrice).toLocaleString("en-PK")}</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Renewal Date</p>
-                    <p className="font-semibold text-stone-800">{new Date(selectedMember.renewalDate).toLocaleDateString()}</p>
+                    <p className="font-semibold text-stone-800">{formatDate(selectedMember.renewalDate)}</p>
                   </div>
                 </div>
 
@@ -300,7 +301,7 @@ export default function PaymentForm() {
                   ) : (
                     <>
                       <p className={`text-xl font-bold ${outstandingDues > 0 ? "text-rose-600" : "text-emerald-600"}`}>
-                        PKR {outstandingDues}
+                        PKR {Number(outstandingDues).toLocaleString("en-PK")}
                       </p>
                       <p className="text-[10px] text-stone-400 mt-1 leading-tight">
                         Calculated based on {amountReceived || 0} received vs {planPrice} fee.

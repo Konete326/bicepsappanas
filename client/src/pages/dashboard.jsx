@@ -29,7 +29,7 @@ export default function Dashboard() {
   const kpis = [
     { label: "Active Members", value: stats.activeMembers || 0, icon: Users, color: "text-green-600" },
     { label: "Total Members", value: stats.totalMembers || 0, icon: Users, color: "text-stone-700" },
-    { label: "Today's Revenue", value: `PKR ${stats.todayRevenue || 0}`, icon: DollarSign, color: "text-blue-600" },
+    { label: "Today's Revenue", value: `PKR ${Number(stats.todayRevenue || 0).toLocaleString("en-PK")}`, icon: DollarSign, color: "text-blue-600" },
     { label: "Today's Payments", value: stats.todayPayments || 0, icon: AlertCircle, color: "text-orange-600" }
   ];
 
@@ -119,7 +119,7 @@ export default function Dashboard() {
                     <TableCell className="font-semibold text-xs">S.No - {String(p.serialNo).padStart(3, "0")}</TableCell>
                     <TableCell className="text-xs">{p.memberId?.fullName || "Deleted Member"}</TableCell>
                     <TableCell className="text-xs">{p.paymentMethod}</TableCell>
-                    <TableCell className="font-bold text-xs">PKR {p.amountReceived}</TableCell>
+                    <TableCell className="font-bold text-xs">PKR {Number(p.amountReceived).toLocaleString("en-PK")}</TableCell>
                   </TableRow>
                 ))
               )}

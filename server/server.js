@@ -14,6 +14,8 @@ const dashboardRoutes = require("./router/dashboardRoutes");
 const employeeRoutes = require("./router/employeeRouter");
 const notificationRoutes = require("./router/notificationRoutes");
 const reportsRoutes = require("./router/reportsRoutes");
+const productRoutes = require("./router/productRoutes");
+const saleRoutes = require("./router/saleRoutes");
 const { startScheduler } = require("./services/schedulerService");
 
 const app = express();
@@ -40,6 +42,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reports", reportsRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/sales", saleRoutes);
 
 const globalErrorHandler = require("./middleware/errorMiddleware");
 app.use(globalErrorHandler);

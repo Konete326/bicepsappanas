@@ -17,7 +17,7 @@ export const validators = {
   phone: (v) => {
     if (!v || !v.trim()) return "Phone number is required";
     const cleaned = v.replace(/[\s-]/g, "");
-    if (!/^\+?\d{10,15}$/.test(cleaned)) return "Enter a valid phone number (10-15 digits)";
+    if (!/^\+92[0-9]{10}$/.test(cleaned)) return "Enter valid number (e.g., +923001234567)";
     return "";
   },
   positiveNum: (v) => {
@@ -58,6 +58,11 @@ export const validators = {
   textOptional: (v) => {
     if (!v || !v.trim()) return "";
     if (!/^[a-zA-Z0-9\s,.'#/-]+$/.test(v)) return "Contains invalid characters";
+    return "";
+  },
+  cnic: (v) => {
+    if (!v || !v.trim()) return "";
+    if (!/^\d{5}-\d{7}-\d{1}$/.test(v)) return "Enter valid CNIC (e.g., 42101-1234567-1)";
     return "";
   },
 };

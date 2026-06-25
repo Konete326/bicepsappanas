@@ -7,7 +7,7 @@ exports.checkAndNotifyLowStock = async (productIds, adminId) => {
 
         const products = await Product.find({
             _id: { $in: productIds },
-            $expr: { $lte: ["$stock", "$minStockLevel"] }
+            $expr: { $lte: ["$stock", "$lowStockThreshold"] }
         });
 
         for (const product of products) {
@@ -36,7 +36,7 @@ exports.resolveStockAlert = async (productId, adminId) => {
     try {
         if (!adminId) return;
         const product = await Product.findById(productId);
-        if (product && product.stock > product.minStockLevel) {
+        if (product && product.stock > product.lowStockThreshold) {
             await Notification.updateMany(
                 { product: productId, adminId, isRead: false },
                 { isRead: true }

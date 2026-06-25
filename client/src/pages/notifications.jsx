@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { formatDateTime } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +56,7 @@ export default function Notifications() {
   const clearMutation = useMutation({
     mutationFn: async () => API.delete("/notifications/clear"),
     onSuccess: () => {
-      queryClient.invalidateQueries(["notifications"]);
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       toast({ title: "All notifications cleared" });
       setIsDialogOpen(false);
       setDeleteTarget(null);
@@ -65,7 +66,7 @@ export default function Notifications() {
   const deleteMutation = useMutation({
     mutationFn: async (id) => API.delete(`/notifications/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries(["notifications"]);
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       toast({ title: "Notification deleted" });
       setIsDialogOpen(false);
       setDeleteTarget(null);
@@ -82,7 +83,7 @@ export default function Notifications() {
   const readMutation = useMutation({
     mutationFn: async (id) => API.patch(`/notifications/${id}/read`),
     onSuccess: () => {
-      queryClient.invalidateQueries(["notifications"]);
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     }
   });
 
@@ -177,7 +178,7 @@ export default function Notifications() {
                     </p>
                     <p className="text-xs text-stone-600">{n.message}</p>
                     <span className="text-[10px] text-stone-400">
-                      {new Date(n.createdAt || Date.now()).toLocaleString()}
+                      {formatDateTime(n.createdAt || Date.now())}
                     </span>
                   </div>
                   <Button

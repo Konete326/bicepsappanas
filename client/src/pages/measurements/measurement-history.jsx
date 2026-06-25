@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -260,7 +261,7 @@ export default function MeasurementHistory() {
                                   {h.member.fullName} <span className="text-xs text-stone-400">({h.member.rollNo})</span>
                                 </TableCell>
                                 <TableCell className="text-stone-800">
-                                  {h.hasData ? new Date(h.createdAt || Date.now()).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : <span className="text-stone-400 italic">No Data</span>}
+                                  {h.hasData ? formatDate(h.createdAt || Date.now()) : <span className="text-stone-400 italic">No Data</span>}
                                 </TableCell>
                                 <TableCell>{h.hasData ? `${h.weight} kg` : "-"}</TableCell>
                               <TableCell>
@@ -286,7 +287,7 @@ export default function MeasurementHistory() {
                                   <Button size="icon" variant="outline" className="h-7 w-7 rounded-full text-stone-500 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition-colors" onClick={() => openUpdateModal(h)}>
                                     <Edit className="h-3 w-3" />
                                   </Button>
-                                  <Button size="icon" variant="outline" className="h-7 w-7 rounded-full text-stone-500 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-colors" onClick={() => setConfirmDeleteState({ open: true, memberId: h.member._id, index: h.originalIndex, dateStr: new Date(h.createdAt).toLocaleDateString() })}>
+                                  <Button size="icon" variant="outline" className="h-7 w-7 rounded-full text-stone-500 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-colors" onClick={() => setConfirmDeleteState({ open: true, memberId: h.member._id, index: h.originalIndex, dateStr: formatDate(h.createdAt) })}>
                                     <Trash2 className="h-3 w-3" />
                                   </Button>
                                 </div>

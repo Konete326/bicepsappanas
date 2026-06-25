@@ -12,11 +12,10 @@ exports.createMember = catchAsync(async (req, res) => {
     }
     req.body.rollNo = String(nextRoll).padStart(4, "0");
     
-    // Clear empty optional fields to prevent unique index validation issues
     if (req.body.email === "") req.body.email = undefined;
     if (req.body.address === "") req.body.address = undefined;
-    
-    // Force renewalDate to be identical to joiningDate
+    if (!req.body.cnic?.trim()) delete req.body.cnic;
+
     if (req.body.joiningDate) {
         req.body.renewalDate = req.body.joiningDate;
     }
@@ -34,7 +33,8 @@ exports.getMembers = catchAsync(async (req, res) => {
         filter.$or = [
             { rollNo: { $regex: q, $options: "i" } },
             { fullName: { $regex: q, $options: "i" } },
-            { cellNo: { $regex: q, $options: "i" } }
+            { cellNo: { $regex: q, $options: "i" } },
+            { cnic: { $regex: q, $options: "i" } }
         ];
     }
     const members = await Member.find(filter)
@@ -51,7 +51,8 @@ exports.getMember = catchAsync(async (req, res, next) => {
 exports.updateMember = catchAsync(async (req, res, next) => {
     if (req.body.email === "") req.body.email = undefined;
     if (req.body.address === "") req.body.address = undefined;
-    
+    if (!req.body.cnic?.trim()) delete req.body.cnic;
+
     if (req.body.joiningDate) {
         req.body.renewalDate = req.body.joiningDate;
     }

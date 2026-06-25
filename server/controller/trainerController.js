@@ -4,6 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 exports.createTrainer = catchAsync(async (req, res) => {
+    if (!req.body.cnic?.trim()) delete req.body.cnic;
     const trainer = await Trainer.create(req.body);
     res.status(201).json({ status: "success", data: trainer });
 });
@@ -20,6 +21,7 @@ exports.getTrainer = catchAsync(async (req, res, next) => {
 });
 
 exports.updateTrainer = catchAsync(async (req, res, next) => {
+    if (!req.body.cnic?.trim()) delete req.body.cnic;
     const trainer = await Trainer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!trainer) return next(new AppError("Trainer not found", 404));
     res.status(200).json({ status: "success", data: trainer });

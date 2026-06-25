@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Bell, Package, Check, Trash2, X, ExternalLink } from "lucide-react";
+import { formatTime } from "@/utils/format";
+import { logError } from "@/lib/logger";
 import { useNavigate } from "react-router-dom";
 import {
     Popover,
@@ -48,7 +50,7 @@ export function NotificationBell() {
             setNotifications(res.data.data);
             setUnreadCount(res.data.data.filter(n => !n.isRead).length);
         } catch (err) {
-            console.error("Failed to fetch notifications");
+            logError("Failed to fetch notifications");
         }
     };
 
@@ -149,7 +151,7 @@ export function NotificationBell() {
                                             </p>
                                             <p className="text-[10px] text-stone-500 font-medium leading-relaxed">{n.message}</p>
                                             <div className="flex items-center justify-between mt-2">
-                                                <span className="text-[9px] text-stone-400 font-bold uppercase">{new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                <span className="text-[9px] text-stone-400 font-bold uppercase">{formatTime(n.createdAt)}</span>
                                                 {!n.isRead && (
                                                     <Button
                                                         variant="ghost"

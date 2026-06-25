@@ -38,7 +38,7 @@ export default function PlanForm({ plan, onSuccess, onCancel }) {
       return API.post("/plans", payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["plans"]);
+      queryClient.invalidateQueries({ queryKey: ["plans"] });
       toast({ title: `Plan ${plan?._id ? "updated" : "created"} successfully` });
       onSuccess();
     },
