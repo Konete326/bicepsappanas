@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ export default function POSPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products", searchTerm],
@@ -38,6 +40,7 @@ export default function POSPage() {
       setIsModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["sales"] });
+      navigate("/sales");
     },
     onError: (err) =>
       toast({
@@ -315,8 +318,8 @@ export default function POSPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            <Button disabled={saleMutation.isPending} onClick={handleCompleteSale}>
+            <Button variant="outline" className="rounded-lg" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+            <Button className="rounded-lg" disabled={saleMutation.isPending} onClick={handleCompleteSale}>
               {saleMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Confirm & Complete
             </Button>

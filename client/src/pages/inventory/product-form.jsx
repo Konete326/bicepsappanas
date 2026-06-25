@@ -76,15 +76,35 @@ export default function ProductForm() {
 
   const [errors, setErrors] = useState({});
 
-  const validate = (field, value) => {
+  const validate = (field, value, currentFormData = formData) => {
     const rules = {
       name: validators.name,
-      price: validators.positiveNum,
-      costPrice: (v) => (v === "" || v === undefined ? "" : validators.nonNegNum(v)),
+      price: (v) => {
+        const err = validators.positiveNum(v);
+        if (!err && currentFormData.costPrice !== "" && Number(currentFormData.costPrice) > Number(v)) {
+          return "Cannot be less than cost price";
+        }
+        return err;
+      },
+      costPrice: (v) => {
+        const err = (v === "" || v === undefined ? "" : validators.nonNegNum(v));
+        if (!err && v !== "" && currentFormData.price !== "" && Number(v) > Number(currentFormData.price)) {
+          return "Cannot exceed selling price";
+        }
+        return err;
+      },
       stock: validators.nonNegNum,
     };
     if (rules[field]) {
-      setErrors((prev) => ({ ...prev, [field]: rules[field](value) }));
+      setErrors((prev) => {
+        const newErrors = { ...prev, [field]: rules[field](value) };
+        if (field === "price" && !newErrors.price && currentFormData.costPrice !== "") {
+          newErrors.costPrice = rules.costPrice(currentFormData.costPrice);
+        } else if (field === "costPrice" && !newErrors.costPrice && currentFormData.price !== "") {
+          newErrors.price = rules.price(currentFormData.price);
+        }
+        return newErrors;
+      });
     }
   };
 
@@ -165,8 +185,11 @@ export default function ProductForm() {
 
   const set = (field) => (e) => {
     const value = e.target.value;
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    validate(field, value);
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value };
+      validate(field, value, next);
+      return next;
+    });
   };
 
   const handleImageChange = (e) => {
@@ -268,7 +291,7 @@ export default function ProductForm() {
               <div className="grid grid-cols-1 gap-3">
                 <Field label="Category" error={!formData.category ? "Required" : ""} icon={Tag}>
                   <Select
-                    value={formData.category}
+                    value={formData.category || undefined}
                     onValueChange={(val) => {
                       setFormData((prev) => ({ ...prev, category: val }));
                       setErrors((prev) => ({ ...prev, category: "" }));

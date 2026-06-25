@@ -301,7 +301,29 @@ export default function RoutineView() {
                   <CardTitle className="text-sm font-semibold">Workout Splits</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-3 text-sm text-stone-700 whitespace-pre-line">
-                  {viewModal.hasExercise ? viewModal.exerciseSchedule : <span className="text-stone-400 italic">Not set</span>}
+                  {viewModal.hasExercise ? (
+                    Array.isArray(viewModal.exerciseSchedule) ? (
+                      <div className="space-y-4">
+                        {viewModal.exerciseSchedule.map((ex, idx) => (
+                          <div key={idx} className="border-l-2 border-stone-300 pl-3">
+                            <p className="font-bold text-stone-900">{ex.day}</p>
+                            <ul className="list-disc list-inside text-stone-600 mt-1 space-y-1">
+                              {ex.exercises?.map((item, i) => (
+                                <li key={i}>{item}</li>
+                              ))}
+                            </ul>
+                            {(ex.sets || ex.reps) && (
+                              <p className="text-xs text-stone-500 mt-1.5 font-medium">
+                                {ex.sets && `${ex.sets} Sets`} {ex.sets && ex.reps && '×'} {ex.reps && `${ex.reps} Reps`}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      viewModal.exerciseSchedule
+                    )
+                  ) : <span className="text-stone-400 italic">Not set</span>}
                 </CardContent>
               </Card>
               <Card className="border border-stone-200 shadow-sm">
@@ -310,7 +332,29 @@ export default function RoutineView() {
                   <CardTitle className="text-sm font-semibold">Meal & Diet Plan</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-3 text-sm text-stone-700 whitespace-pre-line">
-                  {viewModal.hasMeal ? viewModal.mealPlan : <span className="text-stone-400 italic">Not set</span>}
+                  {viewModal.hasMeal ? (
+                    Array.isArray(viewModal.mealPlan) ? (
+                      <div className="space-y-4">
+                        {viewModal.mealPlan.map((meal, idx) => (
+                          <div key={idx} className="border-l-2 border-stone-300 pl-3">
+                            <p className="font-bold text-stone-900">{meal.mealType}</p>
+                            <ul className="list-disc list-inside text-stone-600 mt-1 space-y-1">
+                              {meal.items?.map((item, i) => (
+                                <li key={i}>{item}</li>
+                              ))}
+                            </ul>
+                            {(meal.calories || meal.protein) && (
+                              <p className="text-xs text-stone-500 mt-1.5 font-medium">
+                                {meal.calories && `${meal.calories} kcal`} {meal.calories && meal.protein && '•'} {meal.protein && `${meal.protein}g protein`}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      viewModal.mealPlan
+                    )
+                  ) : <span className="text-stone-400 italic">Not set</span>}
                 </CardContent>
               </Card>
             </div>

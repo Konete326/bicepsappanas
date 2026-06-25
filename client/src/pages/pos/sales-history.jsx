@@ -7,21 +7,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Loader2, Eye, Calendar, Receipt, ShoppingCart, CreditCard, Banknote } from "lucide-react";
+import { Loader2, Eye, Calendar, Receipt, ShoppingCart, CreditCard, Banknote, Search } from "lucide-react";
 
 export default function SalesHistory() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedSale, setSelectedSale] = useState(null);
 
   const { data: sales, isLoading } = useQuery({
-    queryKey: ["sales", startDate, endDate],
+    queryKey: ["sales", startDate, endDate, paymentMethod, searchTerm],
     queryFn: async () => {
       const params = {};
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
+      if (paymentMethod !== "All") params.paymentMethod = paymentMethod;
+      if (searchTerm) params.search = searchTerm;
       const res = await API.get("/sales", { params });
       return res.data.data || [];
     },
@@ -36,28 +41,60 @@ export default function SalesHistory() {
 
       <Card>
         <CardContent className="pt-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 max-w-5xl">
+            <div className="sm:col-span-4">
+              <Label className="text-xs flex items-center gap-1.5">
+                <Search className="h-3.5 w-3.5" />
+                Customer Search
+              </Label>
+              <Input
+                placeholder="Search by name..."
+                className="h-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="sm:col-span-3">
               <Label className="text-xs flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5" />
                 Start Date
               </Label>
               <Input
                 type="date"
+                className="h-9"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
-            <div>
+            <div className="sm:col-span-3">
               <Label className="text-xs flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5" />
                 End Date
               </Label>
               <Input
                 type="date"
+                className="h-9"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="text-xs flex items-center gap-1.5">
+                <CreditCard className="h-3.5 w-3.5" />
+                Payment
+              </Label>
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="All Methods" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Cash">Cash</SelectItem>
+                  <SelectItem value="Easy Paisa">Easy Paisa</SelectItem>
+                  <SelectItem value="Jazz Cash">Jazz Cash</SelectItem>
+                  <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>

@@ -8,7 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Search, Edit, Trash2, AlertTriangle } from "lucide-react";
+import { Loader2, Plus, Search, Edit, Trash2, AlertTriangle, Eye } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
@@ -33,6 +34,7 @@ export default function ProductList() {
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState("all");
   const [confirmState, setConfirmState] = useState({ open: false, id: null, name: "" });
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -204,6 +206,14 @@ export default function ProductList() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right space-x-2">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg"
+                          onClick={() => setSelectedProduct(product)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         <Link to={`/inventory/edit/${product._id}`}>
                           <Button size="icon" variant="ghost" className="h-8 w-8 bg-white text-stone-900 hover:bg-stone-100 border border-stone-900 rounded-lg">
                             <Edit className="h-4 w-4" />
@@ -236,6 +246,76 @@ export default function ProductList() {
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
+
+      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-outfit uppercase text-base">Product Details</DialogTitle>
+            <DialogDescription>
+              Viewing details for {selectedProduct?.name}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedProduct && (
+            <div className="space-y-4">
+              <div className="flex gap-4">
+                <div className="w-24 h-24 bg-stone-100 rounded-lg overflow-hidden border border-stone-200 shrink-0">
+                  {selectedProduct.images?.[0] || selectedProduct.image ? (
+                    <img
+                      src={selectedProduct.images?.[0] || selectedProduct.image}
+                      alt={selectedProduct.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs">N/A</div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div>
+                    <h3 className="font-bold text-stone-900">{selectedProduct.name}</h3>
+                    <p className="font-mono text-xs text-stone-500">{selectedProduct.sku}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className={categoryColors[selectedProduct.category] || categoryColors.Other}>
+                      {selectedProduct.category}
+                    </Badge>
+                    <Badge variant="outline" className={statusColors[selectedProduct.status] || statusColors.Inactive}>
+                      {selectedProduct.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm border-t border-stone-100 pt-4">
+                <div>
+                  <p className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Selling Price</p>
+                  <p className="font-semibold text-stone-800">{formatPKR(selectedProduct.price)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Cost Price</p>
+                  <p className="font-semibold text-stone-800">{selectedProduct.costPrice ? formatPKR(selectedProduct.costPrice) : "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Current Stock</p>
+                  <p className={`font-semibold ${selectedProduct.stock <= selectedProduct.lowStockThreshold ? 'text-red-600' : 'text-stone-800'}`}>
+                    {selectedProduct.stock} units
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Low Stock Alert</p>
+                  <p className="font-semibold text-stone-800">{selectedProduct.lowStockThreshold} units</p>
+                </div>
+              </div>
+
+              {selectedProduct.description && (
+                <div className="border-t border-stone-100 pt-4">
+                  <p className="text-[10px] text-stone-400 uppercase tracking-widest font-bold mb-1">Description</p>
+                  <p className="text-sm text-stone-600">{selectedProduct.description}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

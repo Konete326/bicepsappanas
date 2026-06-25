@@ -39,14 +39,28 @@ exports.createSale = catchAsync(async (req, res, next) => {
 });
 
 exports.getSales = catchAsync(async (req, res) => {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, paymentMethod, search } = req.query;
     let filter = {};
+    
     if (startDate && endDate) {
         filter.createdAt = {
             $gte: new Date(startDate),
             $lte: new Date(endDate + "T23:59:59")
         };
+    } else if (startDate) {
+        filter.createdAt = { $gte: new Date(startDate) };
+    } else if (endDate) {
+        filter.createdAt = { $lte: new Date(endDate + "T23:59:59") };
     }
+
+    if (paymentMethod && paymentMethod !== "All") {
+        filter.paymentMethod = paymentMethod;
+    }
+
+    if (search) {
+        filter.customerName = { $regex: search.trim(), $options: "i" };
+    }
+
     const data = await Sale.find(filter).sort({ createdAt: -1 });
     res.status(200).json({ status: "success", results: data.length, data });
 });
