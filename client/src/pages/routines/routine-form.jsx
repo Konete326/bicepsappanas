@@ -173,8 +173,8 @@ export default function RoutineForm() {
 
   if (loadingRoutine) {
     return (
-      <div className="flex items-center justify-center p-16">
-        <Loader2 className="animate-spin text-stone-400 h-6 w-6" />
+      <div className="flex flex-1 items-center justify-center h-[50vh]">
+        <Loader2 className="animate-spin text-stone-500 h-10 w-10" />
       </div>
     );
   }

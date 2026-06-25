@@ -3,8 +3,8 @@ import API from "@/api/api";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Users, DollarSign, AlertCircle, Calendar } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { Loader2, Users, DollarSign, AlertCircle, Calendar, Package, AlertTriangle } from "lucide-react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
 
 export default function Dashboard() {
   const { data: dashData, isLoading } = useQuery({
@@ -25,6 +25,9 @@ export default function Dashboard() {
 
   const stats = dashData?.stats || {};
   const recentPayments = dashData?.recentPayments || [];
+  const inventoryByCategory = dashData?.inventoryByCategory || [];
+  const lowStockProducts = dashData?.lowStockProducts || [];
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
 
   const kpis = [
     { label: "Active Members", value: stats.activeMembers || 0, icon: Users, color: "text-green-600" },
@@ -90,6 +93,55 @@ export default function Dashboard() {
               </div>
               <Badge variant="outline" className="font-bold">{stats.expiringIn30Days || 0}</Badge>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="border border-stone-200 shadow-sm lg:col-span-2">
+          <CardHeader className="pb-2 border-b border-stone-100">
+            <CardTitle className="text-sm font-semibold">Inventory Breakdown by Category</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 h-64">
+            {inventoryByCategory.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-stone-400 text-xs">No inventory data available</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 1, height: 1 }}>
+                <PieChart>
+                  <Pie data={inventoryByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label>
+                    {inventoryByCategory.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border border-stone-200 shadow-sm lg:col-span-1">
+          <CardHeader className="pb-2 border-b border-stone-100 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-semibold">Low Stock Alerts</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent className="pt-4 space-y-4 max-h-64 overflow-y-auto">
+            {lowStockProducts.length === 0 ? (
+              <p className="text-xs text-stone-500 text-center py-4">No low stock items</p>
+            ) : (
+              lowStockProducts.map(product => (
+                <div key={product._id} className="flex justify-between items-center border-b border-stone-100 pb-2 last:border-0 last:pb-0">
+                  <div className="min-w-0 flex-1 pr-2">
+                    <p className="text-xs font-semibold text-stone-800 truncate">{product.name}</p>
+                    <p className="text-[10px] text-stone-500">Threshold: {product.lowStockThreshold}</p>
+                  </div>
+                  <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 whitespace-nowrap text-[10px]">
+                    {product.stock} left
+                  </Badge>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>

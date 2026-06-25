@@ -1,6 +1,7 @@
 const Member = require("../model/member");
 const Payment = require("../model/payment");
 const Trainer = require("../model/trainer");
+const Product = require("../model/product");
 const catchAsync = require("../utils/catchAsync");
 
 exports.getDashboardStats = catchAsync(async (req, res) => {
@@ -23,6 +24,8 @@ exports.getDashboardStats = catchAsync(async (req, res) => {
         totalTrainers,
         recentPayments,
         todayPayments,
+        lowStockProducts,
+        inventoryByCategory
     ] = await Promise.all([
         Member.countDocuments(),
         Member.countDocuments({ status: "Active" }),
@@ -36,6 +39,10 @@ exports.getDashboardStats = catchAsync(async (req, res) => {
             { $match: { date: { $gte: today } } },
             { $group: { _id: null, total: { $sum: "$amountReceived" }, count: { $sum: 1 } } }
         ]),
+        Product.find({ $expr: { $lte: ["$stock", "$lowStockThreshold"] } }).select("name stock lowStockThreshold").limit(6),
+        Product.aggregate([
+            { $group: { _id: "$category", count: { $sum: 1 } } }
+        ])
     ]);
 
     res.status(200).json({
@@ -53,6 +60,8 @@ exports.getDashboardStats = catchAsync(async (req, res) => {
                 todayPayments: todayPayments[0]?.count || 0,
             },
             recentPayments,
+            lowStockProducts,
+            inventoryByCategory: inventoryByCategory.map(c => ({ name: c._id, value: c.count }))
         }
     });
 });
