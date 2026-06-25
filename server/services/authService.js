@@ -15,6 +15,7 @@ const formatUserResponse = (user) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        permissions: user.permissions,
         gymName: user.gymName,
         gymAddress: user.gymAddress,
         phone: user.phone,

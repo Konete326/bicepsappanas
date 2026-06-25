@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Trash2, Shield, Plus, User } from "lucide-react";
+import { Loader2, Trash2, Shield, Plus, User, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useAuth } from "@/context/AuthContext";
@@ -23,6 +23,7 @@ export default function AdminList() {
     permissions: ["members", "measurements", "routines"] 
   });
   const [step, setStep] = useState(1);
+  const [editingId, setEditingId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [confirmState, setConfirmState] = useState({ open: false, id: null, name: "" });
   const { toast } = useToast();
@@ -48,6 +49,25 @@ export default function AdminList() {
     onError: (err) => {
       toast({
         title: "Failed to create account",
+        description: err.response?.data?.message || "Something went wrong.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (payload) => API.patch(`/auth/admins/${editingId}`, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
+      toast({ title: "Account updated successfully" });
+      setFormData({ name: "", email: "", password: "", role: "admin", permissions: ["members", "measurements", "routines"] });
+      setStep(1);
+      setEditingId(null);
+      setIsAdding(false);
+    },
+    onError: (err) => {
+      toast({
+        title: "Failed to update account",
         description: err.response?.data?.message || "Something went wrong.",
         variant: "destructive"
       });
@@ -92,16 +112,18 @@ export default function AdminList() {
   const handleNextOrSubmit = (e) => {
     e.preventDefault();
     if (step === 1) {
-      if (!formData.name || !formData.email || !formData.password) {
-        return toast({ title: "Validation Error", description: "All fields are required.", variant: "destructive" });
+      if (!formData.name || !formData.email || (!formData.password && !editingId)) {
+        return toast({ title: "Validation Error", description: "Name, Email, and Password are required for new accounts.", variant: "destructive" });
       }
       if (formData.role === "trainer") {
         setStep(2);
       } else {
-        createMutation.mutate(formData);
+        if (editingId) updateMutation.mutate(formData);
+        else createMutation.mutate(formData);
       }
     } else {
-      createMutation.mutate(formData);
+      if (editingId) updateMutation.mutate(formData);
+      else createMutation.mutate(formData);
     }
   };
 
@@ -115,7 +137,12 @@ export default function AdminList() {
           </h2>
           <p className="text-sm text-stone-500 mt-1">Manage staff login accounts and system permissions.</p>
         </div>
-        <Button onClick={() => { setStep(1); setIsAdding(true); }}>
+        <Button onClick={() => { 
+          setEditingId(null);
+          setFormData({ name: "", email: "", password: "", role: "admin", permissions: ["members", "measurements", "routines"] });
+          setStep(1); 
+          setIsAdding(true); 
+        }}>
           <Plus className="mr-2 h-4 w-4" /> Create Account
         </Button>
       </div>
@@ -123,7 +150,9 @@ export default function AdminList() {
       <Dialog open={isAdding} onOpenChange={setIsAdding}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{step === 1 ? "Register New Account" : "Assign Permissions"}</DialogTitle>
+            <DialogTitle>
+              {step === 1 ? (editingId ? "Edit Account" : "Register New Account") : "Assign Permissions"}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleNextOrSubmit} className="space-y-4 mt-2">
             {step === 1 ? (
@@ -148,7 +177,7 @@ export default function AdminList() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-stone-500 font-semibold mb-1 block">Password</Label>
+                  <Label className="text-xs text-stone-500 font-semibold mb-1 block">Password {editingId && "(Leave blank to keep unchanged)"}</Label>
                   <Input
                     type="password"
                     placeholder="Min 6 characters"
@@ -234,16 +263,37 @@ export default function AdminList() {
                       {admin.role || "admin"}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right">
-                    {admin._id !== user?._id && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 text-rose-600 hover:bg-rose-50 hover:text-rose-700 border border-transparent hover:border-rose-200 transition-colors"
-                        onClick={() => setConfirmState({ open: true, id: admin._id, name: admin.name })}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                  <TableCell className="text-right whitespace-nowrap">
+                    {admin._id !== user?._id && admin.email !== "bicepsappanas@gmail.com" && (
+                      <>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700 border border-transparent hover:border-blue-200 transition-colors mr-1"
+                          onClick={() => {
+                            setEditingId(admin._id);
+                            setFormData({
+                              name: admin.name,
+                              email: admin.email,
+                              password: "",
+                              role: admin.role || "admin",
+                              permissions: admin.permissions || ["members", "measurements", "routines"]
+                            });
+                            setStep(1);
+                            setIsAdding(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-rose-600 hover:bg-rose-50 hover:text-rose-700 border border-transparent hover:border-rose-200 transition-colors"
+                          onClick={() => setConfirmState({ open: true, id: admin._id, name: admin.name })}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
                     )}
                   </TableCell>
                 </TableRow>

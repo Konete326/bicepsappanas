@@ -62,10 +62,43 @@ exports.getAdmins = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteAdmin = catchAsync(async (req, res, next) => {
-    if (req.params.id === req.user.id) {
+    const userToDelete = await User.findById(req.params.id);
+    if (!userToDelete) return next(new AppError("User not found", 404));
+
+    if (userToDelete.email === "bicepsappanas@gmail.com") {
+        return next(new AppError("The main admin account cannot be deleted.", 403));
+    }
+    if (userToDelete._id.toString() === req.user.id) {
         return next(new AppError("You cannot delete your own account", 400));
     }
-    const user = await User.findOneAndDelete({ _id: req.params.id });
-    if (!user) return next(new AppError("User not found", 404));
+
+    await User.findByIdAndDelete(req.params.id);
     res.status(200).json({ status: "success", message: "Account deleted successfully" });
+});
+
+exports.updateAdmin = catchAsync(async (req, res, next) => {
+    const { name, email, password, permissions, role } = req.body;
+    const userToUpdate = await User.findById(req.params.id);
+    
+    if (!userToUpdate) return next(new AppError("User not found", 404));
+
+    if (userToUpdate.email === "bicepsappanas@gmail.com") {
+        if (role && role !== "admin") return next(new AppError("Cannot change role of main admin.", 403));
+        if (email && email !== "bicepsappanas@gmail.com") return next(new AppError("Cannot change email of main admin.", 403));
+    }
+
+    if (name) userToUpdate.name = name;
+    if (email) userToUpdate.email = email;
+    if (password) userToUpdate.password = password; // Will be hashed by pre-save hook
+    if (role) userToUpdate.role = role;
+    
+    if (userToUpdate.role === "trainer") {
+        userToUpdate.permissions = permissions;
+    } else {
+        userToUpdate.permissions = undefined;
+    }
+
+    await userToUpdate.save();
+
+    res.status(200).json({ status: "success", message: "Account updated successfully" });
 });

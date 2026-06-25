@@ -89,6 +89,8 @@ function Router() {
       <Route path="/trainers/:id/ledger" element={<AdminRoute><Layout title="Trainer Ledger & Payout"><LedgerView /></Layout></AdminRoute>} />
       <Route path="/trainers/:id/ledger/new" element={<AdminRoute><Layout title="Log Ledger Entry"><LedgerEntryForm /></Layout></AdminRoute>} />
 
+      <Route path="/admins" element={<AdminRoute><Layout title="System Access"><AdminList /></Layout></AdminRoute>} />
+
       <Route path="/measurements" element={<PermissionRoute permission="measurements"><Layout title="Physical Tracking"><MeasurementHistory /></Layout></PermissionRoute>} />
       <Route path="/measurements/new" element={<PermissionRoute permission="measurements"><Layout title="Log Body Measurements"><MeasurementForm /></Layout></PermissionRoute>} />
       <Route path="/measurements/:id" element={<PermissionRoute permission="measurements"><Layout title="View Measurements"><MeasurementView /></Layout></PermissionRoute>} />
@@ -122,14 +124,14 @@ export default function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
-            {import.meta.env.DEV && (
+            {/* import.meta.env.DEV && (
               <Agentation
                 endpoint="http://localhost:4747"
                 onSessionCreated={(sessionId) => {
                   console.log("Session started:", sessionId);
                 }}
               />
-            )}
+            ) */}
           </TooltipProvider>
         </QueryClientProvider>
       </RouterComponent>
