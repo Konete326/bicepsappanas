@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import API from "@/api/api";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +53,7 @@ export default function Dashboard() {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
 
   const kpis = [
-    { label: "Active Members", value: stats.activeMembers || 0, icon: Users, color: "text-green-600" },
+    { label: "Fees Due Today", value: stats.dueToday || 0, icon: Calendar, color: "text-red-600", link: "/members?dueToday=true" },
     { label: "Total Members", value: stats.totalMembers || 0, icon: Users, color: "text-stone-700" },
     { label: "Today's Revenue", value: `PKR ${Number(stats.todayRevenue || 0).toLocaleString("en-PK")}`, icon: DollarSign, color: "text-blue-600" },
     { label: "Today's Payments", value: stats.todayPayments || 0, icon: AlertCircle, color: "text-orange-600" }
@@ -67,15 +68,33 @@ export default function Dashboard() {
   return (
     <div className="p-6 space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpis.map((kpi, idx) => (
-          <Card key={idx} className="border border-stone-200 shadow-sm p-4 bg-white">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-stone-500 font-semibold">{kpi.label}</span>
-              <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
-            </div>
-            <p className="text-xl font-bold text-stone-900 font-outfit">{kpi.value}</p>
-          </Card>
-        ))}
+        {kpis.map((kpi, idx) => {
+          const CardContentComp = (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-stone-500 font-semibold">{kpi.label}</span>
+                <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
+              </div>
+              <p className="text-xl font-bold text-stone-900 font-outfit">{kpi.value}</p>
+            </>
+          );
+
+          if (kpi.link) {
+            return (
+              <Link key={idx} to={kpi.link} className="block transition-transform hover:scale-[1.02] cursor-pointer">
+                <Card className="border border-stone-200 shadow-sm p-4 bg-white h-full hover:border-red-400">
+                  {CardContentComp}
+                </Card>
+              </Link>
+            );
+          }
+
+          return (
+            <Card key={idx} className="border border-stone-200 shadow-sm p-4 bg-white">
+              {CardContentComp}
+            </Card>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

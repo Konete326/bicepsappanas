@@ -45,6 +45,14 @@ exports.getDashboardStats = catchAsync(async (req, res) => {
         ])
     ]);
 
+    const allMembersForDues = await Member.find({ status: { $ne: "Frozen" } });
+    const todayDay = Number(new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'Asia/Karachi' }).format(new Date()));
+    const dueToday = allMembersForDues.filter(m => {
+        const memberDay = Number(new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'Asia/Karachi' }).format(new Date(m.renewalDate)));
+        const isUnpaid = new Date(m.renewalDate) <= new Date();
+        return memberDay === todayDay && isUnpaid;
+    }).length;
+
     res.status(200).json({
         success: true,
         data: {
@@ -58,6 +66,7 @@ exports.getDashboardStats = catchAsync(async (req, res) => {
                 totalTrainers,
                 todayRevenue: todayPayments[0]?.total || 0,
                 todayPayments: todayPayments[0]?.count || 0,
+                dueToday,
             },
             recentPayments,
             lowStockProducts,

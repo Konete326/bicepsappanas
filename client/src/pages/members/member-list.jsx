@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { formatDate } from "@/utils/format";
 import API from "@/api/api";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,9 @@ export default function MemberList() {
   const [gender, setGender] = useState("all");
   const [joiningDateFilter, setJoiningDateFilter] = useState("");
   const [memberTypeFilter, setMemberTypeFilter] = useState("all");
+  const [searchParams] = useSearchParams();
+  const dueTodayParam = searchParams.get("dueToday") === "true";
+  const [filterDueToday, setFilterDueToday] = useState(dueTodayParam);
   const [confirmState, setConfirmState] = useState({ open: false, id: null, name: "" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -177,7 +180,16 @@ export default function MemberList() {
           <Loader2 className="animate-spin text-stone-500" />
         </div>
       ) : (
-        <div className="border border-stone-200 rounded-lg overflow-x-auto bg-white">
+        <div className="space-y-4">
+          {filterDueToday && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-lg text-xs flex justify-between items-center font-medium shadow-sm">
+              <span className="flex items-center gap-2">⚠️ Showing members whose fees are due today.</span>
+              <button onClick={() => setFilterDueToday(false)} className="underline hover:text-red-950 font-bold cursor-pointer">
+                Clear Filter
+              </button>
+            </div>
+          )}
+          <div className="border border-stone-200 rounded-lg overflow-x-auto bg-white">
           <Table>
             <TableHeader>
               <TableRow>
@@ -216,7 +228,16 @@ export default function MemberList() {
                     matchesToday = todayDay === memberDay;
                   }
                   
-                  return matchesPayment && matchesGender && matchesDate && matchesType && matchesToday;
+                  let matchesDueToday = true;
+                  if (filterDueToday) {
+                    const formatter = new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'Asia/Karachi' });
+                    const todayDay = Number(formatter.format(new Date()));
+                    const memberRenewalDay = Number(formatter.format(new Date(member.renewalDate)));
+                    const isUnpaid = getPaymentStatus(member.renewalDate).value === "unpaid";
+                    matchesDueToday = memberRenewalDay === todayDay && isUnpaid;
+                  }
+                  
+                  return matchesPayment && matchesGender && matchesDate && matchesType && matchesToday && matchesDueToday;
                 });
                 if (filteredList.length === 0) {
                   return (
@@ -259,6 +280,7 @@ export default function MemberList() {
             </TableBody>
           </Table>
         </div>
+      </div>
       )}
 
       <ConfirmModal
