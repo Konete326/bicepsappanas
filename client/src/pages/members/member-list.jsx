@@ -18,6 +18,7 @@ export default function MemberList() {
   const [paymentStatus, setPaymentStatus] = useState("all");
   const [gender, setGender] = useState("all");
   const [joiningDateFilter, setJoiningDateFilter] = useState("");
+  const [memberTypeFilter, setMemberTypeFilter] = useState("all");
   const [confirmState, setConfirmState] = useState({ open: false, id: null, name: "" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -97,63 +98,87 @@ export default function MemberList() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-        <div className="relative sm:col-span-4">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
-          <Input
-            placeholder="Search Roll No or Name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+      <div className="space-y-4">
+        {/* Row 1 */}
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+          <div className="relative sm:col-span-6">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
+            <Input
+              placeholder="Search Roll No or Name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <div className="sm:col-span-3">
+            <Input
+              type="date"
+              value={joiningDateFilter}
+              onChange={(e) => setJoiningDateFilter(e.target.value)}
+              className="w-full"
+              placeholder="Joining Date"
+            />
+          </div>
+          <div className="sm:col-span-3">
+            <Select value={memberTypeFilter} onValueChange={setMemberTypeFilter}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Membership Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Plan Types</SelectItem>
+                <SelectItem value="Basic">Basic</SelectItem>
+                <SelectItem value="Special">Special</SelectItem>
+                <SelectItem value="VIP">VIP</SelectItem>
+                <SelectItem value="Premium">Premium</SelectItem>
+                <SelectItem value="Cardio">Cardio</SelectItem>
+                <SelectItem value="CrossFit">CrossFit</SelectItem>
+                <SelectItem value="Personal Training">Personal Training</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className="sm:col-span-2">
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Filter Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Expired">Expired</SelectItem>
-              <SelectItem value="Frozen">Frozen</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="sm:col-span-2">
-          <Select value={paymentStatus} onValueChange={setPaymentStatus}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Filter Payment" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Payments</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="due_soon">Due Soon</SelectItem>
-              <SelectItem value="unpaid">Unpaid</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="sm:col-span-2">
-          <Select value={gender} onValueChange={setGender}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Filter Gender" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Genders</SelectItem>
-              <SelectItem value="Male">Male</SelectItem>
-              <SelectItem value="Female">Female</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="sm:col-span-2">
-          <Input
-            type="date"
-            value={joiningDateFilter}
-            onChange={(e) => setJoiningDateFilter(e.target.value)}
-            className="w-full"
-            placeholder="Joining Date"
-          />
+
+        {/* Row 2 */}
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+          <div className="sm:col-span-4">
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Filter Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Expired">Expired</SelectItem>
+                <SelectItem value="Frozen">Frozen</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="sm:col-span-4">
+            <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Filter Payment" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Payments</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="due_soon">Due Soon</SelectItem>
+                <SelectItem value="unpaid">Unpaid</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="sm:col-span-4">
+            <Select value={gender} onValueChange={setGender}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Filter Gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Genders</SelectItem>
+                <SelectItem value="Male">Male</SelectItem>
+                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -183,6 +208,7 @@ export default function MemberList() {
                 const filteredList = list.filter((member) => {
                   const matchesPayment = paymentStatus === "all" || getPaymentStatus(member.renewalDate).value === paymentStatus;
                   const matchesGender = gender === "all" || member.gender === gender;
+                  const matchesType = memberTypeFilter === "all" || member.memberType === memberTypeFilter;
                   
                   let matchesDate = true;
                   if (joiningDateFilter && member.joiningDate) {
@@ -192,7 +218,7 @@ export default function MemberList() {
                     matchesDate = filterDay === memberDay;
                   }
                   
-                  return matchesPayment && matchesGender && matchesDate;
+                  return matchesPayment && matchesGender && matchesDate && matchesType;
                 });
                 if (filteredList.length === 0) {
                   return (
