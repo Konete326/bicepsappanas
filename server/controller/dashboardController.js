@@ -48,9 +48,19 @@ exports.getDashboardStats = catchAsync(async (req, res) => {
     const allMembersForDues = await Member.find({ status: { $ne: "Frozen" } });
     const todayDay = Number(new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'Asia/Karachi' }).format(new Date()));
     const dueToday = allMembersForDues.filter(m => {
-        const memberDay = Number(new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'Asia/Karachi' }).format(new Date(m.renewalDate)));
-        const isUnpaid = new Date(m.renewalDate) <= new Date();
-        return memberDay === todayDay && isUnpaid;
+        if (!m.joiningDate || !m.renewalDate) return false;
+        
+        // Match joining day number (ignoring month & year)
+        const memberDay = Number(new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'Asia/Karachi' }).format(new Date(m.joiningDate)));
+        const matchesDay = memberDay === todayDay;
+        
+        // Verify payment is unpaid (renewalDate <= today in Karachi timezone)
+        const formatter = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Asia/Karachi' });
+        const renewalStr = formatter.format(new Date(m.renewalDate));
+        const todayStr = formatter.format(new Date());
+        const isUnpaid = renewalStr <= todayStr;
+        
+        return matchesDay && isUnpaid;
     }).length;
 
     res.status(200).json({
