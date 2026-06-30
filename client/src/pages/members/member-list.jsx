@@ -16,6 +16,7 @@ export default function MemberList() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [paymentStatus, setPaymentStatus] = useState("all");
+  const [gender, setGender] = useState("all");
   const [confirmState, setConfirmState] = useState({ open: false, id: null, name: "" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -96,7 +97,7 @@ export default function MemberList() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-        <div className="relative sm:col-span-6">
+        <div className="relative sm:col-span-3">
           <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
           <Input
             placeholder="Search Roll No or Name..."
@@ -111,7 +112,7 @@ export default function MemberList() {
               <SelectValue placeholder="Filter Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Members</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="Active">Active</SelectItem>
               <SelectItem value="Expired">Expired</SelectItem>
               <SelectItem value="Frozen">Frozen</SelectItem>
@@ -128,6 +129,19 @@ export default function MemberList() {
               <SelectItem value="paid">Paid</SelectItem>
               <SelectItem value="due_soon">Due Soon</SelectItem>
               <SelectItem value="unpaid">Unpaid</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-3">
+          <Select value={gender} onValueChange={setGender}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter Gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Genders</SelectItem>
+              <SelectItem value="Male">Male</SelectItem>
+              <SelectItem value="Female">Female</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -157,8 +171,9 @@ export default function MemberList() {
               {(() => {
                 const list = members || [];
                 const filteredList = list.filter((member) => {
-                  if (paymentStatus === "all") return true;
-                  return getPaymentStatus(member.renewalDate).value === paymentStatus;
+                  const matchesPayment = paymentStatus === "all" || getPaymentStatus(member.renewalDate).value === paymentStatus;
+                  const matchesGender = gender === "all" || member.gender === gender;
+                  return matchesPayment && matchesGender;
                 });
                 if (filteredList.length === 0) {
                   return (
