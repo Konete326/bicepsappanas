@@ -14,7 +14,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 export default function MemberList() {
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("all");
+  const [showTodayOnly, setShowTodayOnly] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState("all");
   const [gender, setGender] = useState("all");
   const [joiningDateFilter, setJoiningDateFilter] = useState("");
@@ -24,9 +24,9 @@ export default function MemberList() {
   const queryClient = useQueryClient();
 
   const { data: members, isLoading } = useQuery({
-    queryKey: ["members", search, status],
+    queryKey: ["members", search],
     queryFn: async () => {
-      const res = await API.get("/members", { params: { search, status } });
+      const res = await API.get("/members", { params: { search } });
       return res.data.data || [];
     }
   });
@@ -135,17 +135,14 @@ export default function MemberList() {
           </Select>
         </div>
         <div className="sm:col-span-2">
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="w-full h-8 text-xs border-stone-200 focus:border-stone-400 rounded-lg px-2">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Expired">Expired</SelectItem>
-              <SelectItem value="Frozen">Frozen</SelectItem>
-            </SelectContent>
-          </Select>
+          <Button
+            type="button"
+            variant={showTodayOnly ? "default" : "outline"}
+            className="w-full h-8 text-xs font-semibold rounded-lg"
+            onClick={() => setShowTodayOnly(!showTodayOnly)}
+          >
+            {showTodayOnly ? "Today Only" : "Show Today"}
+          </Button>
         </div>
         <div className="sm:col-span-2">
           <Select value={paymentStatus} onValueChange={setPaymentStatus}>
@@ -211,7 +208,15 @@ export default function MemberList() {
                     matchesDate = filterDay === memberDay;
                   }
                   
-                  return matchesPayment && matchesGender && matchesDate && matchesType;
+                  let matchesToday = true;
+                  if (showTodayOnly && member.joiningDate) {
+                    const formatter = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Asia/Karachi' });
+                    const karachiToday = formatter.format(new Date());
+                    const memberDateStr = formatter.format(new Date(member.joiningDate));
+                    matchesToday = karachiToday === memberDateStr;
+                  }
+                  
+                  return matchesPayment && matchesGender && matchesDate && matchesType && matchesToday;
                 });
                 if (filteredList.length === 0) {
                   return (
