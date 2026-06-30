@@ -186,8 +186,10 @@ export default function MemberList() {
                   
                   let matchesDate = true;
                   if (joiningDateFilter && member.joiningDate) {
-                    const mDateStr = new Date(member.joiningDate).toISOString().split('T')[0];
-                    matchesDate = mDateStr === joiningDateFilter;
+                    const filterDay = Number(joiningDateFilter.split('-')[2]);
+                    const formatter = new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'Asia/Karachi' });
+                    const memberDay = Number(formatter.format(new Date(member.joiningDate)));
+                    matchesDate = filterDay === memberDay;
                   }
                   
                   return matchesPayment && matchesGender && matchesDate;
