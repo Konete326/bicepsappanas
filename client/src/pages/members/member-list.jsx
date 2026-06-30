@@ -98,87 +98,80 @@ export default function MemberList() {
         </Link>
       </div>
 
-      <div className="space-y-4">
-        {/* Row 1 */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-          <div className="relative sm:col-span-6">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
-            <Input
-              placeholder="Search Roll No or Name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <div className="sm:col-span-3">
-            <Input
-              type="date"
-              value={joiningDateFilter}
-              onChange={(e) => setJoiningDateFilter(e.target.value)}
-              className="w-full"
-              placeholder="Joining Date"
-            />
-          </div>
-          <div className="sm:col-span-3">
-            <Select value={memberTypeFilter} onValueChange={setMemberTypeFilter}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Membership Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Plan Types</SelectItem>
-                <SelectItem value="Basic">Basic</SelectItem>
-                <SelectItem value="Special">Special</SelectItem>
-                <SelectItem value="VIP">VIP</SelectItem>
-                <SelectItem value="Premium">Premium</SelectItem>
-                <SelectItem value="Cardio">Cardio</SelectItem>
-                <SelectItem value="CrossFit">CrossFit</SelectItem>
-                <SelectItem value="Personal Training">Personal Training</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+        <div className="relative sm:col-span-2">
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-stone-400" />
+          <Input
+            placeholder="Search name/roll..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8 h-8 text-xs border-stone-200 focus:border-stone-400 rounded-lg placeholder:text-[10px]"
+          />
         </div>
-
-        {/* Row 2 */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-          <div className="sm:col-span-4">
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Filter Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Expired">Expired</SelectItem>
-                <SelectItem value="Frozen">Frozen</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="sm:col-span-4">
-            <Select value={paymentStatus} onValueChange={setPaymentStatus}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Filter Payment" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Payments</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="due_soon">Due Soon</SelectItem>
-                <SelectItem value="unpaid">Unpaid</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="sm:col-span-4">
-            <Select value={gender} onValueChange={setGender}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Filter Gender" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Genders</SelectItem>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="sm:col-span-2">
+          <Input
+            type="date"
+            value={joiningDateFilter}
+            onChange={(e) => setJoiningDateFilter(e.target.value)}
+            className="w-full h-8 text-xs border-stone-200 focus:border-stone-400 rounded-lg px-2"
+            placeholder="Joining Date"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <Select value={memberTypeFilter} onValueChange={setMemberTypeFilter}>
+            <SelectTrigger className="w-full h-8 text-xs border-stone-200 focus:border-stone-400 rounded-lg px-2">
+              <SelectValue placeholder="Plan Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Plans</SelectItem>
+              <SelectItem value="Basic">Basic</SelectItem>
+              <SelectItem value="Special">Special</SelectItem>
+              <SelectItem value="VIP">VIP</SelectItem>
+              <SelectItem value="Premium">Premium</SelectItem>
+              <SelectItem value="Cardio">Cardio</SelectItem>
+              <SelectItem value="CrossFit">CrossFit</SelectItem>
+              <SelectItem value="Personal Training">Personal Training</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-2">
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="w-full h-8 text-xs border-stone-200 focus:border-stone-400 rounded-lg px-2">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Expired">Expired</SelectItem>
+              <SelectItem value="Frozen">Frozen</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-2">
+          <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+            <SelectTrigger className="w-full h-8 text-xs border-stone-200 focus:border-stone-400 rounded-lg px-2">
+              <SelectValue placeholder="Payment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Payments</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="due_soon">Due Soon</SelectItem>
+              <SelectItem value="unpaid">Unpaid</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="sm:col-span-2">
+          <Select value={gender} onValueChange={setGender}>
+            <SelectTrigger className="w-full h-8 text-xs border-stone-200 focus:border-stone-400 rounded-lg px-2">
+              <SelectValue placeholder="Gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Genders</SelectItem>
+              <SelectItem value="Male">Male</SelectItem>
+              <SelectItem value="Female">Female</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
