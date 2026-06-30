@@ -77,7 +77,7 @@ export default function MemberList() {
     const diffTime = renewal.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) {
+    if (diffDays <= 0) {
       return { label: "Unpaid", value: "unpaid", className: "bg-red-50 text-red-700 border-red-200/50 hover:bg-red-50/80" };
     } else if (diffDays <= 7) {
       return { label: "Due Soon", value: "due_soon", className: "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-50/80" };
@@ -144,6 +144,8 @@ export default function MemberList() {
               <TableRow>
                 <TableHead>Roll No</TableHead>
                 <TableHead>Full Name</TableHead>
+                <TableHead>Surname</TableHead>
+                <TableHead>Membership Type</TableHead>
                 <TableHead>Cell Number</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Payment Status</TableHead>
@@ -161,7 +163,7 @@ export default function MemberList() {
                 if (filteredList.length === 0) {
                   return (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-stone-500 py-6">
+                      <TableCell colSpan={9} className="text-center text-stone-500 py-6">
                         No members found.
                       </TableCell>
                     </TableRow>
@@ -173,6 +175,8 @@ export default function MemberList() {
                     <TableRow key={member._id}>
                       <TableCell className="font-semibold">{member.rollNo}</TableCell>
                       <TableCell>{member.fullName}</TableCell>
+                      <TableCell>{member.surName || member.surname || "-"}</TableCell>
+                      <TableCell>{member.memberType || "-"}</TableCell>
                       <TableCell>{member.cellNo}</TableCell>
                       <TableCell>{getStatusBadge(member.status)}</TableCell>
                       <TableCell>

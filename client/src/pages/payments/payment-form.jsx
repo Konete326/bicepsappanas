@@ -34,6 +34,10 @@ export default function PaymentForm() {
   useEffect(() => {
     const preselected = searchParams.get("memberId");
     if (preselected) setMemberId(preselected);
+    const preselectedMonth = searchParams.get("monthIndex");
+    if (preselectedMonth !== null && preselectedMonth !== undefined) {
+      setMonthIndex(preselectedMonth);
+    }
   }, [searchParams]);
 
   const validate = (field, value) => {
@@ -62,6 +66,15 @@ export default function PaymentForm() {
   });
 
   const selectedMember = members?.find((m) => m._id === memberId);
+
+  useEffect(() => {
+    if (selectedMember) {
+      setAmountReceived(String(selectedMember.monthlyFee || ""));
+    } else {
+      setAmountReceived("");
+    }
+  }, [memberId, members]);
+
   const planPrice = selectedMember?.monthlyFee || 0;
   const outstandingDues = Math.max(0, planPrice - (parseInt(amountReceived) || 0));
 

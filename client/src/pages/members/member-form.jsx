@@ -166,7 +166,7 @@ export default function MemberForm() {
       ...formData,
       email: formData.email.trim() === "" ? undefined : formData.email,
       address: formData.address.trim() === "" ? "N/A" : formData.address,
-      renewalDate: formData.joiningDate
+      renewalDate: id ? formData.renewalDate : formData.joiningDate
     };
     mutation.mutate(payload);
   };
@@ -340,7 +340,13 @@ export default function MemberForm() {
                     value={formData.joiningDate}
                     onChange={(e) => {
                       const newDate = e.target.value;
-                      setFormData((prev) => ({ ...prev, joiningDate: newDate, renewalDate: newDate }));
+                      setFormData((prev) => {
+                        const updated = { ...prev, joiningDate: newDate };
+                        if (!id) {
+                          updated.renewalDate = newDate;
+                        }
+                        return updated;
+                      });
                     }}
                     required
                   />

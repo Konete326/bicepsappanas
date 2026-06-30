@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "@/api/api";
 import { useToast } from "@/hooks/use-toast";
@@ -69,6 +70,7 @@ function ConfirmModal({ open, onConfirm, onCancel, month, action }) {
 }
 
 export default function PaymentGrid({ memberId }) {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [pending, setPending] = useState(null);
@@ -222,7 +224,13 @@ export default function PaymentGrid({ memberId }) {
               </span>
 
               <button
-                onClick={() => handleClick(idx, isPaid)}
+                onClick={() => {
+                  if (isPaid) {
+                    handleClick(idx, isPaid);
+                  } else {
+                    navigate(`/payments/new?memberId=${memberId}&monthIndex=${idx}`);
+                  }
+                }}
                 disabled={toggleMutation.isPending}
                 className={`w-full py-1 text-[9px] font-bold rounded-lg tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
                   isPaid

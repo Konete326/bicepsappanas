@@ -19,12 +19,42 @@ exports.createPayment = catchAsync(async (req, res, next) => {
     });
 
     const monthToUpdate = monthIndex !== undefined ? Number(monthIndex) : new Date().getMonth();
-    member.paymentGrid.set(String(monthToUpdate), true);
-    member.status = "Active";
     const planDuration = member.planLink?.duration || 1;
-    const renewal = new Date(member.renewalDate);
-    renewal.setMonth(renewal.getMonth() + planDuration);
+    
+    for (let i = 0; i < planDuration; i++) {
+        const mIdx = (monthToUpdate + i) % 12;
+        member.paymentGrid.set(String(mIdx), true);
+    }
+
+    let highestPaidMonth = -1;
+    for (const [key, val] of member.paymentGrid.entries()) {
+        if (val === true) {
+            const mIdx = Number(key);
+            if (mIdx > highestPaidMonth) {
+                highestPaidMonth = mIdx;
+            }
+        }
+    }
+
+    const renewal = new Date(member.joiningDate);
+    if (highestPaidMonth !== -1) {
+        const originalDay = renewal.getDate();
+        renewal.setMonth(highestPaidMonth + 1);
+        renewal.setDate(originalDay);
+    }
     member.renewalDate = renewal;
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const renewalZero = new Date(renewal);
+    renewalZero.setHours(0,0,0,0);
+
+    if (renewalZero > today) {
+        member.status = "Active";
+    } else {
+        member.status = "Expired";
+    }
+
     await member.save();
 
     const Notification = require("../model/notification");

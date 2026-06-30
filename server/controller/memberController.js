@@ -62,9 +62,6 @@ exports.updateMember = catchAsync(async (req, res, next) => {
     if (req.body.address === "") req.body.address = undefined;
     if (!req.body.cnic?.trim()) delete req.body.cnic;
 
-    if (req.body.joiningDate) {
-        req.body.renewalDate = req.body.joiningDate;
-    }
 
     const member = await Member.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!member) return next(new AppError("Member not found", 404));
@@ -103,6 +100,36 @@ exports.togglePaymentGrid = catchAsync(async (req, res, next) => {
     if (!member) return next(new AppError("Member not found", 404));
     const current = member.paymentGrid.get(String(monthIndex)) || false;
     member.paymentGrid.set(String(monthIndex), !current);
+
+    let highestPaidMonth = -1;
+    for (const [key, val] of member.paymentGrid.entries()) {
+        if (val === true) {
+            const mIdx = Number(key);
+            if (mIdx > highestPaidMonth) {
+                highestPaidMonth = mIdx;
+            }
+        }
+    }
+
+    const renewal = new Date(member.joiningDate);
+    if (highestPaidMonth !== -1) {
+        const originalDay = renewal.getDate();
+        renewal.setMonth(highestPaidMonth + 1);
+        renewal.setDate(originalDay);
+    }
+    member.renewalDate = renewal;
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const renewalZero = new Date(renewal);
+    renewalZero.setHours(0,0,0,0);
+
+    if (renewalZero > today) {
+        member.status = "Active";
+    } else {
+        member.status = "Expired";
+    }
+
     await member.save();
     res.status(200).json({ status: "success", data: member.paymentGrid });
 });
