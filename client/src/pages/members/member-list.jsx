@@ -210,10 +210,10 @@ export default function MemberList() {
                   
                   let matchesToday = true;
                   if (showTodayOnly && member.joiningDate) {
-                    const formatter = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Asia/Karachi' });
-                    const karachiToday = formatter.format(new Date());
-                    const memberDateStr = formatter.format(new Date(member.joiningDate));
-                    matchesToday = karachiToday === memberDateStr;
+                    const formatter = new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'Asia/Karachi' });
+                    const todayDay = Number(formatter.format(new Date()));
+                    const memberDay = Number(formatter.format(new Date(member.joiningDate)));
+                    matchesToday = todayDay === memberDay;
                   }
                   
                   return matchesPayment && matchesGender && matchesDate && matchesType && matchesToday;
