@@ -17,6 +17,7 @@ export default function MemberList() {
   const [status, setStatus] = useState("all");
   const [paymentStatus, setPaymentStatus] = useState("all");
   const [gender, setGender] = useState("all");
+  const [joiningDateFilter, setJoiningDateFilter] = useState("");
   const [confirmState, setConfirmState] = useState({ open: false, id: null, name: "" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -97,7 +98,7 @@ export default function MemberList() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-        <div className="relative sm:col-span-3">
+        <div className="relative sm:col-span-4">
           <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
           <Input
             placeholder="Search Roll No or Name..."
@@ -106,7 +107,7 @@ export default function MemberList() {
             className="pl-9"
           />
         </div>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-2">
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Filter Status" />
@@ -119,7 +120,7 @@ export default function MemberList() {
             </SelectContent>
           </Select>
         </div>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-2">
           <Select value={paymentStatus} onValueChange={setPaymentStatus}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Filter Payment" />
@@ -132,7 +133,7 @@ export default function MemberList() {
             </SelectContent>
           </Select>
         </div>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-2">
           <Select value={gender} onValueChange={setGender}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Filter Gender" />
@@ -144,6 +145,15 @@ export default function MemberList() {
               <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div className="sm:col-span-2">
+          <Input
+            type="date"
+            value={joiningDateFilter}
+            onChange={(e) => setJoiningDateFilter(e.target.value)}
+            className="w-full"
+            placeholder="Joining Date"
+          />
         </div>
       </div>
 
@@ -173,7 +183,14 @@ export default function MemberList() {
                 const filteredList = list.filter((member) => {
                   const matchesPayment = paymentStatus === "all" || getPaymentStatus(member.renewalDate).value === paymentStatus;
                   const matchesGender = gender === "all" || member.gender === gender;
-                  return matchesPayment && matchesGender;
+                  
+                  let matchesDate = true;
+                  if (joiningDateFilter && member.joiningDate) {
+                    const mDateStr = new Date(member.joiningDate).toISOString().split('T')[0];
+                    matchesDate = mDateStr === joiningDateFilter;
+                  }
+                  
+                  return matchesPayment && matchesGender && matchesDate;
                 });
                 if (filteredList.length === 0) {
                   return (
